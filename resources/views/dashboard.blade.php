@@ -633,7 +633,7 @@
     </div>
 @endif
 
-            <!-- Stats Cards -->
+            <!-- Stats Cards 
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <div class="stat-icon">
@@ -670,17 +670,17 @@
                         <i class="fas fa-exchange-alt"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>1/1</h3>
+                        <h3>1/1</h3>    
                         <p>Free Transfers</p>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
-            <!-- Main Dashboard Grid -->
+            <!-- Main Dashboard Grid
             <div class="dashboard-grid">
-                <!-- Left Column -->
+                 Left Column 
                 <div class="left-column">
-                    <!-- My Team Card -->
+                     My Team Card 
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">My Team</h3>
@@ -737,9 +737,8 @@
                             </li>
                         </ul>
                     </div>
-                    
-                   
-                            <!-- Upcoming Fixtures Section -->
+                
+                             Upcoming Fixtures Section -->
 @if(isset($upcomingFixtures) && count($upcomingFixtures) > 0)
     <div class="card">
         <div class="card-header">
@@ -832,7 +831,7 @@
                                         <span>Your Team</span>
                                     </div>
                                 </div>
-                                <div class="player-points">224</div>
+                                <div class="player-points">0</div>
                             </li>
                         </ul>
                     </div>

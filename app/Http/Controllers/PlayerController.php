@@ -4,23 +4,52 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Player;
-use App\Models\Team;
+use App\Models\FantasyTeam;
 
 class PlayerController extends Controller
 {
     /**
-     * Display a listing of players.
+     * Display a listing of the resource.
      */
     public function index()
     {
+        $players = Player::with('team')->get();
+        return view('players.index', compact('players'));
+    }
+
+    /**
+     * Show the form for selecting players by position.
+     */
+    public function select($position)
+    {
         $players = Player::with('team')
-            ->orderBy('total_points', 'desc')
-            ->paginate(20);
+            ->where('position', ucfirst($position))
+            ->get();
             
-        $positions = Player::select('position')->distinct()->pluck('position');
-        $teams = Team::select('id', 'name')->get();
-        
-        return view('players.index', compact('players', 'positions', 'teams'));
+        return view('players.select', compact('players', 'position'));
+    }
+
+    /**
+     * Add a player to the user's fantasy team.
+     */
+    public function addToTeam(Request $request)
+    {
+        $validated = $request->validate([
+            'player_id' => 'required|exists:players,id',
+            'position' => 'required|in:goalkeeper,defender,midfielder,forward'
+        ]);
+
+        // Get or create user's fantasy team
+        $fantasyTeam = FantasyTeam::firstOrCreate(
+            ['user_id' => auth()->id()],
+            ['name' => auth()->user()->name . "'s Team", 'budget' => 100.00]
+        );
+
+        // Add player to team (you'll need to implement this logic)
+        // This is a simplified version - you'll need to handle position limits, budget, etc.
+
+        return redirect()->route('fantasy-team.index')
+            ->with('success', 'Player added to your team!');
     }
 
     /**
@@ -28,52 +57,23 @@ class PlayerController extends Controller
      */
     public function search(Request $request)
     {
-        $query = Player::with('team');
-        
-        if ($request->has('name') && $request->name) {
-            $query->where('name', 'like', '%' . $request->name . '%');
-        }
-        
-        if ($request->has('position') && $request->position) {
-            $query->where('position', $request->position);
-        }
-        
-        if ($request->has('team_id') && $request->team_id) {
-            $query->where('team_id', $request->team_id);
-        }
-        
-        if ($request->has('min_price') && $request->min_price) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        
-        if ($request->has('max_price') && $request->max_price) {
-            $query->where('price', '<=', $request->max_price);
-        }
-        
-        $players = $query->orderBy('total_points', 'desc')->paginate(20);
-        
-        $positions = Player::select('position')->distinct()->pluck('position');
-        $teams = Team::select('id', 'name')->get();
-        
-        return view('players.search', compact('players', 'positions', 'teams'));
+        $query = $request->get('query');
+        $players = Player::with('team')
+            ->where('name', 'LIKE', "%{$query}%")
+            ->orWhereHas('team', function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%");
+            })
+            ->get();
+
+        return view('players.search', compact('players', 'query'));
     }
 
     /**
-     * Display the specified player.
+     * Display the specified resource.
      */
     public function show(Player $player)
     {
-        $player->load('team', 'fixtures');
-        
-        // Get similar players (same position, similar price)
-        $similarPlayers = Player::where('position', $player->position)
-            ->where('id', '!=', $player->id)
-            ->whereBetween('price', [$player->price - 2, $player->price + 2])
-            ->orderBy('total_points', 'desc')
-            ->take(5)
-            ->get();
-        
-        return view('players.show', compact('player', 'similarPlayers'));
+        return view('players.show', compact('player'));
     }
 
     /**
@@ -81,19 +81,10 @@ class PlayerController extends Controller
      */
     public function byPosition($position)
     {
-        $validPositions = ['GK', 'DEF', 'MID', 'FWD'];
-        
-        if (!in_array($position, $validPositions)) {
-            return redirect()->route('players.index')->with('error', 'Invalid position specified.');
-        }
-        
         $players = Player::with('team')
-            ->where('position', $position)
-            ->orderBy('total_points', 'desc')
-            ->paginate(20);
-            
-        $teams = Team::select('id', 'name')->get();
-        
-        return view('players.by-position', compact('players', 'position', 'teams'));
+            ->where('position', ucfirst($position))
+            ->get();
+
+        return view('players.by-position', compact('players', 'position'));
     }
 }

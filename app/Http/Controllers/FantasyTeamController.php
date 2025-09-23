@@ -14,60 +14,62 @@ class FantasyTeamController extends Controller
      */
     public function index()
     {
-        // Iegūst lietotāja fantāzijas komandu
+        // Get the user's fantasy team with players
         $fantasyTeam = Auth::user()->fantasyTeam;
         
         return view('fantasy-team.index', compact('fantasyTeam'));
     }
-
-    /**
+    /** 
      * Parāda formu jauna resursa izveidei.
      */
-    public function create()
-    {
-        // Pārbauda, vai lietotājam jau ir komanda
-        if (Auth::user()->fantasyTeam) {
-            return redirect()->route('fantasy-team.index')
-                ->with('error', 'Jums jau ir fantāzijas komanda!');
-        }
-        
-        // Iegūst spēlētājus izvēlei
-        $players = Player::all();
-        
-        return view('fantasy-team.create', compact('players'));
-    }
-
     /**
-     * Saglabā tikko izveidotu resursu datubāzē.
-     */
-    public function store(Request $request)
-    {
-        // Validē pieprasījumu
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'players' => 'required|array|size:15', // Komandā ir 15 spēlētāji
-            'players.*' => 'exists:players,id',
-            'captain_id' => 'required|exists:players,id'
-        ]);
-        
-        // Izveido fantāzijas komandu
-        $fantasyTeam = FantasyTeam::create([
-            'name' => $validated['name'],
-            'user_id' => Auth::id(),
-            'budget' => 100.00, // Sākuma budžets
-        ]);
-        
-        // Pievieno spēlētājus komandai
-        $fantasyTeam->players()->attach($validated['players']);
-        
-        // Uzstāda kapteini
-        $fantasyTeam->players()->updateExistingPivot($validated['captain_id'], [
-            'is_captain' => true
-        ]);
-        
+ * Show the form for creating a new resource.
+ */
+public function create()
+{
+    // Check if user already has a team
+    if (Auth::user()->fantasyTeam) {
         return redirect()->route('fantasy-team.index')
-            ->with('success', 'Fantāzijas komanda veiksmīgi izveidota!');
+            ->with('error', 'You already have a fantasy team!');
     }
+    
+    return view('fantasy-team.create');
+}
+
+/**
+ * Store a newly created resource in storage.
+ */
+public function store(Request $request)
+{
+    // Validate the request
+    $validated = $request->validate([
+        'team_name' => 'required|string|max:255',
+        'formation' => 'required|string',
+        'players' => 'required|array|size:15', // 11 starters + 4 subs
+        'players.*' => 'exists:players,id',
+        'captain_id' => 'required|exists:players,id'
+    ]);
+    
+    // Create the fantasy team
+    $fantasyTeam = FantasyTeam::create([
+        'name' => $validated['team_name'],
+        'user_id' => Auth::id(),
+        'formation' => $validated['formation'],
+        'budget' => 100.00,
+        'total_points' => 0
+    ]);
+    
+    // Attach players to the team
+    $fantasyTeam->players()->attach($validated['players']);
+    
+    // Set captain
+    $fantasyTeam->players()->updateExistingPivot($validated['captain_id'], [
+        'is_captain' => true
+    ]);
+    
+    return redirect()->route('fantasy-team.index')
+        ->with('success', 'Fantasy team created successfully!');
+}
 
     /**
      * Parāda norādīto resursu.

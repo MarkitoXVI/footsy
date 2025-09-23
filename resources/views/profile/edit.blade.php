@@ -508,15 +508,15 @@
 
             <div class="profile-stats">
                 <div class="stat-item">
-                    <div class="stat-value">124</div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Global Rank</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">1,248</div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Total Points</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">3</div>
+                    <div class="stat-value">0</div>
                     <div class="stat-label">Leagues Joined</div>
                 </div>
             </div>

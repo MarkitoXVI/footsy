@@ -4,30 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\League;
-use App\Models\Team;
 
 class LeagueController extends Controller
 {
+    // Temporary storage for demo (in real app, use database)
+    private static $leagues = [];
+    
     /**
-     * Display a listing of leagues.
+     * Display a listing of the resource.
      */
     public function index()
     {
-        $user = Auth::user();
-        $team = $user->team;
+        // Get user's joined leagues
+        $userLeagues = array_filter(self::$leagues, function($league) {
+            return in_array(Auth::id(), $league['members'] ?? []);
+        });
         
-        $leagues = League::with(['teams' => function($query) {
-            $query->orderBy('points', 'desc');
-        }])->get();
+        // Get other available leagues
+        $otherLeagues = array_filter(self::$leagues, function($league) {
+            return !in_array(Auth::id(), $league['members'] ?? []);
+        });
         
-        $userLeagues = $team ? $team->leagues : collect();
-        
-        return view('leagues.index', compact('leagues', 'userLeagues', 'team'));
+        return view('leagues.index', compact('userLeagues', 'otherLeagues'));
     }
 
     /**
-     * Show the form for creating a new league.
+     * Show the form for creating a new resource.
      */
     public function create()
     {
@@ -35,141 +37,91 @@ class LeagueController extends Controller
     }
 
     /**
-     * Store a newly created league.
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $team = $user->team;
-        
-        if (!$team) {
-            return redirect()->route('team.create')->with('error', 'You need to create a team first!');
-        }
-        
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_private' => 'boolean',
-            'password' => 'nullable|string|min:4|required_if:is_private,true',
+            'league_name' => 'required|string|max:255',
+            'league_description' => 'required|string',
+            'max_participants' => 'required|integer|min:2|max:100',
+            'privacy' => 'required|in:public,private',
+            'custom_rules' => 'nullable|string',
         ]);
         
-        $league = League::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'is_private' => $validated['is_private'] ?? false,
-            'password' => $validated['password'] ?? null,
-            'admin_id' => $user->id,
-        ]);
+        // Generate unique league code
+        $leagueCode = strtoupper(substr(md5(uniqid()), 0, 6));
         
-        // Add the creator's team to the league
-        $league->teams()->attach($team->id);
+        // Create new league
+        $league = [
+            'id' => count(self::$leagues) + 1,
+            'name' => $validated['league_name'],
+            'description' => $validated['league_description'],
+            'max_participants' => $validated['max_participants'],
+            'privacy' => $validated['privacy'],
+            'custom_rules' => $validated['custom_rules'] ?? '',
+            'code' => $leagueCode,
+            'admin_id' => Auth::id(),
+            'admin_name' => Auth::user()->name,
+            'created_at' => now()->format('F j, Y'),
+            'members' => [Auth::id()], // Admin is automatically a member
+            'participant_count' => 1,
+            'allow_transfers' => $request->has('allow_transfers'),
+            'use_wildcards' => $request->has('use_wildcards'),
+            'show_rankings' => $request->has('show_rankings'),
+        ];
         
-        return redirect()->route('leagues.show', $league)->with('status', 'League created successfully!');
+        // Add to leagues array
+        self::$leagues[] = $league;
+        
+        return redirect()->route('leagues.index')
+            ->with('success', 'League created successfully! League code: ' . $leagueCode);
     }
 
     /**
-     * Display the specified league.
+     * Join a league.
      */
-    public function show(League $league)
+    public function join($leagueId)
     {
-        $league->load(['teams' => function($query) {
-            $query->orderBy('points', 'desc');
-        }, 'admin']);
+        $league = collect(self::$leagues)->firstWhere('id', $leagueId);
         
-        $user = Auth::user();
-        $userTeam = $user->team;
-        $isMember = $userTeam ? $league->teams->contains($userTeam->id) : false;
-        
-        return view('leagues.show', compact('league', 'isMember'));
-    }
-
-    /**
-     * Show the form for joining a league.
-     */
-    public function join(League $league)
-    {
-        $user = Auth::user();
-        $team = $user->team;
-        
-        if (!$team) {
-            return redirect()->route('team.create')->with('error', 'You need to create a team first!');
-        }
-        
-        $isMember = $league->teams->contains($team->id);
-        
-        if ($isMember) {
-            return redirect()->route('leagues.show', $league)->with('info', 'You are already a member of this league.');
-        }
-        
-        return view('leagues.join', compact('league'));
-    }
-
-    /**
-     * Process joining a league.
-     */
-    public function processJoin(Request $request, League $league)
-    {
-        $user = Auth::user();
-        $team = $user->team;
-        
-        if (!$team) {
-            return redirect()->route('team.create')->with('error', 'You need to create a team first!');
-        }
-        
-        // Check if league is private and requires password
-        if ($league->is_private) {
-            $validated = $request->validate([
-                'password' => 'required|string',
-            ]);
+        if ($league && !in_array(Auth::id(), $league['members'])) {
+            $league['members'][] = Auth::id();
+            $league['participant_count']++;
             
-            if ($validated['password'] !== $league->password) {
-                return redirect()->back()->with('error', 'Incorrect password for this private league.');
+            // Update the league in the array
+            $key = array_search($league, self::$leagues);
+            if ($key !== false) {
+                self::$leagues[$key] = $league;
             }
         }
         
-        // Add team to league
-        $league->teams()->attach($team->id);
-        
-        return redirect()->route('leagues.show', $league)->with('status', 'Successfully joined the league!');
-    }
-
-    /**
-     * Display league standings.
-     */
-    public function standings(League $league)
-    {
-        $league->load(['teams' => function($query) {
-            $query->orderBy('points', 'desc');
-        }]);
-        
-        return view('leagues.standings', compact('league'));
+        return redirect()->route('leagues.index')
+            ->with('success', 'Successfully joined the league!');
     }
 
     /**
      * Leave a league.
      */
-    public function leave(League $league)
+    public function leave($leagueId)
     {
-        $user = Auth::user();
-        $team = $user->team;
+        $league = collect(self::$leagues)->firstWhere('id', $leagueId);
         
-        if ($team && $league->teams->contains($team->id)) {
-            $league->teams()->detach($team->id);
-            
-            // If the league admin is leaving, assign new admin or delete if empty
-            if ($league->admin_id === $user->id) {
-                $newAdmin = $league->teams()->first();
-                if ($newAdmin) {
-                    $league->update(['admin_id' => $newAdmin->user_id]);
-                } else {
-                    $league->delete();
-                    return redirect()->route('leagues.index')->with('status', 'League deleted as you were the last member.');
+        if ($league && in_array(Auth::id(), $league['members'])) {
+            $key = array_search(Auth::id(), $league['members']);
+            if ($key !== false) {
+                unset($league['members'][$key]);
+                $league['participant_count']--;
+                
+                // Update the league in the array
+                $arrayKey = array_search($league, self::$leagues);
+                if ($arrayKey !== false) {
+                    self::$leagues[$arrayKey] = $league;
                 }
             }
-            
-            return redirect()->route('leagues.index')->with('status', 'Successfully left the league.');
         }
         
-        return redirect()->back()->with('error', 'You are not a member of this league.');
+        return redirect()->route('leagues.index')
+            ->with('success', 'Successfully left the league!');
     }
 }

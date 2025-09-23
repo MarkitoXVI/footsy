@@ -43,25 +43,34 @@ Route::middleware('auth')->group(function () {
     // Fantasy Team Management Routes
     Route::prefix('fantasy-team')->group(function () {
         Route::get('/', [FantasyTeamController::class, 'index'])->name('fantasy-team.index');
-        Route::get('/create', [FantasyTeamController::class, 'create'])->name('fantasy-team.create');
-        Route::post('/', [FantasyTeamController::class, 'store'])->name('fantasy-team.store');
+        Route::get('/fantasy-team/create', [FantasyTeamController::class, 'create'])->name('fantasy-team.create');
+        Route::post('/fantasy-team', [FantasyTeamController::class, 'store'])->name('fantasy-team.store');
         Route::get('/{fantasy_team}', [FantasyTeamController::class, 'show'])->name('fantasy-team.show');
         Route::get('/{fantasy_team}/edit', [FantasyTeamController::class, 'edit'])->name('fantasy-team.edit');
         Route::put('/{fantasy_team}', [FantasyTeamController::class, 'update'])->name('fantasy-team.update');
         Route::delete('/{fantasy_team}', [FantasyTeamController::class, 'destroy'])->name('fantasy-team.destroy');
         Route::post('/{fantasy_team}/select-captain', [FantasyTeamController::class, 'selectCaptain'])->name('fantasy-team.select-captain');
     });
+
+    // Player Selection Routes (NEW - Add these)
+    Route::prefix('players')->group(function () {
+        Route::get('/', [PlayerController::class, 'index'])->name('players.index');
+        Route::get('/select/{position}', [PlayerController::class, 'select'])->name('players.select');
+        Route::post('/add-to-team', [PlayerController::class, 'addToTeam'])->name('players.add-to-team');
+        Route::get('/search', [PlayerController::class, 'search'])->name('players.search');
+        Route::get('/{player}', [PlayerController::class, 'show'])->name('players.show');
+        Route::get('/position/{position}', [PlayerController::class, 'byPosition'])->name('players.by-position');
+    });
+    
     
     // League Routes
-    Route::prefix('leagues')->group(function () {
-        Route::get('/', [LeagueController::class, 'index'])->name('leagues.index');
-        Route::get('/create', [LeagueController::class, 'create'])->name('leagues.create');
-        Route::post('/', [LeagueController::class, 'store'])->name('leagues.store');
-        Route::get('/{league}', [LeagueController::class, 'show'])->name('leagues.show');
-        Route::get('/{league}/join', [LeagueController::class, 'join'])->name('leagues.join');
-        Route::get('/{league}/standings', [LeagueController::class, 'standings'])->name('leagues.standings');
-        Route::delete('/{league}/leave', [LeagueController::class, 'leave'])->name('leagues.leave');
-    });
+   Route::prefix('leagues')->group(function () {
+    Route::get('/', [LeagueController::class, 'index'])->name('leagues.index');
+    Route::get('/create', [LeagueController::class, 'create'])->name('leagues.create');
+    Route::post('/', [LeagueController::class, 'store'])->name('leagues.store');
+    Route::get('/{league}/join', [LeagueController::class, 'join'])->name('leagues.join');
+    Route::get('/{league}/leave', [LeagueController::class, 'leave'])->name('leagues.leave');
+});
     
     // Player Routes
     Route::prefix('players')->group(function () {

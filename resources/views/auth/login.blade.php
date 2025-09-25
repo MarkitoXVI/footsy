@@ -540,7 +540,7 @@
                             <span>Or sign in with</span>
                         </div>
                         
-                        <a href="#" class="btn btn-google">
+                        <a href="{{ route('google.login') }}" class="btn btn-google">
                             <i class="fab fa-google"></i>
                             Sign in with Google
                         </a>

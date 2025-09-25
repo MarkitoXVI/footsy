@@ -41,35 +41,29 @@ public function create()
  */
 public function store(Request $request)
 {
-    // Validate the request
-    $validated = $request->validate([
-        'team_name' => 'required|string|max:255',
+    $data = $request->validate([
+        'team_name' => 'required|string|max:30',
         'formation' => 'required|string',
-        'players' => 'required|array|size:15', // 11 starters + 4 subs
-        'players.*' => 'exists:players,id',
-        'captain_id' => 'required|exists:players,id'
+        'players.goalkeeper' => 'required|integer',
+        'players.defenders' => 'required|array',
+        'players.midfielders' => 'required|array',
+        'players.forwards' => 'required|array',
+        'players.substitutes' => 'required|array',
+        'total_budget' => 'required|numeric',
+        'spent_budget' => 'required|numeric',
     ]);
-    
-    // Create the fantasy team
-    $fantasyTeam = FantasyTeam::create([
-        'name' => $validated['team_name'],
-        'user_id' => Auth::id(),
-        'formation' => $validated['formation'],
-        'budget' => 100.00,
-        'total_points' => 0
-    ]);
-    
-    // Attach players to the team
-    $fantasyTeam->players()->attach($validated['players']);
-    
-    // Set captain
-    $fantasyTeam->players()->updateExistingPivot($validated['captain_id'], [
-        'is_captain' => true
-    ]);
-    
-    return redirect()->route('fantasy-team.index')
-        ->with('success', 'Fantasy team created successfully!');
-}
+
+    // Save the team (adjust to your DB structure)
+    $team = new FantasyTeam();
+    $team->user_id = auth()->id();
+    $team->name = $data['team_name'];
+    $team->formation = $data['formation'];
+    $team->players = json_encode($data['players']);
+    $team->total_budget = $data['total_budget'];
+    $team->spent_budget = $data['spent_budget'];
+    $team->save();
+
+return response()->json(['success' => true, 'team_id' => $team->id]);}
 
     /**
      * Parāda norādīto resursu.

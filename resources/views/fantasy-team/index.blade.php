@@ -618,9 +618,6 @@
         <div class="team-content">
             <div class="team-header">
                 <h1 class="team-title">My Fantasy Team</h1>
-                <a href="{{ route('fantasy-team.create') }}" class="create-team-btn">
-                    <i class="fas fa-plus"></i> Create Team
-                </a>
             </div>
 
             <!-- Success Message -->

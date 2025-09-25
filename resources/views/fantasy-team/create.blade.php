@@ -657,6 +657,16 @@
             display: none;
         }
         
+        /* Loading Spinner */
+        .fa-spin {
+            animation: fa-spin 2s infinite linear;
+        }
+        
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Responsive Design */
         @media (max-width: 1200px) {
             .team-layout {
@@ -832,6 +842,14 @@
                 <h1 class="team-creation-title">Create Your Fantasy Team</h1>
                 <p class="team-creation-subtitle">Select 11 starting players and 4 substitutes within your £100M budget</p>
             </div>
+
+            <!-- Team Name Input -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="teamName" style="font-weight:600;display:block;margin-bottom:0.5rem;">Team Name</label>
+                <input type="text" id="teamName" name="team_name" maxlength="30" placeholder="Enter your team name"
+                    style="width:100%;max-width:400px;padding:0.75rem 1rem;border:1px solid var(--light-gray);border-radius:8px;font-size:1rem;">
+            </div>
+            <!-- End Team Name Input -->
 
             <!-- Budget Display -->
             <div class="budget-display">
@@ -1125,7 +1143,7 @@
         // Render existing players
         function renderExistingPlayers() {
             // Render goalkeeper
-            renderPlayerSlot('gk', 0, 'goalkeeper');
+            renderPlayerSlot('gk', 'gk', 'goalkeeper');
             
             // Render defenders
             teamData.players.defenders.forEach((player, index) => {
@@ -1154,11 +1172,22 @@
             currentSlot = slot;
             selectedPlayer = null;
             
-            document.getElementById('modalTitle').textContent = `Select ${position.charAt(0).toUpperCase() + position.slice(1)}`;
+            // Set correct modal title based on position
+            let modalTitle = '';
+            if (slot === 'sub1' || slot === 'sub2' || slot === 'sub3' || slot === 'sub4') {
+                modalTitle = `Select Substitute ${position.charAt(0).toUpperCase() + position.slice(1)}`;
+            } else {
+                modalTitle = `Select ${position.charAt(0).toUpperCase() + position.slice(1)}`;
+            }
+            
+            document.getElementById('modalTitle').textContent = modalTitle;
             document.getElementById('playersGrid').innerHTML = '';
             
+            // Use correct position key for goalkeepers
+            const positionKey = position === 'goalkeeper' ? 'goalkeeper' : position;
+            
             // Filter players by position and sort by price
-            const availablePlayers = playersData[position]
+            const availablePlayers = playersData[positionKey]
                 .filter(player => !isPlayerInTeam(player.id))
                 .sort((a, b) => b.price - a.price);
             
@@ -1239,7 +1268,14 @@
             teamData.spentBudget += selectedPlayer.price;
             
             // Update UI
-            renderPlayerSlot(currentSlot, currentSlot, currentPosition);
+            if (currentSlot === 'sub1' || currentSlot === 'sub2' || currentSlot === 'sub3' || currentSlot === 'sub4') {
+                renderSubstituteSlot(currentSlot);
+            } else if (currentPosition === 'goalkeeper') {
+                renderPlayerSlot('gk', 'gk', 'goalkeeper');
+            } else {
+                renderPlayerSlot(currentSlot, currentSlot, currentPosition);
+            }
+            
             updateBudgetDisplay();
             checkTeamCompletion();
             closePlayerModal();
@@ -1268,27 +1304,43 @@
                     benchPlayer.querySelector('.bench-price').textContent = '';
                 }
             } else {
+                // Handle goalkeeper with different ID structure
                 if (position === 'goalkeeper') {
                     player = teamData.players.gk;
-                } else if (position === 'defender') {
-                    player = teamData.players.defenders[index];
-                } else if (position === 'midfielder') {
-                    player = teamData.players.midfielders[index];
-                } else if (position === 'forward') {
-                    player = teamData.players.forwards[index];
-                }
-                
-                const avatar = document.getElementById(`${position}-avatar-${index}`);
-                const name = document.getElementById(`${position}-name-${index}`);
-                
-                if (player) {
-                    avatar.className = 'player-avatar filled';
-                    avatar.innerHTML = player.team + '<div class="player-price">£' + player.price + 'M</div>';
-                    name.textContent = player.name;
+                    const avatar = document.getElementById('gk-avatar');
+                    const name = document.getElementById('gk-name');
+                    
+                    if (player) {
+                        avatar.className = 'player-avatar filled';
+                        avatar.innerHTML = player.team + '<div class="player-price">£' + player.price + 'M</div>';
+                        name.textContent = player.name;
+                    } else {
+                        avatar.className = 'player-avatar empty';
+                        avatar.innerHTML = '<i class="fas fa-plus"></i>';
+                        name.textContent = '';
+                    }
                 } else {
-                    avatar.className = 'player-avatar empty';
-                    avatar.innerHTML = '<i class="fas fa-plus"></i>';
-                    name.textContent = '';
+                    // Handle other positions normally
+                    if (position === 'defender') {
+                        player = teamData.players.defenders[index];
+                    } else if (position === 'midfielder') {
+                        player = teamData.players.midfielders[index];
+                    } else if (position === 'forward') {
+                        player = teamData.players.forwards[index];
+                    }
+                    
+                    const avatar = document.getElementById(`${position}-avatar-${index}`);
+                    const name = document.getElementById(`${position}-name-${index}`);
+                    
+                    if (player) {
+                        avatar.className = 'player-avatar filled';
+                        avatar.innerHTML = player.team + '<div class="player-price">£' + player.price + 'M</div>';
+                        name.textContent = player.name;
+                    } else {
+                        avatar.className = 'player-avatar empty';
+                        avatar.innerHTML = '<i class="fas fa-plus"></i>';
+                        name.textContent = '';
+                    }
                 }
             }
         }
@@ -1296,14 +1348,39 @@
         // Render substitute slot
         function renderSubstituteSlot(slot) {
             const player = teamData.players.substitutes[slot];
-            const benchPlayer = document.querySelector(`[onclick*="${slot}"]`);
+            
+            // Find the correct bench player element
+            const benchPlayers = document.querySelectorAll('.bench-player');
+            let benchPlayer = null;
+            
+            benchPlayers.forEach(bp => {
+                if (bp.onclick && bp.onclick.toString().includes(slot)) {
+                    benchPlayer = bp;
+                }
+            });
+            
+            if (!benchPlayer) return;
             
             if (player) {
                 benchPlayer.classList.add('filled');
-                benchPlayer.querySelector('.bench-avatar').className = 'bench-avatar filled';
-                benchPlayer.querySelector('.bench-avatar').textContent = player.team;
-                benchPlayer.querySelector('.bench-name').textContent = player.name;
-                benchPlayer.querySelector('.bench-price').textContent = `£${player.price}M`;
+                const avatar = benchPlayer.querySelector('.bench-avatar');
+                const name = benchPlayer.querySelector('.bench-name');
+                const price = benchPlayer.querySelector('.bench-price');
+                
+                avatar.className = 'bench-avatar filled';
+                avatar.textContent = player.team;
+                name.textContent = player.name;
+                price.textContent = `£${player.price}M`;
+            } else {
+                benchPlayer.classList.remove('filled');
+                const avatar = benchPlayer.querySelector('.bench-avatar');
+                const name = benchPlayer.querySelector('.bench-name');
+                const price = benchPlayer.querySelector('.bench-price');
+                
+                avatar.className = 'bench-avatar empty';
+                avatar.innerHTML = '<i class="fas fa-plus"></i>';
+                name.textContent = 'Select Player';
+                price.textContent = '';
             }
         }
 
@@ -1376,18 +1453,66 @@
             document.getElementById('validationError').style.display = 'none';
         }
 
-        // Create team (simulate form submission)
+        // Create team (actual form submission)
         function createTeam() {
             // Validate team
             if (teamData.spentBudget > teamData.totalBudget) {
                 showError('Team exceeds budget limit!');
                 return;
             }
-            
-            // Show success message and redirect
-            alert('Team created successfully!');
-            window.location.href = "{{ route('fantasy-team.index') }}";
+
+            const teamName = document.getElementById('teamName').value.trim();
+            if (!teamName) {
+                showError('Please enter a team name.');
+                return;
+            }
+
+            // Prepare team data for submission
+            const teamSubmission = {
+                team_name: teamName,
+                formation: teamData.formation,
+                players: {
+                    goalkeeper: teamData.players.gk ? teamData.players.gk.id : null,
+                    defenders: teamData.players.defenders.map(def => def ? def.id : null),
+                    midfielders: teamData.players.midfielders.map(mid => mid ? mid.id : null),
+                    forwards: teamData.players.forwards.map(fwd => fwd ? fwd.id : null),
+                    substitutes: {
+                        sub1: teamData.players.substitutes.sub1 ? teamData.players.substitutes.sub1.id : null,
+                        sub2: teamData.players.substitutes.sub2 ? teamData.players.substitutes.sub2.id : null,
+                        sub3: teamData.players.substitutes.sub3 ? teamData.players.substitutes.sub3.id : null,
+                        sub4: teamData.players.substitutes.sub4 ? teamData.players.substitutes.sub4.id : null
+                    }
+                },
+                total_budget: teamData.totalBudget,
+                spent_budget: teamData.spentBudget
+            };
+
+            // Show loading state
+            const createButton = document.getElementById('createTeamBtn');
+            createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Team...';
+            createButton.disabled = true;
+
+            // Submit team data to server
+            fetch('/fantasy-team', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(teamSubmission)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.team_id) {
+            window.location.href = `/fantasy-team/${data.team_id}`;
+        } else {
+            showError('Failed to create team. Please try again.');
         }
+    })
+    .catch(() => {
+        showError('Failed to create team. Please try again.');
+    });
+}
     </script>
 </body>
 </html>

@@ -14,21 +14,13 @@ class TransferController extends Controller
      * Display a listing of transfers.
      */
     public function index()
-    {
-        $user = Auth::user();
-        $team = $user->team;
-        
-        if (!$team) {
-            return redirect()->route('team.create')->with('error', 'You need to create a team first!');
-        }
-        
-        $team->load('players');
-        
-        $remainingBudget = $team->budget;
-        $freeTransfers = 1; // This would be calculated based on game rules
-        
-        return view('transfers.index', compact('team', 'remainingBudget', 'freeTransfers'));
-    }
+{
+    $user = Auth::user();
+    $fantasyTeam = FantasyTeam::where('user_id', $user->id)->with('players')->first();
+    $allPlayers = Player::all();
+    
+    return view('transfers.index', compact('fantasyTeam', 'allPlayers'));
+}
 
     /**
      * Show the form for making a transfer.

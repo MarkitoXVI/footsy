@@ -9,6 +9,7 @@ use App\Http\Controllers\FixtureController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,7 +90,7 @@ Route::middleware('auth')->group(function () {
     
     // Transfer Routes
     Route::prefix('transfers')->group(function () {
-        Route::get('/', [TransferController::class, 'index'])->name('transfers.index');
+        Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
         Route::get('/make', [TransferController::class, 'create'])->name('transfers.create');
         Route::post('/', [TransferController::class, 'store'])->name('transfers.store');
         Route::get('/history', [TransferController::class, 'history'])->name('transfers.history');
@@ -111,6 +112,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/points', [DashboardController::class, 'points'])->name('points');
     Route::get('/rank', [DashboardController::class, 'rank'])->name('rank');
 });
+
+// Google Authentication Routes
+
+Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
 
 
 

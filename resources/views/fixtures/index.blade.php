@@ -414,6 +414,31 @@
             }
         }
     </style>
+    <style>
+        /* Results styling for finished fixtures */
+        .gameweek-results { padding: 1rem 1.5rem 1.5rem; background: #fff; border-top: 1px solid var(--light-gray); }
+        .gameweek-results-header { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .results-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem; }
+        .result-item { border: 1px solid var(--light-gray); border-radius: 8px; padding: 0.75rem 1rem; background: #fafbff; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-weight: 600; }
+        .result-teams { display: flex; gap: 0.5rem; align-items: center; }
+        .result-score { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--primary); }
+        .scorers { margin: 0; padding-left: 1rem; }
+        .scorers li { font-size: 0.9rem; color: var(--dark); }
+        .scorer-team { font-weight: 600; margin-right: 0.25rem; }
+        .no-events { font-size: 0.9rem; color: var(--gray); }
+        /* Inline score in card center */
+        .score-block { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; align-items: start; justify-items: stretch; column-gap: 1rem; row-gap: 0.25rem; min-width: 240px; }
+        .scoreline { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--primary); }
+        .scorers-inline { list-style: none; padding: 0; margin: 0; text-align: center; }
+        .scorers-inline li { font-size: 0.8rem; color: var(--gray); }
+        .scorers-inline .scorer-team { font-weight: 700; color: var(--dark); }
+        .scorers-list { list-style: none; padding: 0; margin: 0; width: 100%; }
+        .scorers-list li { font-size: 0.8rem; color: var(--gray); }
+        .home-scorers { justify-self: start; text-align: left; grid-column: 1; grid-row: 2; }
+        .away-scorers { justify-self: end; text-align: right; grid-column: 2; grid-row: 2; }
+        .scoreline { grid-column: 1 / -1; grid-row: 1; justify-self: center; }
+    </style>
 </head>
 <body>
     <!-- Sidebar Navigation -->
@@ -520,7 +545,17 @@
                                     <div class="team-logo">BRE</div>
                                     <div class="team-name">Brentford</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Igor Thiago 8'</li>
+                                        <li>Igor Thiago 20'</li>
+                                        <li>Mathias Jensen 90+5'</li>
+                                    </ul>
+                                    <div class="scoreline">3 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Benjamin Šeško 26'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Manchester United</div>
                                     <div class="team-logo">MUN</div>
@@ -538,7 +573,17 @@
                                     <div class="team-logo">LEE</div>
                                     <div class="team-name">Leeds United</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Joe Rodon 37'</li>
+                                        <li>Sean Longstaff 54'</li>
+                                    </ul>
+                                    <div class="scoreline">2 - 2</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Antione Semenyo 26'</li>
+                                        <li>Eli Junior Kroupi 90+3'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Bournemouth</div>
                                     <div class="team-logo">BOU</div>
@@ -556,7 +601,17 @@
                                     <div class="team-logo">CHE</div>
                                     <div class="team-name">Chelsea</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Enzo Fernández 24'</li>
+                                    </ul>
+                                    <div class="scoreline">1 - 3</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Danny Welbeck 77'</li>
+                                        <li>Maxim De Cuyper 90' +2</li>
+                                        <li>Danny Welbeck 90' +10</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Brighton</div>
                                     <div class="team-logo">BHA</div>
@@ -574,7 +629,19 @@
                                     <div class="team-logo">MCI</div>
                                     <div class="team-name">Manchester City</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Maxime Estève 12' (OG)</li>
+                                        <li>Matheus Nunes 61'</li>
+                                        <li>Maxime Estève 65' (OG)</li>
+                                        <li>Erling Haaland 90'</li>
+                                        <li>Erling Haaland 90' +3</li>
+                                    </ul>
+                                    <div class="scoreline">5 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Jaidon Anthony 38'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Burnley</div>
                                     <div class="team-logo">BUR</div>
@@ -592,7 +659,16 @@
                                     <div class="team-logo">CRY</div>
                                     <div class="team-name">Crystal Palace</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Ismaïla Sarr 9'</li>
+                                        <li>Edward Nketiah 90' +7</li>
+                                    </ul>
+                                    <div class="scoreline">2 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Federico Chiesa 87'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Liverpool</div>
                                     <div class="team-logo">LIV</div>
@@ -610,7 +686,14 @@
                                     <div class="team-logo">NOT</div>
                                     <div class="team-name">Nottingham Forest</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                    </ul>
+                                    <div class="scoreline">0 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Omar Alderete 38'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Sunderland</div>
                                     <div class="team-logo">SUN</div>
@@ -628,7 +711,15 @@
                                     <div class="team-logo">TOT</div>
                                     <div class="team-name">Tottenham</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>João Palhinha 90' +4</li>
+                                    </ul>
+                                    <div class="scoreline">1 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Santiago Bueno 54'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Wolves</div>
                                     <div class="team-logo">WOL</div>
@@ -646,7 +737,17 @@
                                     <div class="team-logo">AST</div>
                                     <div class="team-name">Aston Villa</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Ollie Watkins 37'</li>
+                                        <li>John McGinn 49'</li>
+                                        <li>Emiliano Buendía 51'</li>
+                                    </ul>
+                                    <div class="scoreline">3 - 1</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Raúl Jiménez 3'</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Fulham</div>
                                     <div class="team-logo">FUL</div>
@@ -664,7 +765,16 @@
                                     <div class="team-logo">NEW</div>
                                     <div class="team-name">Newcastle</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                        <li>Nick Woltemade 34'</li>
+                                    </ul>
+                                    <div class="scoreline">1 - 2</div>
+                                    <ul class="scorers-list away-scorers">
+                                        <li>Mikel Merino 84'</li>
+                                        <li>Gabriel Magalhães 90' +6</li>
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">Arsenal</div>
                                     <div class="team-logo">ARS</div>
@@ -682,7 +792,13 @@
                                     <div class="team-logo">EVE</div>
                                     <div class="team-name">Everton</div>
                                 </div>
-                                <div class="vs">vs</div>
+                                <div class="score-block">
+                                    <ul class="scorers-list home-scorers">
+                                    </ul>
+                                    <div class="scoreline">Game hasn't started yet</div>
+                                    <ul class="scorers-list away-scorers">
+                                    </ul>
+                                </div>
                                 <div class="away-team">
                                     <div class="team-name">West Ham</div>
                                     <div class="team-logo">WHU</div>
@@ -695,7 +811,7 @@
                             </div>
                         </li>
                     </ul>
-                </div>
+                    
 
                 <!-- Gameweek 7 -->
                 <div class="gameweek-card" id="gameweek-7" style="display: none;">

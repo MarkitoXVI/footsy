@@ -754,6 +754,7 @@
             }
         }
     </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     <!-- Sidebar Navigation -->
@@ -1453,6 +1454,11 @@
             document.getElementById('validationError').style.display = 'none';
         }
 
+        // Get CSRF token from meta tag
+        function getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        }
+
         // Create team (actual form submission)
         function createTeam() {
             // Validate team
@@ -1461,9 +1467,30 @@
                 return;
             }
 
-            const teamName = document.getElementById('teamName').value.trim();
+            // Check if all positions are filled
+            const isComplete = teamData.players.gk &&
+                teamData.players.defenders.every(def => def) &&
+                teamData.players.midfielders.every(mid => mid) &&
+                teamData.players.forwards.every(fwd => fwd) &&
+                Object.values(teamData.players.substitutes).every(sub => sub);
+
+            if (!isComplete) {
+                showError('Please fill all player positions before creating your team!');
+                return;
+            }
+
+            // Get team name with validation
+            let teamName = prompt('Please enter your team name (3-50 characters):');
+            
             if (!teamName) {
-                showError('Please enter a team name.');
+                showError('Team name is required!');
+                return;
+            }
+
+            teamName = teamName.trim();
+            
+            if (teamName.length < 3 || teamName.length > 50) {
+                showError('Team name must be between 3 and 50 characters!');
                 return;
             }
 
@@ -1473,9 +1500,9 @@
                 formation: teamData.formation,
                 players: {
                     goalkeeper: teamData.players.gk ? teamData.players.gk.id : null,
-                    defenders: teamData.players.defenders.map(def => def ? def.id : null),
-                    midfielders: teamData.players.midfielders.map(mid => mid ? mid.id : null),
-                    forwards: teamData.players.forwards.map(fwd => fwd ? fwd.id : null),
+                    defenders: teamData.players.defenders.map(def => def ? def.id : null).filter(id => id !== null),
+                    midfielders: teamData.players.midfielders.map(mid => mid ? mid.id : null).filter(id => id !== null),
+                    forwards: teamData.players.forwards.map(fwd => fwd ? fwd.id : null).filter(id => id !== null),
                     substitutes: {
                         sub1: teamData.players.substitutes.sub1 ? teamData.players.substitutes.sub1.id : null,
                         sub2: teamData.players.substitutes.sub2 ? teamData.players.substitutes.sub2.id : null,
@@ -1487,32 +1514,49 @@
                 spent_budget: teamData.spentBudget
             };
 
+            console.log('Submitting team data:', teamSubmission);
+
             // Show loading state
             const createButton = document.getElementById('createTeamBtn');
+            const originalText = createButton.innerHTML;
             createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Team...';
             createButton.disabled = true;
 
             // Submit team data to server
-            fetch('/fantasy-team', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify(teamSubmission)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.team_id) {
-            window.location.href = `/fantasy-team/${data.team_id}`;
-        } else {
-            showError('Failed to create team. Please try again.');
+            fetch('{{ route("fantasy-team.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(teamSubmission)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || `Server error: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message and redirect
+                    alert('Team created successfully!');
+                    window.location.href = data.redirect_url || "{{ route('fantasy-team.index') }}";
+                } else {
+                    throw new Error(data.message || 'Failed to create team');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError(error.message || 'An error occurred while creating the team. Please try again.');
+                createButton.innerHTML = originalText;
+                createButton.disabled = false;
+            });
         }
-    })
-    .catch(() => {
-        showError('Failed to create team. Please try again.');
-    });
-}
     </script>
 </body>
 </html>

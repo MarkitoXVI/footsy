@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leagues - Footsy Fantasy Football</title>
+    <title>Leagues - Footsy Fantasy FootballV</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -642,38 +642,38 @@
             <div class="league-section">
                 <h2 class="section-title">My Leagues</h2>
                 
-                @if(count($userLeagues) > 0)
+                @if($userLeagues->count() > 0)
                     @foreach($userLeagues as $league)
                     <div class="league-card">
                         <div class="league-header">
                             <div>
-                                <h3 class="league-name">{{ $league['name'] }}</h3>
-                                <div class="league-code">Code: {{ $league['code'] }}</div>
+                                <h3 class="league-name">{{ $league->name }}</h3>
+                                <div class="league-code">Code: {{ $league->code }}</div>
                             </div>
                             <span class="league-status status-joined">Joined</span>
                         </div>
-                        <p class="league-description">{{ $league['description'] }}</p>
-                        <p class="league-admin">Admin: {{ $league['admin_name'] }} • Created: {{ $league['created_at'] }}</p>
+                        <p class="league-description">{{ $league->scoring_system === 'standard' ? 'Standard scoring league' : '' }}</p>
+                        <p class="league-admin">Admin: {{ optional($league->admin)->name }} • Created: {{ $league->created_at?->format('F j, Y') }}</p>
                         <div class="league-details">
                             <div class="league-detail">
-                                <span class="detail-value">{{ $league['participant_count'] }}/{{ $league['max_participants'] }}</span>
+                                <span class="detail-value">{{ $league->participants_count }}/{{ $league->max_participants ?? '∞' }}</span>
                                 <span class="detail-label">Participants</span>
                             </div>
                             <div class="league-detail">
-                                <span class="detail-value">{{ ucfirst($league['privacy']) }}</span>
+                                <span class="detail-value">{{ ucfirst($league->type) }}</span>
                                 <span class="detail-label">Privacy</span>
                             </div>
                             <div class="league-detail">
-                                <span class="detail-value">{{ $league['id'] == 1 ? '124th' : '--' }}</span>
+                                <span class="detail-value">--</span>
                                 <span class="detail-label">Your Rank</span>
                             </div>
                         </div>
                         <div class="league-actions">
-                            <button class="league-btn btn-primary" onclick="viewStandings('{{ $league['name'] }}')">View Standings</button>
-                            @if($league['admin_id'] != Auth::id())
-                                <button class="league-btn btn-danger" onclick="leaveLeague({{ $league['id'] }}, '{{ $league['name'] }}')">Leave League</button>
+                            <a class="league-btn btn-primary" href="{{ route('leagues.show', $league) }}">View Standings</a>
+                            @if($league->admin_id != Auth::id())
+                                <button class="league-btn btn-danger" onclick="leaveLeague({{ $league->id }}, @json($league->name))">Leave League</button>
                             @else
-                                <button class="league-btn btn-danger" onclick="deleteLeague({{ $league['id'] }}, '{{ $league['name'] }}')">Delete League</button>
+                                <button class="league-btn btn-danger" onclick="deleteLeague({{ $league->id }}, @json($league->name))">Delete League</button>
                             @endif
                         </div>
                     </div>
@@ -694,35 +694,35 @@
             <div class="league-section">
                 <h2 class="section-title">Other Leagues</h2>
                 
-                @if(count($otherLeagues) > 0)
+                @if($otherLeagues->count() > 0)
                     @foreach($otherLeagues as $league)
                     <div class="league-card">
                         <div class="league-header">
                             <div>
-                                <h3 class="league-name">{{ $league['name'] }}</h3>
-                                <div class="league-code">Code: {{ $league['code'] }}</div>
+                                <h3 class="league-name">{{ $league->name }}</h3>
+                                <div class="league-code">Code: {{ $league->code }}</div>
                             </div>
-                            <span class="league-status status-{{ $league['privacy'] }}">{{ ucfirst($league['privacy']) }}</span>
+                            <span class="league-status status-{{ $league->type }}">{{ ucfirst($league->type) }}</span>
                         </div>
-                        <p class="league-description">{{ $league['description'] }}</p>
-                        <p class="league-admin">Admin: {{ $league['admin_name'] }} • Created: {{ $league['created_at'] }}</p>
+                        <p class="league-description">{{ $league->scoring_system === 'standard' ? 'Standard scoring league' : '' }}</p>
+                        <p class="league-admin">Admin: {{ optional($league->admin)->name }} • Created: {{ $league->created_at?->format('F j, Y') }}</p>
                         <div class="league-details">
                             <div class="league-detail">
-                                <span class="detail-value">{{ $league['participant_count'] }}/{{ $league['max_participants'] }}</span>
+                                <span class="detail-value">{{ $league->participants_count }}/{{ $league->max_participants ?? '∞' }}</span>
                                 <span class="detail-label">Participants</span>
                             </div>
                             <div class="league-detail">
-                                <span class="detail-value">{{ ucfirst($league['privacy']) }}</span>
+                                <span class="detail-value">{{ ucfirst($league->type) }}</span>
                                 <span class="detail-label">Privacy</span>
                             </div>
                         </div>
                         <div class="league-actions">
-                            @if($league['privacy'] == 'public')
-                                <button class="league-btn btn-primary" onclick="joinLeague({{ $league['id'] }}, '{{ $league['name'] }}')">Join League</button>
+                            @if($league->type == 'public')
+                                <button class="league-btn btn-primary" onclick="joinLeague({{ $league->id }}, @json($league->name))">Join League</button>
                             @else
-                                <button class="league-btn btn-primary" onclick="requestToJoin({{ $league['id'] }}, '{{ $league['name'] }}')">Request to Join</button>
+                                <button class="league-btn btn-primary" onclick="requestToJoin({{ $league->id }}, @json($league->name))">Request to Join</button>
                             @endif
-                            <button class="league-btn btn-secondary" onclick="viewLeagueDetails({{ $league['id'] }})">View Details</button>
+                            <a class="league-btn btn-secondary" href="{{ route('leagues.show', $league) }}">View Details</a>
                         </div>
                     </div>
                     @endforeach
@@ -739,6 +739,7 @@
         </div>
     </div>
 
+    
     <script>
         // League actions
         function joinLeague(leagueId, leagueName) {
@@ -765,10 +766,7 @@
             }
         }
 
-        function viewStandings(leagueName) {
-            alert(`Redirecting to ${leagueName} standings...`);
-            // In real app, redirect to standings page
-        }
+        // standings handled via anchor links
 
         function viewLeagueDetails(leagueId) {
             alert(`Showing details for league ID: ${leagueId}`);

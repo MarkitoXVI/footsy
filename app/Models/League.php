@@ -48,8 +48,7 @@ class League extends Model
     {
         return $this->belongsToMany(User::class, 'league_user')
                     ->withPivot('points', 'rank')
-                    ->withTimestamps()
-                    ->orderBy('rank');
+                    ->withTimestamps();
     }
 
     /**

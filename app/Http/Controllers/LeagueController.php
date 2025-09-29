@@ -2,29 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\League;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LeagueController extends Controller
 {
-    // Temporary storage for demo (in real app, use database)
-    private static $leagues = [];
-    
+    /**
+     * Display a single league with standings.
+     */
+    public function show(League $league)
+    {
+        $league->load(['admin', 'participants' => function ($q) {
+            $q->orderBy('league_user.rank');
+        }]);
+
+        // participants relation already orders by rank in model, but we ensure here
+        $participants = $league->participants;
+
+        return view('leagues.show', compact('league', 'participants'));
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // Get user's joined leagues
-        $userLeagues = array_filter(self::$leagues, function($league) {
-            return in_array(Auth::id(), $league['members'] ?? []);
-        });
-        
-        // Get other available leagues
-        $otherLeagues = array_filter(self::$leagues, function($league) {
-            return !in_array(Auth::id(), $league['members'] ?? []);
-        });
-        
+        $userId = Auth::id();
+
+        $userLeagues = League::with(['admin'])
+            ->withCount('participants')
+            ->where(function ($q) use ($userId) {
+                $q->where('admin_id', $userId)
+                  ->orWhereHas('participants', function ($qq) use ($userId) {
+                      $qq->where('user_id', $userId);
+                  });
+            })
+            ->orderByDesc('created_at')
+            ->get();
+
+        $otherLeagues = League::with(['admin'])
+            ->withCount('participants')
+            ->where('admin_id', '!=', $userId)
+            ->whereDoesntHave('participants', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('leagues.index', compact('userLeagues', 'otherLeagues'));
     }
 
@@ -42,86 +68,69 @@ class LeagueController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'league_name' => 'required|string|max:255',
-            'league_description' => 'required|string',
-            'max_participants' => 'required|integer|min:2|max:100',
-            'privacy' => 'required|in:public,private',
-            'custom_rules' => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'max_participants' => 'nullable|integer|min:2|max:100',
+            'type' => 'nullable|in:public,private',
+            'privacy' => 'nullable|in:public,private',
         ]);
-        
-        // Generate unique league code
-        $leagueCode = strtoupper(substr(md5(uniqid()), 0, 6));
-        
-        // Create new league
-        $league = [
-            'id' => count(self::$leagues) + 1,
-            'name' => $validated['league_name'],
-            'description' => $validated['league_description'],
-            'max_participants' => $validated['max_participants'],
-            'privacy' => $validated['privacy'],
-            'custom_rules' => $validated['custom_rules'] ?? '',
-            'code' => $leagueCode,
+
+        $type = $validated['type'] ?? $validated['privacy'] ?? 'public';
+
+        $league = League::create([
+            'name' => $validated['name'],
+            'code' => strtoupper(Str::random(6)),
+            'type' => $type,
             'admin_id' => Auth::id(),
-            'admin_name' => Auth::user()->name,
-            'created_at' => now()->format('F j, Y'),
-            'members' => [Auth::id()], // Admin is automatically a member
-            'participant_count' => 1,
-            'allow_transfers' => $request->has('allow_transfers'),
-            'use_wildcards' => $request->has('use_wildcards'),
-            'show_rankings' => $request->has('show_rankings'),
-        ];
-        
-        // Add to leagues array
-        self::$leagues[] = $league;
-        
+            'is_public' => $type === 'public',
+            'max_participants' => $validated['max_participants'] ?? null,
+            'scoring_system' => 'standard',
+        ]);
+
+        // Attach the creator as a participant
+        $league->participants()->syncWithoutDetaching([
+            Auth::id() => ['points' => 0, 'rank' => 0]
+        ]);
+
         return redirect()->route('leagues.index')
-            ->with('success', 'League created successfully! League code: ' . $leagueCode);
+            ->with('success', 'League created successfully! League code: ' . $league->code);
     }
 
     /**
      * Join a league.
      */
-    public function join($leagueId)
+    public function join(League $league)
     {
-        $league = collect(self::$leagues)->firstWhere('id', $leagueId);
-        
-        if ($league && !in_array(Auth::id(), $league['members'])) {
-            $league['members'][] = Auth::id();
-            $league['participant_count']++;
-            
-            // Update the league in the array
-            $key = array_search($league, self::$leagues);
-            if ($key !== false) {
-                self::$leagues[$key] = $league;
+        $userId = Auth::id();
+
+        // Prevent joining twice and admin self-join
+        $alreadyMember = $league->participants()->where('user_id', $userId)->exists();
+        if (!$alreadyMember && $league->admin_id !== $userId) {
+            // Respect capacity if set
+            if ($league->max_participants && ($league->participants()->count() + 1) > $league->max_participants) {
+                return redirect()->route('leagues.index')->with('success', 'League is full.');
             }
+
+            $league->participants()->attach($userId, ['points' => 0, 'rank' => 0]);
         }
-        
-        return redirect()->route('leagues.index')
-            ->with('success', 'Successfully joined the league!');
+
+        return redirect()->route('leagues.index');
     }
 
     /**
      * Leave a league.
      */
-    public function leave($leagueId)
+    public function leave(League $league)
     {
-        $league = collect(self::$leagues)->firstWhere('id', $leagueId);
-        
-        if ($league && in_array(Auth::id(), $league['members'])) {
-            $key = array_search(Auth::id(), $league['members']);
-            if ($key !== false) {
-                unset($league['members'][$key]);
-                $league['participant_count']--;
-                
-                // Update the league in the array
-                $arrayKey = array_search($league, self::$leagues);
-                if ($arrayKey !== false) {
-                    self::$leagues[$arrayKey] = $league;
-                }
-            }
+        $userId = Auth::id();
+
+        // Admin cannot leave their own league via this action
+        if ($league->admin_id === $userId) {
+            return redirect()->route('leagues.index')
+                ->with('success', 'League admins cannot leave their own league.');
         }
-        
-        return redirect()->route('leagues.index')
-            ->with('success', 'Successfully left the league!');
+
+        $league->participants()->detach($userId);
+
+        return redirect()->route('leagues.index');
     }
 }

@@ -6,6 +6,8 @@ use App\Models\FantasyTeam;
 use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FantasyTeamController extends Controller
 {
@@ -14,152 +16,152 @@ class FantasyTeamController extends Controller
      */
     public function index()
     {
-        // Get the user's fantasy team with players
-        $fantasyTeam = Auth::user()->fantasyTeam;
-        
+        $user = Auth::user();
+        $fantasyTeam = FantasyTeam::where('user_id', $user->id)
+            ->with(['players.team']) // Eager load players and their teams
+            ->first();
+
         return view('fantasy-team.index', compact('fantasyTeam'));
     }
-    /** 
+
+    /**
      * Parāda formu jauna resursa izveidei.
      */
-    /**
- * Show the form for creating a new resource.
- */
-public function create()
-{
-    // Check if user already has a team
-    if (Auth::user()->fantasyTeam) {
-        return redirect()->route('fantasy-team.index')
-            ->with('error', 'You already have a fantasy team!');
-    }
-    
-    return view('fantasy-team.create');
-}
-
-/**
- * Store a newly created resource in storage.
- */
-public function store(Request $request)
-{
-    $data = $request->validate([
-        'team_name' => 'required|string|max:30',
-        'formation' => 'required|string',
-        'players.goalkeeper' => 'required|integer',
-        'players.defenders' => 'required|array',
-        'players.midfielders' => 'required|array',
-        'players.forwards' => 'required|array',
-        'players.substitutes' => 'required|array',
-        'total_budget' => 'required|numeric',
-        'spent_budget' => 'required|numeric',
-    ]);
-
-    // Save the team (adjust to your DB structure)
-    $team = new FantasyTeam();
-    $team->user_id = auth()->id();
-    $team->name = $data['team_name'];
-    $team->formation = $data['formation'];
-    $team->players = json_encode($data['players']);
-    $team->total_budget = $data['total_budget'];
-    $team->spent_budget = $data['spent_budget'];
-    $team->save();
-
-return response()->json(['success' => true, 'team_id' => $team->id]);}
-
-    /**
-     * Parāda norādīto resursu.
-     */
-    public function show(FantasyTeam $fantasyTeam)
+    public function create()
     {
-        // Autorizācija - lietotājs var skatīt tikai savu komandu
-        $this->authorize('view', $fantasyTeam);
-        
-        return view('fantasy-team.show', compact('fantasyTeam'));
+        $players = Player::all()->groupBy('position');
+        return view('fantasy-team.create', compact('players'));
     }
 
     /**
-     * Parāda formu resursa rediģēšanai.
+     * Store a newly created resource in storage.
      */
-    public function edit(FantasyTeam $fantasyTeam)
+    public function store(Request $request)
     {
-        // Autorizācija - lietotājs var rediģēt tikai savu komandu
-        $this->authorize('update', $fantasyTeam);
+        Log::info('Team creation request received', $request->all());
         
-        $players = Player::all();
+        DB::beginTransaction();
         
-        return view('fantasy-team.edit', compact('fantasyTeam', 'players'));
+        try {
+            $user = Auth::user();
+            
+            // Check if user already has a team
+            $existingTeam = FantasyTeam::where('user_id', $user->id)->first();
+            if ($existingTeam) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You already have a fantasy team!'
+                ], 400);
+            }
+
+            // Validate the request
+            $validated = $request->validate([
+                'team_name' => 'required|string|max:255',
+                'formation' => 'required|string',
+                'players' => 'required|array',
+                'total_budget' => 'required|numeric',
+                'spent_budget' => 'required|numeric'
+            ]);
+
+            // Create the fantasy team
+            $fantasyTeam = FantasyTeam::create([
+                'user_id' => $user->id,
+                'team_name' => $validated['team_name'],
+                'formation' => $validated['formation'],
+                'total_budget' => $validated['total_budget'],
+                'spent_budget' => $validated['spent_budget'],
+                'remaining_budget' => $validated['total_budget'] - $validated['spent_budget']
+            ]);
+
+            // Attach players to the team
+            $this->attachPlayersToTeam($fantasyTeam, $validated['players']);
+
+            DB::commit();
+
+            Log::info('Team created successfully', ['team_id' => $fantasyTeam->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Team created successfully!',
+                'team_id' => $fantasyTeam->id,
+                'redirect_url' => route('fantasy-team.index')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to create team: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create team: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    /**
-     * Atjaunina norādīto resursu datubāzē.
-     */
-    public function update(Request $request, FantasyTeam $fantasyTeam)
+    private function attachPlayersToTeam($fantasyTeam, $playersData)
     {
-        // Autorizācija - lietotājs var atjaunināt tikai savu komandu
-        $this->authorize('update', $fantasyTeam);
+        $playerData = [];
         
-        // Validē pieprasījumu
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'players' => 'required|array|size:15',
-            'players.*' => 'exists:players,id',
-            'captain_id' => 'required|exists:players,id'
-        ]);
+        // Starting goalkeeper
+        if (!empty($playersData['goalkeeper'])) {
+            $playerData[$playersData['goalkeeper']] = [
+                'is_substitute' => false,
+                'position_order' => 1
+            ];
+        }
         
-        // Atjaunina komandu
-        $fantasyTeam->update([
-            'name' => $validated['name']
-        ]);
+        // Defenders
+        if (!empty($playersData['defenders'])) {
+            foreach ($playersData['defenders'] as $index => $defenderId) {
+                if (!empty($defenderId)) {
+                    $playerData[$defenderId] = [
+                        'is_substitute' => false,
+                        'position_order' => 2 + $index
+                    ];
+                }
+            }
+        }
         
-        // Sinhronizē spēlētājus
-        $fantasyTeam->players()->sync($validated['players']);
+        // Midfielders
+        if (!empty($playersData['midfielders'])) {
+            foreach ($playersData['midfielders'] as $index => $midfielderId) {
+                if (!empty($midfielderId)) {
+                    $playerData[$midfielderId] = [
+                        'is_substitute' => false,
+                        'position_order' => 2 + count($playersData['defenders'] ?? []) + $index
+                    ];
+                }
+            }
+        }
         
-        // Visus spēlētājus sākumā uzstāda kā ne-kapteini
-        $fantasyTeam->players()->update(['is_captain' => false]);
+        // Forwards
+        if (!empty($playersData['forwards'])) {
+            foreach ($playersData['forwards'] as $index => $forwardId) {
+                if (!empty($forwardId)) {
+                    $playerData[$forwardId] = [
+                        'is_substitute' => false,
+                        'position_order' => 2 + count($playersData['defenders'] ?? []) + count($playersData['midfielders'] ?? []) + $index
+                    ];
+                }
+            }
+        }
         
-        // Uzstāda jauno kapteini
-        $fantasyTeam->players()->updateExistingPivot($validated['captain_id'], [
-            'is_captain' => true
-        ]);
-        
-        return redirect()->route('fantasy-team.index')
-            ->with('success', 'Fantāzijas komanda veiksmīgi atjaunināta!');
-    }
+        // Substitutes
+        $substituteOrder = 1;
+        if (!empty($playersData['substitutes'])) {
+            foreach ($playersData['substitutes'] as $substituteId) {
+                if (!empty($substituteId)) {
+                    $playerData[$substituteId] = [
+                        'is_substitute' => true,
+                        'position_order' => $substituteOrder++
+                    ];
+                }
+            }
+        }
 
-    /**
-     * Dzēš norādīto resursu no datubāzes.
-     */
-    public function destroy(FantasyTeam $fantasyTeam)
-    {
-        // Autorizācija - lietotājs var dzēst tikai savu komandu
-        $this->authorize('delete', $fantasyTeam);
-        
-        $fantasyTeam->delete();
-        
-        return redirect()->route('dashboard')
-            ->with('success', 'Fantāzijas komanda veiksmīgi dzēsta!');
-    }
-
-    /**
-     * Izvēlas kapteini fantāzijas komandai.
-     */
-    public function selectCaptain(Request $request, FantasyTeam $fantasyTeam)
-    {
-        // Autorizācija - lietotājs var atjaunināt tikai savu komandu
-        $this->authorize('update', $fantasyTeam);
-        
-        $validated = $request->validate([
-            'captain_id' => 'required|exists:players,id'
-        ]);
-        
-        // Visus spēlētājus sākumā uzstāda kā ne-kapteini
-        $fantasyTeam->players()->update(['is_captain' => false]);
-        
-        // Uzstāda jauno kapteini
-        $fantasyTeam->players()->updateExistingPivot($validated['captain_id'], [
-            'is_captain' => true
-        ]);
-        
-        return redirect()->back()
-            ->with('success', 'Kapteinis veiksmīgi izvēlēts!');
+        // Attach players with additional data
+        if (!empty($playerData)) {
+            $fantasyTeam->players()->attach($playerData);
+        }
     }
 }

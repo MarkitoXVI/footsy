@@ -6,25 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
+        // Drop the existing table if it exists
+        Schema::dropIfExists('fantasy_teams');
+        
+        // Create the corrected table
         Schema::create('fantasy_teams', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('budget', 8, 2)->default(100.00);
+            $table->string('team_name');
+            $table->string('formation')->default('4-4-2');
+            $table->decimal('total_budget', 8, 2)->default(100.00);
+            $table->decimal('spent_budget', 8, 2)->default(0.00);
+            $table->decimal('remaining_budget', 8, 2)->default(100.00);
             $table->integer('total_points')->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('fantasy_teams');
     }

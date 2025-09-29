@@ -591,7 +591,7 @@
                 <p class="create-league-subtitle">Set up your fantasy football league and invite other managers to compete</p>
             </div>
 
-            <form class="create-league-form" id="createLeagueForm">
+            <form class="create-league-form" id="createLeagueForm" method="POST" action="{{ route('leagues.store') }}">
                 @csrf
                 
                 <!-- Basic Information Section -->
@@ -600,13 +600,13 @@
                     
                     <div class="form-group required">
                         <label for="league_name">League Name</label>
-                        <input type="text" id="league_name" name="league_name" class="form-control" placeholder="Enter a unique league name" required>
+                        <input type="text" id="league_name" name="name" class="form-control" placeholder="Enter a unique league name" required>
                         <div class="form-hint">Choose a name that represents your league's theme or purpose</div>
                     </div>
                     
                     <div class="form-group required">
                         <label for="league_description">League Description</label>
-                        <textarea id="league_description" name="league_description" class="form-control" placeholder="Describe your league's purpose, rules, or theme" required></textarea>
+                        <textarea id="league_description" name="league_description" class="form-control" placeholder="Describe your league's purpose, rules, or theme"></textarea>
                         <div class="form-hint">This description will help potential participants understand your league</div>
                     </div>
                 </div>
@@ -617,7 +617,7 @@
                     
                     <div class="form-group required">
                         <label for="max_participants">Maximum Participants</label>
-                        <input type="number" id="max_participants" name="max_participants" class="form-control" min="2" max="100" value="20" required>
+                        <input type="number" id="max_participants" name="max_participants" class="form-control" min="2" max="100" value="20">
                         <div class="form-hint">Set the maximum number of teams allowed in your league (2-100)</div>
                     </div>
                     
@@ -625,7 +625,7 @@
                         <label>Privacy Settings</label>
                         <div class="privacy-options">
                             <div class="privacy-option" onclick="selectPrivacy('public')">
-                                <input type="radio" id="privacy_public" name="privacy" value="public" checked>
+                                <input type="radio" id="privacy_public" name="type" value="public" checked>
                                 <div class="privacy-icon">
                                     <i class="fas fa-globe"></i>
                                 </div>
@@ -634,7 +634,7 @@
                             </div>
                             
                             <div class="privacy-option" onclick="selectPrivacy('private')">
-                                <input type="radio" id="privacy_private" name="privacy" value="private">
+                                <input type="radio" id="privacy_private" name="type" value="private">
                                 <div class="privacy-icon">
                                     <i class="fas fa-lock"></i>
                                 </div>
@@ -726,63 +726,8 @@
             // Select public by default
             selectPrivacy('public');
             
-            // Form submission
-            document.getElementById('createLeagueForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form data
-                const formData = new FormData(this);
-                const leagueData = {
-                    name: formData.get('league_name'),
-                    description: formData.get('league_description'),
-                    max_participants: formData.get('max_participants'),
-                    privacy: formData.get('privacy'),
-                    custom_rules: formData.get('custom_rules'),
-                    allow_transfers: document.getElementById('allow_transfers').checked,
-                    use_wildcards: document.getElementById('use_wildcards').checked,
-                    show_rankings: document.getElementById('show_rankings').checked,
-                    created_date: document.getElementById('createdDate').textContent,
-                    admin: document.getElementById('leagueAdmin').textContent
-                };
-                
-                // Validate form
-                if (!leagueData.name || !leagueData.description) {
-                    showToast('Please fill in all required fields', 'error');
-                    return;
-                }
-                
-                // Simulate API call to create league
-                simulateLeagueCreation(leagueData);
-            });
+            // No JS interception; the form submits normally to the server.
         });
-        
-        // Simulate league creation (replace with actual API call)
-        function simulateLeagueCreation(leagueData) {
-            // Show loading state
-            const submitBtn = document.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating League...';
-            submitBtn.disabled = true;
-            
-            // Simulate API delay
-            setTimeout(() => {
-                // Generate a random league code
-                const leagueCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                
-                // Show success message
-                showToast(`League "${leagueData.name}" created successfully!`, 'success');
-                
-                // Update league code in the info section
-                document.getElementById('leagueCode').textContent = leagueCode;
-                
-                // Reset form after successful creation
-                setTimeout(() => {
-                    // In a real application, you would redirect to the new league page
-                    window.location.href = "{{ route('leagues.index') }}";
-                }, 2000);
-                
-            }, 2000);
-        }
         
         // Toast notification function
         function showToast(message, type) {

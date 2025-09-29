@@ -1033,10 +1033,10 @@
             new Chart(pointsCtx, {
                 type: 'line',
                 data: {
-                    labels: ['GW1', 'GW2', 'GW3', 'GW4', 'GW5', 'GW6', 'GW7', 'GW8'],
+                    labels: ['GW1', 'GW2', 'GW3', 'GW4', 'GW5'],
                     datasets: [{
                         label: 'Your Points',
-                        data: [68, 72, 65, 78, 82, 75, 88, 92],
+                        data: [0, 0, 0, 0, 0],
                         borderColor: '#3a5ee5',
                         backgroundColor: 'rgba(58, 94, 229, 0.1)',
                         tension: 0.3,
@@ -1124,45 +1124,45 @@
             });
 
             // Teams Chart
-            const teamsCtx = document.getElementById('teamsChart').getContext('2d');
-            new Chart(teamsCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Attack', 'Defense', 'Midfield', 'Set Pieces', 'Form'],
-                    datasets: [{
-                        label: 'Man City',
-                        data: [95, 88, 92, 85, 90],
-                        borderColor: '#6c757d',
-                        backgroundColor: 'rgba(108, 117, 125, 0.1)',
-                        pointBackgroundColor: '#6c757d'
-                    }, {
-                        label: 'Liverpool',
-                        data: [88, 82, 90, 80, 85],
-                        borderColor: '#e53e3e',
-                        backgroundColor: 'rgba(229, 62, 62, 0.1)',
-                        pointBackgroundColor: '#e53e3e'
-                    }, {
-                        label: 'Arsenal',
-                        data: [85, 90, 87, 82, 88],
-                        borderColor: '#3a5ee5',
-                        backgroundColor: 'rgba(58, 94, 229, 0.1)',
-                        pointBackgroundColor: '#3a5ee5'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: {
-                                display: true
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 100
-                        }
-                    }
-                }
-            });
+            // const teamsCtx = document.getElementById('teamsChart').getContext('2d');
+            // new Chart(teamsCtx, {
+            //     type: 'radar',
+            //     data: {
+            //         labels: ['Attack', 'Defense', 'Midfield', 'Set Pieces', 'Form'],
+            //         datasets: [{
+            //             label: 'Man City',
+            //             data: [95, 88, 92, 85, 90],
+            //             borderColor: '#6c757d',
+            //             backgroundColor: 'rgba(108, 117, 125, 0.1)',
+            //             pointBackgroundColor: '#6c757d'
+            //         }, {
+            //             label: 'Liverpool',
+            //             data: [88, 82, 90, 80, 85],
+            //             borderColor: '#e53e3e',
+            //             backgroundColor: 'rgba(229, 62, 62, 0.1)',
+            //             pointBackgroundColor: '#e53e3e'
+            //         }, {
+            //             label: 'Arsenal',
+            //             data: [85, 90, 87, 82, 88],
+            //             borderColor: '#3a5ee5',
+            //             backgroundColor: 'rgba(58, 94, 229, 0.1)',
+            //             pointBackgroundColor: '#3a5ee5'
+            //         }]
+            //     },
+            //     options: {
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         scales: {
+            //             r: {
+            //                 angleLines: {
+            //                     display: true
+            //                 },
+            //                 suggestedMin: 0,
+            //                 suggestedMax: 100
+            //             }
+            //         }
+            //     }
+            // });
         });
 
         // Add interactivity to performer tabs

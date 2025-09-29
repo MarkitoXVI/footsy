@@ -6,28 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-        Schema::create('fantasy_team_player', function (Blueprint $table) {
+        Schema::create('fantasy_team_players', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fantasy_team_id')->constrained()->onDelete('cascade');
             $table->foreignId('player_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_substitute')->default(false);
+            $table->integer('position_order')->nullable();
             $table->boolean('is_captain')->default(false);
             $table->timestamps();
-            
-            // Ensure unique combination of fantasy_team_id and player_id
+
             $table->unique(['fantasy_team_id', 'player_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('fantasy_team_player');
+        Schema::dropIfExists('fantasy_team_players');
     }
 };

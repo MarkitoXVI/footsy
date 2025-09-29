@@ -12,9 +12,12 @@ class FantasyTeam extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
         'user_id',
-        'budget',
+        'team_name',
+        'formation',
+        'total_budget',
+        'spent_budget',
+        'remaining_budget',
         'total_points'
     ];
 
@@ -29,12 +32,12 @@ class FantasyTeam extends Model
     /**
      * The players that belong to the fantasy team.
      */
-    public function players(): BelongsToMany
-    {
-        return $this->belongsToMany(Player::class)
-                    ->withPivot('is_captain')
-                    ->withTimestamps();
-    }
+public function players()
+{
+    return $this->belongsToMany(Player::class, 'fantasy_team_players')
+                ->withPivot(['is_substitute', 'position_order'])
+                ->withTimestamps();
+}
 
     /**
      * Get the captain of the team.

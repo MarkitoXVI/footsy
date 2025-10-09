@@ -188,29 +188,102 @@
             font-size: 1.8rem;
         }
         
-        .gameweek-selector {
+        /* Calendar Styles */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-nav {
             display: flex;
             gap: 0.5rem;
             align-items: center;
         }
         
-        .gameweek-btn {
-            padding: 0.5rem 1rem;
-            background: white;
-            border: 1px solid var(--light-gray);
+        .calendar-btn {
+            background: var(--light);
+            border: none;
             border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .gameweek-btn.active {
-            background: var(--gradient);
+        .calendar-btn:hover {
+            background: var(--primary);
             color: white;
-            border-color: var(--primary);
         }
         
-        .gameweek-btn:hover:not(.active) {
-            border-color: var(--primary);
+        .calendar-month {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gray);
+            padding: 0.5rem 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            background: var(--light);
+        }
+        
+        .calendar-day.active {
+            background: var(--gradient);
+            color: white;
+        }
+        
+        .calendar-day.has-fixtures::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+        }
+        
+        .calendar-day.other-month {
+            color: var(--light-gray);
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--primary);
         }
         
         /* Fixtures Grid */
@@ -220,31 +293,23 @@
             gap: 1.5rem;
         }
         
-        .gameweek-card {
+        .date-card {
             background: white;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
-        .gameweek-header {
+        .date-header {
             background: var(--gradient);
             color: white;
             padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
-        .gameweek-title {
+        .date-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
             font-weight: 600;
-        }
-        
-        .gameweek-dates {
-            font-size: 0.9rem;
-            opacity: 0.9;
         }
         
         .fixtures-list {
@@ -320,15 +385,72 @@
             color: var(--dark);
         }
         
-        .fixture-date {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        
         .fixture-venue {
             font-size: 0.8rem;
             color: var(--gray);
             margin-top: 0.25rem;
+        }
+        
+        .no-fixtures {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        .no-fixtures i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Results styling for finished fixtures */
+        .score-block { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-template-rows: auto auto; 
+            align-items: start; 
+            justify-items: stretch; 
+            column-gap: 1rem; 
+            row-gap: 0.25rem; 
+            min-width: 240px; 
+        }
+        
+        .scoreline { 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 700; 
+            color: var(--primary); 
+        }
+        
+        .scorers-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+            width: 100%; 
+        }
+        
+        .scorers-list li { 
+            font-size: 0.8rem; 
+            color: var(--gray); 
+        }
+        
+        .home-scorers { 
+            justify-self: start; 
+            text-align: left; 
+            grid-column: 1; 
+            grid-row: 2; 
+        }
+        
+        .away-scorers { 
+            justify-self: end; 
+            text-align: right; 
+            grid-column: 2; 
+            grid-row: 2; 
+        }
+        
+        .scoreline { 
+            grid-column: 1 / -1; 
+            grid-row: 1; 
+            justify-self: center; 
         }
         
         /* Responsive Design */
@@ -409,35 +531,14 @@
                 padding: 0 1rem;
             }
             
-            .gameweek-selector {
-                flex-wrap: wrap;
+            .calendar-grid {
+                gap: 2px;
+            }
+            
+            .calendar-day {
+                font-size: 0.8rem;
             }
         }
-    </style>
-    <style>
-        /* Results styling for finished fixtures */
-        .gameweek-results { padding: 1rem 1.5rem 1.5rem; background: #fff; border-top: 1px solid var(--light-gray); }
-        .gameweek-results-header { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.75rem; }
-        .results-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem; }
-        .result-item { border: 1px solid var(--light-gray); border-radius: 8px; padding: 0.75rem 1rem; background: #fafbff; }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-weight: 600; }
-        .result-teams { display: flex; gap: 0.5rem; align-items: center; }
-        .result-score { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--primary); }
-        .scorers { margin: 0; padding-left: 1rem; }
-        .scorers li { font-size: 0.9rem; color: var(--dark); }
-        .scorer-team { font-weight: 600; margin-right: 0.25rem; }
-        .no-events { font-size: 0.9rem; color: var(--gray); }
-        /* Inline score in card center */
-        .score-block { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; align-items: start; justify-items: stretch; column-gap: 1rem; row-gap: 0.25rem; min-width: 240px; }
-        .scoreline { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--primary); }
-        .scorers-inline { list-style: none; padding: 0; margin: 0; text-align: center; }
-        .scorers-inline li { font-size: 0.8rem; color: var(--gray); }
-        .scorers-inline .scorer-team { font-weight: 700; color: var(--dark); }
-        .scorers-list { list-style: none; padding: 0; margin: 0; width: 100%; }
-        .scorers-list li { font-size: 0.8rem; color: var(--gray); }
-        .home-scorers { justify-self: start; text-align: left; grid-column: 1; grid-row: 2; }
-        .away-scorers { justify-self: end; text-align: right; grid-column: 2; grid-row: 2; }
-        .scoreline { grid-column: 1 / -1; grid-row: 1; justify-self: center; }
     </style>
 </head>
 <body>
@@ -486,6 +587,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('help') }}" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help and Support</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('profile.edit') }}" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -525,522 +632,609 @@
         <div class="fixtures-content">
             <div class="fixtures-header">
                 <h1 class="fixtures-title">Premier League Fixtures</h1>
-                <div class="gameweek-selector">
-                    <button class="gameweek-btn active">Gameweek 6</button>
-                    <button class="gameweek-btn">Gameweek 7</button>
+            </div>
+
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="calendar-btn" id="prev-month">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="calendar-month" id="current-month">September 2025</div>
+                        <button class="calendar-btn" id="next-month">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <button class="calendar-btn" id="today-btn">
+                        Today
+                    </button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                    <!-- Calendar days will be populated by JavaScript -->
                 </div>
             </div>
 
-            <div class="fixtures-grid">
-                <!-- Gameweek 6 -->
-                <div class="gameweek-card" id="gameweek-6">
-                    <div class="gameweek-header">
-                        <div class="gameweek-title">Gameweek 6</div>
-                        <div class="gameweek-dates">Sep 27 - Sep 29, 2025</div>
-                    </div>
-                    <ul class="fixtures-list">
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">BRE</div>
-                                    <div class="team-name">Brentford</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Igor Thiago 8'</li>
-                                        <li>Igor Thiago 20'</li>
-                                        <li>Mathias Jensen 90+5'</li>
-                                    </ul>
-                                    <div class="scoreline">3 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Benjamin Šeško 26'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Manchester United</div>
-                                    <div class="team-logo">MUN</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">14:30</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Gtech Community Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">LEE</div>
-                                    <div class="team-name">Leeds United</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Joe Rodon 37'</li>
-                                        <li>Sean Longstaff 54'</li>
-                                    </ul>
-                                    <div class="scoreline">2 - 2</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Antione Semenyo 26'</li>
-                                        <li>Eli Junior Kroupi 90+3'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Bournemouth</div>
-                                    <div class="team-logo">BOU</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Elland Road</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">CHE</div>
-                                    <div class="team-name">Chelsea</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Enzo Fernández 24'</li>
-                                    </ul>
-                                    <div class="scoreline">1 - 3</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Danny Welbeck 77'</li>
-                                        <li>Maxim De Cuyper 90' +2</li>
-                                        <li>Danny Welbeck 90' +10</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Brighton</div>
-                                    <div class="team-logo">BHA</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Stamford Bridge</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">MCI</div>
-                                    <div class="team-name">Manchester City</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Maxime Estève 12' (OG)</li>
-                                        <li>Matheus Nunes 61'</li>
-                                        <li>Maxime Estève 65' (OG)</li>
-                                        <li>Erling Haaland 90'</li>
-                                        <li>Erling Haaland 90' +3</li>
-                                    </ul>
-                                    <div class="scoreline">5 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Jaidon Anthony 38'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Burnley</div>
-                                    <div class="team-logo">BUR</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Etihad Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">CRY</div>
-                                    <div class="team-name">Crystal Palace</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Ismaïla Sarr 9'</li>
-                                        <li>Edward Nketiah 90' +7</li>
-                                    </ul>
-                                    <div class="scoreline">2 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Federico Chiesa 87'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Liverpool</div>
-                                    <div class="team-logo">LIV</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Selhurst Park</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">NOT</div>
-                                    <div class="team-name">Nottingham Forest</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                    </ul>
-                                    <div class="scoreline">0 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Omar Alderete 38'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Sunderland</div>
-                                    <div class="team-logo">SUN</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">19:30</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">City Ground</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">TOT</div>
-                                    <div class="team-name">Tottenham</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>João Palhinha 90' +4</li>
-                                    </ul>
-                                    <div class="scoreline">1 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Santiago Bueno 54'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Wolves</div>
-                                    <div class="team-logo">WOL</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">22:00</div>
-                                <div class="fixture-date">Sat, Sep 27</div>
-                                <div class="fixture-venue">Tottenham Hotspur Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">AST</div>
-                                    <div class="team-name">Aston Villa</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Ollie Watkins 37'</li>
-                                        <li>John McGinn 49'</li>
-                                        <li>Emiliano Buendía 51'</li>
-                                    </ul>
-                                    <div class="scoreline">3 - 1</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Raúl Jiménez 3'</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Fulham</div>
-                                    <div class="team-logo">FUL</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">16:00</div>
-                                <div class="fixture-date">Sun, Sep 28</div>
-                                <div class="fixture-venue">Villa Park</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">NEW</div>
-                                    <div class="team-name">Newcastle</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                        <li>Nick Woltemade 34'</li>
-                                    </ul>
-                                    <div class="scoreline">1 - 2</div>
-                                    <ul class="scorers-list away-scorers">
-                                        <li>Mikel Merino 84'</li>
-                                        <li>Gabriel Magalhães 90' +6</li>
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">Arsenal</div>
-                                    <div class="team-logo">ARS</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">18:30</div>
-                                <div class="fixture-date">Sun, Sep 28</div>
-                                <div class="fixture-venue">St. James' Park</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">EVE</div>
-                                    <div class="team-name">Everton</div>
-                                </div>
-                                <div class="score-block">
-                                    <ul class="scorers-list home-scorers">
-                                    </ul>
-                                    <div class="scoreline">Game hasn't started yet</div>
-                                    <ul class="scorers-list away-scorers">
-                                    </ul>
-                                </div>
-                                <div class="away-team">
-                                    <div class="team-name">West Ham</div>
-                                    <div class="team-logo">WHU</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">22:00</div>
-                                <div class="fixture-date">Sun, Sep 29</div>
-                                <div class="fixture-venue">Hill Dickinson Stadium</div>
-                            </div>
-                        </li>
-                    </ul>
-                    
-
-                <!-- Gameweek 7 -->
-                <div class="gameweek-card" id="gameweek-7" style="display: none;">
-                    <div class="gameweek-header">
-                        <div class="gameweek-title">Gameweek 7</div>
-                        <div class="gameweek-dates">Oct 3 - Oct 5, 2025</div>
-                    </div>
-                    <ul class="fixtures-list">
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">BOU</div>
-                                    <div class="team-name">Bournemouth</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Fulham</div>
-                                    <div class="team-logo">FUL</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">22:00</div>
-                                <div class="fixture-date">Fri, Oct 3</div>
-                                <div class="fixture-venue">Vitality Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">LEE</div>
-                                    <div class="team-name">Leeds United</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Tottenham</div>
-                                    <div class="team-logo">TOT</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">14:30</div>
-                                <div class="fixture-date">Sat, Oct 4</div>
-                                <div class="fixture-venue">Elland Road</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">MUN</div>
-                                    <div class="team-name">Manchester United</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Sunderland</div>
-                                    <div class="team-logo">SUN</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Oct 4</div>
-                                <div class="fixture-venue">Old Trafford</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">ARS</div>
-                                    <div class="team-name">Arsenal</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">West Ham</div>
-                                    <div class="team-logo">WHU</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">17:00</div>
-                                <div class="fixture-date">Sat, Oct 4</div>
-                                <div class="fixture-venue">Emirates Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">CHE</div>
-                                    <div class="team-name">Chelsea</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Liverpool</div>
-                                    <div class="team-logo">LIV</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">19:30</div>
-                                <div class="fixture-date">Sat, Oct 4</div>
-                                <div class="fixture-venue">Stamford Bridge</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">EVE</div>
-                                    <div class="team-name">Everton</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Crystal Palace</div>
-                                    <div class="team-logo">CRY</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">16:00</div>
-                                <div class="fixture-date">Sun, Oct 5</div>
-                                <div class="fixture-venue">Hill Dickinson Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">NEW</div>
-                                    <div class="team-name">Newcastle</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Nottingham Forest</div>
-                                    <div class="team-logo">NFO</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">16:00</div>
-                                <div class="fixture-date">Sun, Oct 5</div>
-                                <div class="fixture-venue">St. James' Park</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">WOL</div>
-                                    <div class="team-name">Wolverhampton</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Brighton</div>
-                                    <div class="team-logo">BHA</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">16:00</div>
-                                <div class="fixture-date">Sun, Oct 5</div>
-                                <div class="fixture-venue">Molineux Stadium</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">AST</div>
-                                    <div class="team-name">Aston Villa</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Burnley</div>
-                                    <div class="team-logo">BUR</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">16:00</div>
-                                <div class="fixture-date">Sun, Oct 5</div>
-                                <div class="fixture-venue">Villa</div>
-                            </div>
-                        </li>
-                        <li class="fixture-item">
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">BRE</div>
-                                    <div class="team-name">Brentford</div>
-                                </div>
-                                <div class="vs">vs</div>
-                                <div class="away-team">
-                                    <div class="team-name">Manchester City</div>
-                                    <div class="team-logo">MCI</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">18:30</div>
-                                <div class="fixture-date">Sun, Oct 5</div>
-                                <div class="fixture-venue">Gtech Community Stadium</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            <!-- Fixtures Display -->
+            <div id="fixtures-display">
+                <!-- Fixtures will be displayed here based on selected date -->
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Gameweek selector functionality
-            const gameweekButtons = document.querySelectorAll('.gameweek-btn');
-            const gameweekCards = document.querySelectorAll('.gameweek-card');
+            // Fixtures data organized by date
+            const fixturesData = {
+                '2025-09-27': [
+                    {
+                        homeTeam: 'Brentford',
+                        homeLogo: 'BRE',
+                        awayTeam: 'Manchester United',
+                        awayLogo: 'MUN',
+                        time: '14:30',
+                        venue: 'Gtech Community Stadium',
+                        score: '3 - 1',
+                        homeScorers: ['Igor Thiago 8\'', 'Igor Thiago 20\'', 'Mathias Jensen 90+5\''],
+                        awayScorers: ['Benjamin Šeško 26\'']
+                    },
+                    {
+                        homeTeam: 'Leeds United',
+                        homeLogo: 'LEE',
+                        awayTeam: 'Bournemouth',
+                        awayLogo: 'BOU',
+                        time: '17:00',
+                        venue: 'Elland Road',
+                        score: '2 - 2',
+                        homeScorers: ['Joe Rodon 37\'', 'Sean Longstaff 54\''],
+                        awayScorers: ['Antione Semenyo 26\'', 'Eli Junior Kroupi 90+3\'']
+                    },
+                    {
+                        homeTeam: 'Chelsea',
+                        homeLogo: 'CHE',
+                        awayTeam: 'Brighton',
+                        awayLogo: 'BHA',
+                        time: '17:00',
+                        venue: 'Stamford Bridge',
+                        score: '1 - 3',
+                        homeScorers: ['Enzo Fernández 24\''],
+                        awayScorers: ['Danny Welbeck 77\'', 'Maxim De Cuyper 90+2', 'Danny Welbeck 90+10']
+                    },
+                    {
+                        homeTeam: 'Manchester City',
+                        homeLogo: 'MCI',
+                        awayTeam: 'Burnley',
+                        awayLogo: 'BUR',
+                        time: '17:00',
+                        venue: 'Etihad Stadium',
+                        score: '5 - 1',
+                        homeScorers: ['Maxime Estève 12\' (OG)', 'Matheus Nunes 61\'', 'Maxime Estève 65\' (OG)', 'Erling Haaland 90\'', 'Erling Haaland 90+3'],
+                        awayScorers: ['Jaidon Anthony 38\'']
+                    },
+                    {
+                        homeTeam: 'Crystal Palace',
+                        homeLogo: 'CRY',
+                        awayTeam: 'Liverpool',
+                        awayLogo: 'LIV',
+                        time: '17:00',
+                        venue: 'Selhurst Park',
+                        score: '2 - 1',
+                        homeScorers: ['Ismaïla Sarr 9\'', 'Edward Nketiah 90+7'],
+                        awayScorers: ['Federico Chiesa 87\'']
+                    },
+                    {
+                        homeTeam: 'Nottingham Forest',
+                        homeLogo: 'NOT',
+                        awayTeam: 'Sunderland',
+                        awayLogo: 'SUN',
+                        time: '19:30',
+                        venue: 'City Ground',
+                        score: '0 - 1',
+                        homeScorers: [],
+                        awayScorers: ['Omar Alderete 38\'']
+                    },
+                    {
+                        homeTeam: 'Tottenham',
+                        homeLogo: 'TOT',
+                        awayTeam: 'Wolves',
+                        awayLogo: 'WOL',
+                        time: '22:00',
+                        venue: 'Tottenham Hotspur Stadium',
+                        score: '1 - 1',
+                        homeScorers: ['João Palhinha 90+4'],
+                        awayScorers: ['Santiago Bueno 54\'']
+                    }
+                ],
+                '2025-09-28': [
+                    {
+                        homeTeam: 'Aston Villa',
+                        homeLogo: 'AST',
+                        awayTeam: 'Fulham',
+                        awayLogo: 'FUL',
+                        time: '16:00',
+                        venue: 'Villa Park',
+                        score: '3 - 1',
+                        homeScorers: ['Ollie Watkins 37\'', 'John McGinn 49\'', 'Emiliano Buendía 51\''],
+                        awayScorers: ['Raúl Jiménez 3\'']
+                    },
+                    {
+                        homeTeam: 'Newcastle',
+                        homeLogo: 'NEW',
+                        awayTeam: 'Arsenal',
+                        awayLogo: 'ARS',
+                        time: '18:30',
+                        venue: 'St. James\' Park',
+                        score: '1 - 2',
+                        homeScorers: ['Nick Woltemade 34\''],
+                        awayScorers: ['Mikel Merino 84\'', 'Gabriel Magalhães 90+6']
+                    }
+                ],
+                '2025-09-29': [
+                    {
+                        homeTeam: 'Everton',
+                        homeLogo: 'EVE',
+                        awayTeam: 'West Ham',
+                        awayLogo: 'WHU',
+                        time: '22:00',
+                        venue: 'Hill Dickinson Stadium',
+                        score: '1 - 1',
+                        homeScorers: ['Michael Keane 18\''],
+                        awayScorers: ['Jarrod Bowen 65\'']
+                    },
+                ],
+                '2025-10-03': [
+                    {
+                        homeTeam: 'Bournemouth',
+                        homeLogo: 'BOU',
+                        awayTeam: 'Fulham',
+                        awayLogo: 'FUL',
+                        time: '22:00',
+                        venue: 'Vitality Stadium',
+                        score: '3 - 1',
+                        homeScorers: ['Antoine Semenyo 78\'', 'Antoine Semenyo 90+6\'', 'Justin Kluivert 84\''],
+                        awayScorers: ['Ryan Sessegnon 70\'']
+                    }
+                ],
+                '2025-10-04': [
+                    {
+                        homeTeam: 'Leeds United',
+                        homeLogo: 'LEE',
+                        awayTeam: 'Tottenham',
+                        awayLogo: 'TOT',
+                        time: '14:30',
+                        venue: 'Elland Road',
+                        score: '1 - 2',
+                        homeScorers: ['Noah Okafor 34\''],
+                        awayScorers: ['Mathys Tel 23\'', 'Mohammed Kudus 57\'']
+                    },
+                    {
+                        homeTeam: 'Manchester United',
+                        homeLogo: 'MUN',
+                        awayTeam: 'Sunderland',
+                        awayLogo: 'SUN',
+                        time: '17:00',
+                        venue: 'Old Trafford',
+                        score: '2 - 0',
+                        homeScorers: ['Mason Mount 8\'', 'Benjamin Šeško 31\''],
+                        awayScorers: [null]
+                    },
+                    {
+                        homeTeam: 'Arsenal',
+                        homeLogo: 'ARS',
+                        awayTeam: 'West Ham',
+                        awayLogo: 'WHU',
+                        time: '17:00',
+                        venue: 'Emirates Stadium',
+                        score: '2 - 0',
+                        homeScorers: ['Declan Rice 38\'', 'Bukayo Saka 67\' (pen)'],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Chelsea',
+                        homeLogo: 'CHE',
+                        awayTeam: 'Liverpool',
+                        awayLogo: 'LIV',
+                        time: '19:30',
+                        venue: 'Stamford Bridge',
+                        score: '2 - 1',
+                        homeScorers: ['Moisés Caicedo 14\'', 'Estêvão 90+5\''],
+                        awayScorers: ['Cody Gakpo 63\'']
+                    }
+                ],
+                '2025-10-05': [
+                    {
+                        homeTeam: 'Everton',
+                        homeLogo: 'EVE',
+                        awayTeam: 'Crystal Palace',
+                        awayLogo: 'CRY',
+                        time: '16:00',
+                        venue: 'Hill Dickinson Stadium',
+                        score: '2 - 1',
+                        homeScorers: ['Iliman Ndiaye 76\' (pen)', 'Jack Grealish 90+3\''],
+                        awayScorers: ['Daniel Muñoz 37\'']
+                    },
+                    {
+                        homeTeam: 'Newcastle',
+                        homeLogo: 'NEW',
+                        awayTeam: 'Nottingham Forest',
+                        awayLogo: 'NFO',
+                        time: '16:00',
+                        venue: 'St. James\' Park',
+                        score: '2 - 0',
+                        homeScorers: ['Bruno Guimarães 58\'', 'Nick Woltemade 84\' (pen)'],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Wolverhampton',
+                        homeLogo: 'WOL',
+                        awayTeam: 'Brighton',
+                        awayLogo: 'BHA',
+                        time: '16:00',
+                        venue: 'Molineux Stadium',
+                        score: '1 - 1',
+                        homeScorers: ['Bart Verbruggen 21\' (OG)'],
+                        awayScorers: ['Jan Paul van Hecke 86\'']
+                    },
+                    {
+                        homeTeam: 'Aston Villa',
+                        homeLogo: 'AST',
+                        awayTeam: 'Burnley',
+                        awayLogo: 'BUR',
+                        time: '16:00',
+                        venue: 'Villa Park',
+                        score: '2 - 1',
+                        homeScorers: ['Donyell Malen 25\'', 'Donyell Malen 63\''],
+                        awayScorers: ['Lesley Ugochukwu 78\'']
+                    },
+                    {
+                        homeTeam: 'Brentford',
+                        homeLogo: 'BRE',
+                        awayTeam: 'Manchester City',
+                        awayLogo: 'MCI',
+                        time: '18:30',
+                        venue: 'Gtech Community Stadium',
+                        score: '0 - 1',
+                        homeScorers: [],
+                        awayScorers: ['Erling Haaland 9\'']
+                    }
+                ],
+                 '2025-10-18': [
+                    {
+                        homeTeam: 'Nottingham Forest',
+                        homeLogo: 'NOT',
+                        awayTeam: 'Chelsea',
+                        awayLogo: 'CHE',
+                        time: '14:30',
+                        venue: 'City Ground',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Brighton',
+                        homeLogo: 'BHA',
+                        awayTeam: 'Newcastle United',
+                        awayLogo: 'NEW',
+                        time: '17:00',
+                        venue: 'Amex Stadium',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Burnley',
+                        homeLogo: 'BUR',
+                        awayTeam: 'Leeds United',
+                        awayLogo: 'LEE',
+                        time: '17:00',
+                        venue: 'Turf Moor',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Crystal Palace',
+                        homeLogo: 'CRY',
+                        awayTeam: 'Bournemouth',
+                        awayLogo: 'BOU',
+                        time: '17:00',
+                        venue: 'Selhurst Park',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Manchester City',
+                        homeLogo: 'MCI',
+                        awayTeam: 'Everton',
+                        awayLogo: 'EVE',
+                        time: '17:00',
+                        venue: 'Etihad Stadium',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Sunderland',
+                        homeLogo: 'SUN',
+                        awayTeam: 'Wolverhampton',
+                        awayLogo: 'WOL',
+                        time: '17:00',
+                        venue: 'Stadium of Light',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Fulham',
+                        homeLogo: 'FUL',
+                        awayTeam: 'Arsenal',
+                        awayLogo: 'ARS',
+                        time: '19:30',
+                        venue: 'Craven Cottage',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    }
+                ],
+                '2025-10-19': [
+                    {
+                        homeTeam: 'Tottenham',
+                        homeLogo: 'TOT',
+                        awayTeam: 'Aston Villa',
+                        awayLogo: 'AST',
+                        time: '16:00',
+                        venue: 'Tottenham Hotspur Stadium',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    },
+                    {
+                        homeTeam: 'Liverpool',
+                        homeLogo: 'LIV',
+                        awayTeam: 'Manchester United',
+                        awayLogo: 'MUN',
+                        time: '18:30',
+                        venue: 'Anfield',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    }
+                ],
+                '2025-10-20': [
+                    {
+                        homeTeam: 'West Ham',
+                        homeLogo: 'WHU',
+                        awayTeam: 'Brentford',
+                        awayLogo: 'BRE',
+                        time: '22:00',
+                        venue: 'London Stadium',
+                        score: null,
+                        homeScorers: [],
+                        awayScorers: []
+                    }
+                ]
+            };
+
             
-            gameweekButtons.forEach((button, index) => {
-                button.addEventListener('click', function() {
-                    // Remove active class from all buttons
-                    gameweekButtons.forEach(btn => btn.classList.remove('active'));
+
+            // Calendar functionality
+            let currentDate = new Date();
+            
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            function updateCalendar() {
+                const calendarGrid = document.querySelector('.calendar-grid');
+                const currentMonthElement = document.getElementById('current-month');
+                
+                // Clear existing calendar days (keep headers)
+                while (calendarGrid.children.length > 7) {
+                    calendarGrid.removeChild(calendarGrid.lastChild);
+                }
+                
+                // Update month display
+                currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDay = firstDay.getDay();
+                
+                // Add empty cells for days before the first day of the month
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day other-month';
+                    calendarGrid.appendChild(emptyDay);
+                }
+                
+                // Add days of the month
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
                     
-                    // Add active class to clicked button
-                    this.classList.add('active');
+                    const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     
-                    // Hide all gameweek cards
-                    gameweekCards.forEach(card => card.style.display = 'none');
+                    // Check if today
+                    const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    if (cellDate.getTime() === today.getTime()) {
+                        dayElement.classList.add('today');
+                    }
                     
-                    // Show selected gameweek card
-                    gameweekCards[index].style.display = 'block';
-                });
+                    // Check if has fixtures
+                    if (fixturesData[dateString]) {
+                        dayElement.classList.add('has-fixtures');
+                    }
+                    
+                    // Add click event
+                    dayElement.addEventListener('click', function() {
+                        // Remove active class from all days
+                        document.querySelectorAll('.calendar-day').forEach(day => {
+                            day.classList.remove('active');
+                        });
+                        
+                        // Add active class to clicked day
+                        this.classList.add('active');
+                        
+                        // Display fixtures for selected date
+                        displayFixtures(dateString);
+                    });
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+                
+                // Auto-select today if it's in the current month view
+                if (currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear()) {
+                    const todayElement = calendarGrid.children[7 + today.getDate() + startingDay - 1];
+                    if (todayElement) {
+                        todayElement.click();
+                    }
+                } else {
+                    // Select first day with fixtures, or first day of month
+                    let selected = false;
+                    for (let i = 7; i < calendarGrid.children.length; i++) {
+                        const dayElement = calendarGrid.children[i];
+                        if (dayElement.classList.contains('has-fixtures')) {
+                            dayElement.click();
+                            selected = true;
+                            break;
+                        }
+                    }
+                    if (!selected && calendarGrid.children.length > 7) {
+                        calendarGrid.children[7].click();
+                    }
+                }
+            }
+            
+            function displayFixtures(dateString) {
+                const fixturesDisplay = document.getElementById('fixtures-display');
+                const fixtures = fixturesData[dateString];
+                
+                if (fixtures && fixtures.length > 0) {
+                    const date = new Date(dateString);
+                    const formattedDate = date.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    
+                    let fixturesHTML = `
+                        <div class="date-card">
+                            <div class="date-header">
+                                <div class="date-title">${formattedDate}</div>
+                            </div>
+                            <ul class="fixtures-list">
+                    `;
+                    
+                    fixtures.forEach(fixture => {
+                        fixturesHTML += `
+                            <li class="fixture-item">
+                                <div class="teams">
+                                    <div class="home-team">
+                                        <div class="team-logo">${fixture.homeLogo}</div>
+                                        <div class="team-name">${fixture.homeTeam}</div>
+                                    </div>
+                                    ${fixture.score ? `
+                                        <div class="score-block">
+                                            <ul class="scorers-list home-scorers">
+                                                ${fixture.homeScorers.map(scorer => `<li>${scorer}</li>`).join('')}
+                                            </ul>
+                                            <div class="scoreline">${fixture.score}</div>
+                                            <ul class="scorers-list away-scorers">
+                                                ${fixture.awayScorers.map(scorer => `<li>${scorer}</li>`).join('')}
+                                            </ul>
+                                        </div>
+                                    ` : `<div class="vs">vs</div>`}
+                                    <div class="away-team">
+                                        <div class="team-name">${fixture.awayTeam}</div>
+                                        <div class="team-logo">${fixture.awayLogo}</div>
+                                    </div>
+                                </div>
+                                <div class="fixture-details">
+                                    <div class="fixture-time">${fixture.time}</div>
+                                    <div class="fixture-venue">${fixture.venue}</div>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    
+                    fixturesHTML += `
+                            </ul>
+                        </div>
+                    `;
+                    
+                    fixturesDisplay.innerHTML = fixturesHTML;
+                } else {
+                    fixturesDisplay.innerHTML = `
+                        <div class="date-card">
+                            <div class="date-header">
+                                <div class="date-title">${new Date(dateString).toLocaleDateString('en-US', { 
+                                    weekday: 'long', 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                })}</div>
+                            </div>
+                            <div class="no-fixtures">
+                                <i class="fas fa-calendar-times"></i>
+                                <h3>No Fixtures Scheduled</h3>
+                                <p>There are no Premier League matches scheduled for this date.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Event listeners for calendar navigation
+            document.getElementById('prev-month').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                updateCalendar();
             });
             
-            // Add hover effects to fixture items
-            const fixtureItems = document.querySelectorAll('.fixture-item');
+            document.getElementById('next-month').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                updateCalendar();
+            });
             
-            fixtureItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                });
+            document.getElementById('today-btn').addEventListener('click', function() {
+                currentDate = new Date();
+                currentDate.setDate(1);
+                updateCalendar();
+            });
+            
+            // Initialize calendar
+            updateCalendar();
+            
+            // Add hover effects to fixture items
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.closest('.fixture-item')) {
+                    const fixtureItem = e.target.closest('.fixture-item');
+                    fixtureItem.style.transform = 'translateY(-2px)';
+                    fixtureItem.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                }
+            });
+            
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.closest('.fixture-item')) {
+                    const fixtureItem = e.target.closest('.fixture-item');
+                    fixtureItem.style.transform = 'translateY(0)';
+                    fixtureItem.style.boxShadow = 'none';
+                }
             });
         });
     </script>

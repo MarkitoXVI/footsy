@@ -34,10 +34,11 @@ class FantasyTeam extends Model
      */
 public function players()
 {
-    return $this->belongsToMany(Player::class, 'fantasy_team_players')
-                ->withPivot(['is_substitute', 'position_order'])
+    return $this->belongsToMany(Player::class, 'fantasy_team_player')
+                ->withPivot('is_substitute', 'position_order')
                 ->withTimestamps();
 }
+
 
     /**
      * Get the captain of the team.

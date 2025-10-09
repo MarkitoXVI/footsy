@@ -446,7 +446,7 @@
     <header>
         <div class="container">
             <nav>
-                <a href="#" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">F</div>
                     Footsy
                 </a>
@@ -465,10 +465,10 @@
                     <div class="testimonial">
                         <p>"Footsy has completely transformed how I enjoy football. My friends and I have our own league and the competition is fierce!"</p>
                         <div class="user">
-                            <div class="user-avatar">A</div>
+                            <div class="user-avatar">PJ</div>
                             <div>
-                                <strong>Alex Johnson</strong>
-                                <div>Footsy User for 2 years</div>
+                                <strong>Paul Johnson</strong>
+                                <div>Footsy User for over 8 years</div>
                             </div>
                         </div>
                     </div>
@@ -540,10 +540,13 @@
                             <span>Or sign in with</span>
                         </div>
                         
-                        <a href="#" class="btn btn-google">
+                       <a href="{{ route('google.login') }}" 
+                        class="flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 
+                                text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg transition duration-150 ease-in-out">
                             <i class="fab fa-google"></i>
-                            Sign in with Google
+                            <span>Sign in with Google</span>
                         </a>
+
                         
                         <div class="auth-footer">
                             <p>Don't have an account? <a href="{{ route('register') }}">Sign up here</a></p>
@@ -565,7 +568,7 @@
                 <a href="#">Help Center</a>
             </div>
             <div class="copyright">
-                &copy; 2023 Footsy - Fantasy Football Platform. All rights reserved.
+                &copy; 2025 Footsy - Fantasy Football Platform. All rights reserved.
             </div>
         </div>
     </footer>

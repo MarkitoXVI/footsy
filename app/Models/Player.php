@@ -7,90 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'team_id',
-        'first_name',
-        'last_name',
-        'position',
-        'jersey_number',
-        'price',
-        'total_points',
-        'form',
-        'points_per_game',
-        'minutes_played',
-        'goals_scored',
-        'assists',
-        'clean_sheets',
-        'yellow_cards',
-        'red_cards',
+        'fpl_id','code','team_id','element_type','first_name','second_name','web_name',
+        'price','form','points_per_game','total_points','minutes',
+        'goals_scored','assists','clean_sheets','yellow_cards','red_cards',
+        'status','news','photo'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'price' => 'decimal:2',
-        'form' => 'decimal:1',
-        'points_per_game' => 'decimal:1',
-    ];
+    protected $appends = ['full_name','photo_url','position_label'];
 
-    /**
-     * Get the team that the player belongs to.
-     */
-    public function team()
+    public function team(){ return $this->belongsTo(Team::class); }
+
+    public function getFullNameAttribute(){ return "{$this->first_name} {$this->second_name}"; }
+
+    public function getPhotoUrlAttribute()
     {
-        return $this->belongsTo(Team::class);
+        // FPL images pattern: strip ".jpg" and prepend "p"
+        // Example: photo "12345.jpg" => .../p12345.png (or .jpg; png is common)
+        if(!$this->photo) return null;
+        $slug = pathinfo($this->photo, PATHINFO_FILENAME);
+        return "https://resources.premierleague.com/premierleague/photos/players/110x140/p{$slug}.png";
     }
 
-    /**
-     * Get the fantasy teams that include this player.
-     */
-    public function fantasyTeams()
+    public function getPositionLabelAttribute()
     {
-        return $this->belongsToMany(FantasyTeam::class, 'fantasy_team_player')
-                    ->withPivot('is_captain', 'is_vice_captain', 'position')
-                    ->withTimestamps();
-    }
-
-    /**
-     * Get the player's full name.
-     */
-    public function getFullNameAttribute()
-    {
-        return "{$this->first_name} {$this->last_name}";
-    }
-
-    /**
-     * Get the player's fixtures.
-     */
-    public function fixtures()
-    {
-        return $this->hasManyThrough(Fixture::class, Team::class, 'id', 'home_team_id', 'team_id', 'id')
-                    ->orHasManyThrough(Fixture::class, Team::class, 'id', 'away_team_id', 'team_id', 'id');
-    }
-
-    /**
-     * Scope a query to only include players of a given position.
-     */
-    public function scopeByPosition($query, $position)
-    {
-        return $query->where('position', $position);
-    }
-
-    /**
-     * Scope a query to only include players from a given team.
-     */
-    public function scopeByTeam($query, $teamId)
-    {
-        return $query->where('team_id', $teamId);
+        return [1=>'GKP',2=>'DEF',3=>'MID',4=>'FWD'][$this->element_type] ?? 'UNK';
     }
 }

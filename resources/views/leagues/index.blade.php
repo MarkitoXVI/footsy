@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leagues - Footsy Fantasy FootballV</title>
+    <title>Leagues - Footsy Fantasy Football</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -329,6 +329,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
         }
         
         .btn-primary {
@@ -442,6 +445,60 @@
         .empty-text {
             color: var(--gray);
             margin-bottom: 1.5rem;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
         }
         
         /* Responsive Design */
@@ -572,6 +629,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('help') }}" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help and Support</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('profile.edit') }}" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -617,12 +680,10 @@
             </div>
 
             <!-- Success Message -->
-            @if(session('success'))
-                <div class="alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
-                </div>
-            @endif
+            <div class="alert-success" id="successMessage" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText"></span>
+            </div>
 
             <!-- Search and Filter -->
             <div class="search-filter">
@@ -641,136 +702,327 @@
             <!-- My Leagues Section -->
             <div class="league-section">
                 <h2 class="section-title">My Leagues</h2>
-                
-                @if($userLeagues->count() > 0)
-                    @foreach($userLeagues as $league)
-                    <div class="league-card">
-                        <div class="league-header">
-                            <div>
-                                <h3 class="league-name">{{ $league->name }}</h3>
-                                <div class="league-code">Code: {{ $league->code }}</div>
-                            </div>
-                            <span class="league-status status-joined">Joined</span>
-                        </div>
-                        <p class="league-description">{{ $league->scoring_system === 'standard' ? 'Standard scoring league' : '' }}</p>
-                        <p class="league-admin">Admin: {{ optional($league->admin)->name }} • Created: {{ $league->created_at?->format('F j, Y') }}</p>
-                        <div class="league-details">
-                            <div class="league-detail">
-                                <span class="detail-value">{{ $league->participants_count }}/{{ $league->max_participants ?? '∞' }}</span>
-                                <span class="detail-label">Participants</span>
-                            </div>
-                            <div class="league-detail">
-                                <span class="detail-value">{{ ucfirst($league->type) }}</span>
-                                <span class="detail-label">Privacy</span>
-                            </div>
-                            <div class="league-detail">
-                                <span class="detail-value">--</span>
-                                <span class="detail-label">Your Rank</span>
-                            </div>
-                        </div>
-                        <div class="league-actions">
-                            <a class="league-btn btn-primary" href="{{ route('leagues.show', $league) }}">View Standings</a>
-                            @if($league->admin_id != Auth::id())
-                                <button class="league-btn btn-danger" onclick="leaveLeague({{ $league->id }}, @json($league->name))">Leave League</button>
-                            @else
-                                <button class="league-btn btn-danger" onclick="deleteLeague({{ $league->id }}, @json($league->name))">Delete League</button>
-                            @endif
-                        </div>
+
+            {{-- Default Standard Leagues --}}
+            <div class="league-card">
+                <div class="league-header">
+                    <div>
+                        <h3 class="league-name">Premier Champions</h3>
+                        <div class="league-code">Code: CHAMP2024</div>
                     </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3 class="empty-title">No Leagues Joined</h3>
-                        <p class="empty-text">You haven't joined any leagues yet. Join a league or create your own to start competing!</p>
-                        <a href="{{ route('leagues.create') }}" class="create-league-btn">Create a League</a>
+                    <span class="league-status status-joined">Joined</span>
+                </div>
+                <p class="league-description">Standard scoring league for serious competitors</p>
+                <p class="league-admin">Admin: John Smith • Created: September 15, 2024</p>
+                <div class="league-details">
+                    <div class="league-detail">
+                        <span class="detail-value">12/20</span>
+                        <span class="detail-label">Participants</span>
                     </div>
-                @endif
+                    <div class="league-detail">
+                        <span class="detail-value">Private</span>
+                        <span class="detail-label">Privacy</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">3rd</span>
+                        <span class="detail-label">Your Rank</span>
+                    </div>
+                </div>
+                <div class="league-actions">
+                    <a class="league-btn btn-primary" href="{{ route('leagues.show', 1) }}">View Standings</a>
+                    <button class="league-btn btn-danger" onclick="leaveLeague(1, 'Premier Champions')">Leave League</button>
+                </div>
             </div>
 
-            <!-- Other Leagues Section -->
-            <div class="league-section">
-                <h2 class="section-title">Other Leagues</h2>
-                
-                @if($otherLeagues->count() > 0)
-                    @foreach($otherLeagues as $league)
-                    <div class="league-card">
-                        <div class="league-header">
-                            <div>
-                                <h3 class="league-name">{{ $league->name }}</h3>
-                                <div class="league-code">Code: {{ $league->code }}</div>
-                            </div>
-                            <span class="league-status status-{{ $league->type }}">{{ ucfirst($league->type) }}</span>
+            <div class="league-card">
+                <div class="league-header">
+                    <div>
+                        <h3 class="league-name">Global Fantasy League</h3>
+                        <div class="league-code">Code: GLOBAL24</div>
+                    </div>
+                    <span class="league-status status-joined">Joined</span>
+                </div>
+                <p class="league-description">International fantasy football competition</p>
+                <p class="league-admin">Admin: You • Created: October 1, 2024</p>
+                <div class="league-details">
+                    <div class="league-detail">
+                        <span class="detail-value">8/∞</span>
+                        <span class="detail-label">Participants</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">Public</span>
+                        <span class="detail-label">Privacy</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">1st</span>
+                        <span class="detail-label">Your Rank</span>
+                    </div>
+                </div>
+                <div class="league-actions">
+                    <a class="league-btn btn-primary" href="{{ route('leagues.show', 2) }}">View Standings</a>
+                    <button class="league-btn btn-danger" onclick="deleteLeague(2, 'Global Fantasy League')">Delete League</button>
+                </div>
+            </div>
+
+            {{-- Dynamically added user-created leagues --}}
+            @forelse($myLeagues as $league)
+                <div class="league-card">
+                    <div class="league-header">
+                        <div>
+                            <h3 class="league-name">{{ $league->name }}</h3>
+                            <div class="league-code">Code: {{ $league->code }}</div>
                         </div>
-                        <p class="league-description">{{ $league->scoring_system === 'standard' ? 'Standard scoring league' : '' }}</p>
-                        <p class="league-admin">Admin: {{ optional($league->admin)->name }} • Created: {{ $league->created_at?->format('F j, Y') }}</p>
-                        <div class="league-details">
-                            <div class="league-detail">
-                                <span class="detail-value">{{ $league->participants_count }}/{{ $league->max_participants ?? '∞' }}</span>
-                                <span class="detail-label">Participants</span>
-                            </div>
-                            <div class="league-detail">
-                                <span class="detail-value">{{ ucfirst($league->type) }}</span>
-                                <span class="detail-label">Privacy</span>
-                            </div>
+                        <span class="league-status status-joined">Joined</span>
+                    </div>
+                    <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
+                    <p class="league-admin">Admin: {{ $league->user->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
+
+                    <div class="league-details">
+                        <div class="league-detail">
+                            <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
+                            <span class="detail-label">Participants</span>
                         </div>
-                        <div class="league-actions">
-                            @if($league->type == 'public')
-                                <button class="league-btn btn-primary" onclick="joinLeague({{ $league->id }}, @json($league->name))">Join League</button>
-                            @else
-                                <button class="league-btn btn-primary" onclick="requestToJoin({{ $league->id }}, @json($league->name))">Request to Join</button>
-                            @endif
-                            <a class="league-btn btn-secondary" href="{{ route('leagues.show', $league) }}">View Details</a>
+                        <div class="league-detail">
+                            <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
+                            <span class="detail-label">Privacy</span>
+                        </div>
+                        <div class="league-detail">
+                            <span class="detail-value">-</span>
+                            <span class="detail-label">Your Rank</span>
                         </div>
                     </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <h3 class="empty-title">No Other Leagues Available</h3>
-                        <p class="empty-text">There are no other leagues available to join at the moment.</p>
+
+                    <div class="league-actions">
+                        <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">View Standings</a>
+                        <form method="POST" action="{{ route('leagues.destroy', $league->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="league-btn btn-danger">Delete League</button>
+                        </form>
                     </div>
-                @endif
+                </div>
+            @empty
+                {{-- Optional message if user has no custom leagues --}}
+            @endforelse
+        </div>
+
+
+       <!-- Other Leagues Section -->
+        <div class="league-section">
+            <h2 class="section-title">Other Leagues</h2>
+
+            {{-- Default global leagues --}}
+            <div class="league-card">
+                <div class="league-header">
+                    <div>
+                        <h3 class="league-name">Weekend Warriors</h3>
+                        <div class="league-code">Code: WEEKEND</div>
+                    </div>
+                    <span class="league-status status-public">Public</span>
+                </div>
+                <p class="league-description">Casual weekend fantasy football fun</p>
+                <p class="league-admin">Admin: Mike Johnson • Created: September 20, 2024</p>
+                <div class="league-details">
+                    <div class="league-detail">
+                        <span class="detail-value">15/30</span>
+                        <span class="detail-label">Participants</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">Public</span>
+                        <span class="detail-label">Privacy</span>
+                    </div>
+                </div>
+                <div class="league-actions">
+                    <button class="league-btn btn-primary" onclick="joinLeague(3, 'Weekend Warriors')">Join League</button>
+                    <a class="league-btn btn-secondary" href="{{ route('leagues.show', 3) }}">View Details</a>
+                </div>
+            </div>
+
+            <div class="league-card">
+                <div class="league-header">
+                    <div>
+                        <h3 class="league-name">Elite Competitors</h3>
+                        <div class="league-code">Code: ELITE2024</div>
+                    </div>
+                    <span class="league-status status-private">Private</span>
+                </div>
+                <p class="league-description">Invite-only league for top players</p>
+                <p class="league-admin">Admin: Sarah Wilson • Created: August 10, 2024</p>
+                <div class="league-details">
+                    <div class="league-detail">
+                        <span class="detail-value">18/20</span>
+                        <span class="detail-label">Participants</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">Private</span>
+                        <span class="detail-label">Privacy</span>
+                    </div>
+                </div>
+                <div class="league-actions">
+                    <button class="league-btn btn-primary" onclick="requestToJoin(4, 'Elite Competitors')">Request to Join</button>
+                    <a class="league-btn btn-secondary" href="{{ route('leagues.show', 4) }}">View Details</a>
+                </div>
+            </div>
+
+            {{-- Dynamically added public leagues --}}
+            @foreach($otherLeagues as $league)
+                <div class="league-card">
+                    <div class="league-header">
+                        <div>
+                            <h3 class="league-name">{{ $league->name }}</h3>
+                            <div class="league-code">Code: {{ $league->code }}</div>
+                        </div>
+                        <span class="league-status status-public">Public</span>
+                    </div>
+                    <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
+                    <p class="league-admin">Admin: {{ $league->user->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
+                    <div class="league-details">
+                        <div class="league-detail">
+                            <span class="detail-value">{{ $league->participants_count ?? 0 }}</span>
+                            <span class="detail-label">Participants</span>
+                        </div>
+                        <div class="league-detail">
+                            <span class="detail-value">Public</span>
+                            <span class="detail-label">Privacy</span>
+                        </div>
+                    </div>
+                    <div class="league-actions">
+                        <form method="POST" action="{{ route('leagues.join', $league->id) }}">
+                            @csrf
+                            <button type="submit" class="league-btn btn-primary">Join League</button>
+                        </form>
+                        <a class="league-btn btn-secondary" href="{{ route('leagues.show', $league->id) }}">View Details</a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="league-btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="league-btn btn-primary" id="confirmAction">Confirm</button>
             </div>
         </div>
     </div>
 
-    
     <script>
+        // League data storage
+        const leaguesData = {
+            1: { id: 1, name: 'Premier Champions', type: 'private', admin: false },
+            2: { id: 2, name: 'Global Fantasy League', type: 'public', admin: true },
+            3: { id: 3, name: 'Weekend Warriors', type: 'public', admin: false },
+            4: { id: 4, name: 'Elite Competitors', type: 'private', admin: false }
+        };
+
+        // Modal functionality
+        let currentAction = null;
+        let currentLeagueId = null;
+
+        function showModal(title, message, confirmCallback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('confirmationModal').style.display = 'flex';
+            currentAction = confirmCallback;
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            currentAction = null;
+            currentLeagueId = null;
+        }
+
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            successText.textContent = message;
+            successMessage.style.display = 'flex';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        }
+
         // League actions
         function joinLeague(leagueId, leagueName) {
-            if (confirm(`Are you sure you want to join "${leagueName}"?`)) {
-                window.location.href = `/leagues/${leagueId}/join`;
-            }
+            showModal(
+                'Join League',
+                `Are you sure you want to join "${leagueName}"?`,
+                () => {
+                    // Simulate API call
+                    setTimeout(() => {
+                        showSuccess(`Successfully joined "${leagueName}"!`);
+                        closeModal();
+                        // In real app, refresh the page or update UI
+                    }, 1000);
+                }
+            );
+            currentLeagueId = leagueId;
         }
 
         function requestToJoin(leagueId, leagueName) {
-            alert(`Join request sent for "${leagueName}". Waiting for approval.`);
-            // In real app, make API call to request joining
+            showModal(
+                'Request to Join',
+                `Send a join request for "${leagueName}"? The admin will need to approve your request.`,
+                () => {
+                    // Simulate API call
+                    setTimeout(() => {
+                        showSuccess(`Join request sent for "${leagueName}". Waiting for approval.`);
+                        closeModal();
+                    }, 1000);
+                }
+            );
+            currentLeagueId = leagueId;
         }
 
         function leaveLeague(leagueId, leagueName) {
-            if (confirm(`Are you sure you want to leave "${leagueName}"?`)) {
-                window.location.href = `/leagues/${leagueId}/leave`;
-            }
+            showModal(
+                'Leave League',
+                `Are you sure you want to leave "${leagueName}"? You will lose all your progress in this league.`,
+                () => {
+                    // Simulate API call
+                    setTimeout(() => {
+                        showSuccess(`Successfully left "${leagueName}".`);
+                        closeModal();
+                        // In real app, remove the league card from UI
+                        const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
+                        if (leagueCard) {
+                            leagueCard.style.display = 'none';
+                        }
+                    }, 1000);
+                }
+            );
+            currentLeagueId = leagueId;
         }
 
         function deleteLeague(leagueId, leagueName) {
-            if (confirm(`Are you sure you want to delete "${leagueName}"? This action cannot be undone.`)) {
-                alert(`League "${leagueName}" deleted successfully.`);
-                // In real app, make API call to delete league
-            }
-        }
-
-        // standings handled via anchor links
-
-        function viewLeagueDetails(leagueId) {
-            alert(`Showing details for league ID: ${leagueId}`);
-            // In real app, show league details modal
+            showModal(
+                'Delete League',
+                `Are you sure you want to delete "${leagueName}"? This action cannot be undone and all league data will be permanently lost.`,
+                () => {
+                    // Simulate API call
+                    setTimeout(() => {
+                        showSuccess(`League "${leagueName}" has been deleted successfully.`);
+                        closeModal();
+                        // In real app, remove the league card from UI
+                        const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
+                        if (leagueCard) {
+                            leagueCard.style.display = 'none';
+                        }
+                    }, 1000);
+                }
+            );
+            currentLeagueId = leagueId;
         }
 
         // Search and filter functionality
@@ -779,6 +1031,14 @@
             const leagueCards = document.querySelectorAll('.league-card');
             const filterSelect = document.querySelector('.filter-select');
 
+            // Modal confirm button
+            document.getElementById('confirmAction').addEventListener('click', function() {
+                if (currentAction) {
+                    currentAction();
+                }
+            });
+
+            // Search functionality
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
                 
@@ -794,35 +1054,45 @@
                 });
             });
 
+            // Filter functionality
             filterSelect.addEventListener('change', function() {
                 const filterValue = this.value;
                 
                 leagueCards.forEach(card => {
-                    if (filterValue === 'all') {
-                        card.style.display = 'block';
-                    } else if (filterValue === 'joined') {
-                        const status = card.querySelector('.league-status').textContent;
-                        if (status === 'Joined') {
+                    const statusElement = card.querySelector('.league-status');
+                    if (!statusElement) return;
+                    
+                    const status = statusElement.textContent.toLowerCase();
+                    
+                    switch (filterValue) {
+                        case 'all':
                             card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    } else if (filterValue === 'public') {
-                        const status = card.querySelector('.league-status').textContent;
-                        if (status === 'Public') {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    } else if (filterValue === 'private') {
-                        const status = card.querySelector('.league-status').textContent;
-                        if (status === 'Private') {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
+                            break;
+                        case 'joined':
+                            card.style.display = status === 'joined' ? 'block' : 'none';
+                            break;
+                        case 'public':
+                            card.style.display = status === 'public' ? 'block' : 'none';
+                            break;
+                        case 'private':
+                            card.style.display = status === 'private' ? 'block' : 'none';
+                            break;
                     }
                 });
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('confirmationModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
             });
         });
     </script>

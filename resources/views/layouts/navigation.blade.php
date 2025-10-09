@@ -84,6 +84,17 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                {{ __('Dashboard') }}
+            </x-nav-link>
+
+            <x-nav-link :href="route('help')" :active="request()->routeIs('help')">
+                {{ __('Help') }}
+            </x-nav-link>
+        </div>
+
+
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

@@ -15,16 +15,10 @@ class Team extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'short_name',
-        'code',
-        'strength',
-        'strength_overall_home',
-        'strength_overall_away',
-        'strength_attack_home',
-        'strength_attack_away',
-        'strength_defense_home',
-        'strength_defense_away',
+        'fpl_id','name','short_name','code','strength',
+        'strength_overall_home','strength_overall_away',
+        'strength_attack_home','strength_attack_away',
+        'strength_defence_home','strength_defence_away',
     ];
 
     /**

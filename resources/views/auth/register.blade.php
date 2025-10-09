@@ -293,19 +293,32 @@
             box-shadow: 0 5px 15px rgba(58, 94, 229, 0.3);
         }
         
+        /* Google Button Styles */
         .btn-google {
             background: white;
-            color: var(--dark);
-            border: 1px solid var(--light-gray);
+            color: #757575;
+            border: 1px solid #dadce0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             margin-top: 1rem;
+            padding: 0.875rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .btn-google:hover {
-            border-color: var(--gray);
+            background: #f8f9fa;
+            border-color: #dadce0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .btn-google i {
+            color: #4285f4;
+            font-size: 1.1rem;
         }
         
         .divider {
@@ -345,6 +358,64 @@
         
         .auth-footer a:hover {
             text-decoration: underline;
+        }
+        
+        /* Team Selection Styles */
+        .team-selection {
+            margin-bottom: 1.5rem;
+        }
+        
+        .team-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px;
+        }
+        
+        .team-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
+        }
+        
+        .team-preview {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(58, 94, 229, 0.05);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .team-preview.active {
+            display: flex;
+        }
+        
+        .team-logo-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: white;
+            padding: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .team-name-preview {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
         }
         
         /* Error Messages */
@@ -411,6 +482,12 @@
                 align-items: flex-start;
                 gap: 1rem;
             }
+            
+            .team-preview {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -419,7 +496,7 @@
     <header>
         <div class="container">
             <nav>
-                <a href="#" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">F</div>
                     Footsy
                 </a>
@@ -475,6 +552,32 @@
                             </div>
                         </div>
                         
+                        <!-- Team Selection -->
+                        <div class="form-group team-selection">
+                            <label for="favorite_team">Select Your Favorite Team</label>
+                            <select id="favorite_team" name="favorite_team" class="team-select form-control" required>
+                                <option value="">Choose your favorite Premier League team</option>
+                                @foreach($teams as $team)
+                                    <option value="{{ $team->short_name }}" 
+                                            data-logo="https://resources.premierleague.com/premierleague/badges/70/t{{ $team->code }}.png"
+                                            data-name="{{ $team->name }}">
+                                        {{ $team->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Team Preview -->
+                            <div id="teamPreview" class="team-preview">
+                                <img id="teamLogo" src="" alt="Team Logo" class="team-logo-preview">
+                                <span id="teamName" class="team-name-preview"></span>
+                            </div>
+
+                            <!-- Validation Error -->
+                            <div class="error-message">
+                                @error('favorite_team') {{ $message }} @enderror
+                            </div>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="input-with-icon">
@@ -500,7 +603,7 @@
                         
                         <div class="form-options">
                             <label class="remember-me">
-                                <input type="checkbox" name="remember">
+                                <input type="checkbox" name="remember" required>
                                 <span>I agree to the <a href="#">Terms & Conditions</a></span>
                             </label>
                         </div>
@@ -511,11 +614,12 @@
                             <span>Or sign up with</span>
                         </div>
                         
-                        <a href="#" class="btn btn-google">
+                        <!-- Google Sign In Button -->
+                        <a href="{{ route('google.login') }}" class="btn btn-google">
                             <i class="fab fa-google"></i>
-                            Sign up with Google
+                            <span>Sign up with Google</span>
                         </a>
-                        
+
                         <div class="auth-footer">
                             <p>Already have an account? <a href="{{ route('login') }}">Sign in here</a></p>
                         </div>
@@ -562,11 +666,34 @@
                 }
             });
             
+            // Team selection preview
+            const teamSelect = document.getElementById('favorite_team');
+            const teamPreview = document.getElementById('teamPreview');
+            const teamLogo = document.getElementById('teamLogo');
+            const teamName = document.getElementById('teamName');
+            
+            teamSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const logoUrl = selectedOption.getAttribute('data-logo');
+                const teamNameText = selectedOption.getAttribute('data-name');
+                
+                if (this.value) {
+                    // Show preview
+                    teamLogo.src = logoUrl;
+                    teamName.textContent = teamNameText;
+                    teamPreview.classList.add('active');
+                    this.classList.remove('input-error');
+                } else {
+                    // Hide preview
+                    teamPreview.classList.remove('active');
+                }
+            });
+            
             // Form validation
             const form = document.querySelector('.auth-form');
             form.addEventListener('submit', function(e) {
                 let isValid = true;
-                const inputs = form.querySelectorAll('input[required]');
+                const inputs = form.querySelectorAll('input[required], select[required]');
                 
                 inputs.forEach(input => {
                     if (!input.value.trim()) {
@@ -584,7 +711,16 @@
                 if (password.value !== confirmPassword.value) {
                     isValid = false;
                     confirmPassword.classList.add('input-error');
-                    document.querySelector('.error-message').textContent = 'Passwords do not match';
+                    const errorDiv = confirmPassword.closest('.form-group').querySelector('.error-message');
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Passwords do not match';
+                    }
+                }
+                
+                // Check if team is selected
+                if (!teamSelect.value) {
+                    isValid = false;
+                    teamSelect.classList.add('input-error');
                 }
                 
                 if (!isValid) {

@@ -27,32 +27,25 @@ class LeagueController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
-        $userId = Auth::id();
-
-        $userLeagues = League::with(['admin'])
+        // Fetch leagues created by the logged-in user
+        $myLeagues = League::with('user')
             ->withCount('participants')
-            ->where(function ($q) use ($userId) {
-                $q->where('admin_id', $userId)
-                  ->orWhereHas('participants', function ($qq) use ($userId) {
-                      $qq->where('user_id', $userId);
-                  });
-            })
-            ->orderByDesc('created_at')
+            ->where('user_id', Auth::id())
             ->get();
 
-        $otherLeagues = League::with(['admin'])
+        // Fetch public leagues not created by the user
+        $otherLeagues = League::with('user')
             ->withCount('participants')
-            ->where('admin_id', '!=', $userId)
-            ->whereDoesntHave('participants', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->orderByDesc('created_at')
+            ->where('privacy', 'public')
+            ->where('user_id', '!=', Auth::id())
             ->get();
 
-        return view('leagues.index', compact('userLeagues', 'otherLeagues'));
+        return view('leagues.index', compact('myLeagues', 'otherLeagues'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -65,35 +58,28 @@ class LeagueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'max_participants' => 'nullable|integer|min:2|max:100',
-            'type' => 'nullable|in:public,private',
-            'privacy' => 'nullable|in:public,private',
-        ]);
+        public function store(Request $request)
+        {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'privacy' => 'required|in:public,private',
+                'description' => 'nullable|string|max:500',
+            ]);
 
-        $type = $validated['type'] ?? $validated['privacy'] ?? 'public';
+            // Automatically generate a code for joining
+            $code = strtoupper(Str::random(8));
 
-        $league = League::create([
-            'name' => $validated['name'],
-            'code' => strtoupper(Str::random(6)),
-            'type' => $type,
-            'admin_id' => Auth::id(),
-            'is_public' => $type === 'public',
-            'max_participants' => $validated['max_participants'] ?? null,
-            'scoring_system' => 'standard',
-        ]);
+            // Create the league and assign it to the current user
+            $league = League::create([
+                'name' => $validated['name'],
+                'privacy' => $validated['privacy'],
+                'description' => $validated['description'] ?? null,
+                'code' => $code,
+                'user_id' => auth()->id(), // <-- VERY IMPORTANT
+            ]);
 
-        // Attach the creator as a participant
-        $league->participants()->syncWithoutDetaching([
-            Auth::id() => ['points' => 0, 'rank' => 0]
-        ]);
-
-        return redirect()->route('leagues.index')
-            ->with('success', 'League created successfully! League code: ' . $league->code);
-    }
+            return redirect()->route('leagues.index')->with('success', 'League created successfully!');
+        }
 
     /**
      * Join a league.

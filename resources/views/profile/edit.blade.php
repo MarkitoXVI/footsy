@@ -461,6 +461,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help and Support</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('profile.edit') }}" class="nav-link active">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -503,7 +509,33 @@
                 <div class="profile-info">
                     <h1>{{ Auth::user()->name }}</h1>
                     <p>Joined {{ Auth::user()->created_at->format('F Y') }}</p>
+
+                    @if(Auth::user()->favorite_team)
+                        @php
+                            $teamCode = strtoupper(Auth::user()->favorite_team);
+                            $logos = [
+                                'ARS' => 3, 'AVL' => 7, 'BOU' => 91, 'BRE' => 94, 'BHA' => 36,
+                                'CHE' => 8, 'CRY' => 31, 'EVE' => 11, 'FUL' => 54, 'LIV' => 14,
+                                'LUT' => 46, 'MCI' => 43, 'MUN' => 1, 'NEW' => 4, 'NFO' => 17,
+                                'SHU' => 49, 'TOT' => 6, 'WHU' => 21, 'WOL' => 39
+                            ];
+                            $teamId = $logos[$teamCode] ?? null;
+                            $teamLogo = $teamId ? "https://resources.premierleague.com/premierleague/badges/70/t{$teamId}.png" : null;
+                        @endphp
+
+                        <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 10px;">
+                            @if($teamLogo)
+                                <img src="{{ $teamLogo }}" alt="{{ $teamCode }} Logo" width="36" height="36" style="border-radius:50%; background:#f8f9fa;">
+                            @endif
+                            <span style="font-weight:600; color:var(--dark); font-size:0.95rem;">
+                                Favorite Team: {{ $teamCode }}
+                            </span>
+                        </div>
+                    @else
+                        <p style="margin-top:0.5rem; color:var(--gray);">No favorite team selected</p>
+                    @endif
                 </div>
+
             </div>
 
             <div class="profile-stats">

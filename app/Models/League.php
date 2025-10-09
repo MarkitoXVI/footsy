@@ -14,14 +14,12 @@ class League extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
+     protected $fillable = [
         'name',
         'code',
-        'type',
-        'admin_id',
-        'is_public',
-        'max_participants',
-        'scoring_system',
+        'privacy',
+        'description',
+        'user_id',
     ];
 
     /**

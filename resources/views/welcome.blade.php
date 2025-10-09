@@ -361,14 +361,13 @@
     <header>
         <div class="container">
             <nav>
-                <a href="#" class="logo">
+                <a href="/" class="logo">
                     <div class="logo-icon">F</div>
                     Footsy
                 </a>
                 <div class="nav-links">
-                    <a href="#">Features</a>
-                    <a href="#">How It Works</a>
-                    <a href="#">Pricing</a>
+                    <a href="{{ route('features') }}">Features</a>
+                    <a href="{{ route('how-it-works') }}">How It Works</a>
                     <a href="{{ route('login') }}" class="btn btn-outline">Log In</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
                 </div>
@@ -384,7 +383,7 @@
                 <p>Join thousands of football fans managing their fantasy teams, competing with friends, and proving their managerial skills.</p>
                 <div class="hero-buttons">
                     <a href="{{ route('register') }}" class="btn btn-primary">Get Started</a>
-                    <a href="#" class="btn btn-outline">Learn More</a>
+                    <a href="{{ route('how-it-works') }}" class="btn btn-outline">Learn More</a>
                 </div>
             </div>
         </div>
@@ -469,7 +468,7 @@
                 <a href="#">Help Center</a>
             </div>
             <div class="copyright">
-                &copy; 2023 Footsy - Fantasy Football Platform. All rights reserved.
+                &copy; 2025 Footsy - Fantasy Football Platform. All rights reserved.
             </div>
         </div>
     </footer>

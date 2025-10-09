@@ -683,6 +683,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help and Support</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('profile.edit') }}" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
@@ -768,7 +774,7 @@
                                     $substitutePlayers = $fantasyTeam->players->where('pivot.is_substitute', true)->sortBy('pivot.position_order');
                                     
                                     // Organize players by position according to formation
-                                    $goalkeepers = $startingPlayers->where('position', 'Goalkeeper');
+                                    $goalkeepers = $startingPlayers->where('position', 'Goalkeeper')->take(1);
                                     $defenders = $startingPlayers->where('position', 'Defender')->take($defendersCount);
                                     $midfielders = $startingPlayers->where('position', 'Midfielder')->take($midfieldersCount);
                                     $forwards = $startingPlayers->where('position', 'Forward')->take($forwardsCount);
@@ -787,7 +793,11 @@
                                             <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
                                         </div>
                                         <div class="player-position">Goalkeeper</div>
-                                        <div class="player-name">{{ $player->first_name }} {{ $player->last_name }}</div>
+                                        @php
+                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
+                                        @endphp
+                                        <div class="player-name">{{ $displayName }}</div>
                                         <div class="player-team">
                                             @if($player->team && is_object($player->team))
                                                 {{ $player->team->name }}
@@ -812,7 +822,11 @@
                                             <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
                                         </div>
                                         <div class="player-position">Defender</div>
-                                        <div class="player-name">{{ $player->first_name }} {{ $player->last_name }}</div>
+                                        @php
+                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
+                                        @endphp
+                                        <div class="player-name">{{ $displayName }}</div>
                                         <div class="player-team">
                                             @if($player->team && is_object($player->team))
                                                 {{ $player->team->name }}
@@ -837,7 +851,11 @@
                                             <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
                                         </div>
                                         <div class="player-position">Midfielder</div>
-                                        <div class="player-name">{{ $player->first_name }} {{ $player->last_name }}</div>
+                                        @php
+                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
+                                        @endphp
+                                        <div class="player-name">{{ $displayName }}</div>
                                         <div class="player-team">
                                             @if($player->team && is_object($player->team))
                                                 {{ $player->team->name }}
@@ -862,7 +880,11 @@
                                             <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
                                         </div>
                                         <div class="player-position">Forward</div>
-                                        <div class="player-name">{{ $player->first_name }} {{ $player->last_name }}</div>
+                                        @php
+                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
+                                        @endphp
+                                        <div class="player-name">{{ $displayName }}</div>
                                         <div class="player-team">
                                             @if($player->team && is_object($player->team))
                                                 {{ $player->team->name }}
@@ -893,7 +915,11 @@
                                 </div>
                                 <div class="bench-info">
                                     <div class="bench-position">{{ $player->position }}</div>
-                                    <div class="bench-name">{{ $player->first_name }} {{ $player->last_name }}</div>
+                                    @php
+                                        $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
+                                        if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
+                                    @endphp
+                                    <div class="bench-name">{{ $displayName }}</div>
                                     <div class="bench-price">£{{ number_format($player->price, 1) }}M</div>
                                 </div>
                             </div>

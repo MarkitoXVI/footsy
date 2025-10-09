@@ -17,33 +17,36 @@ class DashboardController extends Controller
         // Get user's fantasy team (if exists)
         $fantasyTeam = Auth::user()->fantasyTeam;
         
-        // Get upcoming fixtures - USING kickoff_time INSTEAD OF match_date
-        $upcomingFixtures = Fixture::with(['homeTeam', 'awayTeam'])
-            ->where('kickoff_time', '>=', now())
-            ->orderBy('kickoff_time', 'asc')
-            ->limit(5)
-            ->get();
-        
-        // If no fixtures in database, use sample data
-        if ($upcomingFixtures->isEmpty()) {
-            $upcomingFixtures = collect([
-                (object)[
-                    'home_team' => (object)['name' => 'Man City', 'short_name' => 'MCI'],
-                    'away_team' => (object)['name' => 'Liverpool', 'short_name' => 'LIV'],
-                    'kickoff_time' => now()->addDays(2)
-                ],
-                (object)[
-                    'home_team' => (object)['name' => 'Arsenal', 'short_name' => 'ARS'],
-                    'away_team' => (object)['name' => 'Chelsea', 'short_name' => 'CHE'],
-                    'kickoff_time' => now()->addDays(3)
-                ],
-                (object)[
-                    'home_team' => (object)['name' => 'Man United', 'short_name' => 'MUN'],
-                    'away_team' => (object)['name' => 'Tottenham', 'short_name' => 'TOT'],
-                    'kickoff_time' => now()->addDays(4)
-                ]
-            ]);
-        }
+        // Top Games (Gameweek 6) - explicit selection with results and scorers
+        $topGames = collect([
+            (object) [
+                'home_team' => (object)['name' => 'Brentford', 'short_name' => 'BRE'],
+                'away_team' => (object)['name' => 'Manchester United', 'short_name' => 'MUN'],
+                'score_home' => 3,
+                'score_away' => 1,
+                'scorers_home' => ["Igor Thiago 8'", "Igor Thiago 20'", "Mathias Jensen 90+5'"],
+                'scorers_away' => ["Benjamin Šeško 26'"],
+                'gameweek' => 6,
+            ],
+            (object) [
+                'home_team' => (object)['name' => 'Chelsea', 'short_name' => 'CHE'],
+                'away_team' => (object)['name' => 'Brighton', 'short_name' => 'BHA'],
+                'score_home' => 1,
+                'score_away' => 3,
+                'scorers_home' => ["Enzo Fernández 24'"],
+                'scorers_away' => ["Danny Welbeck 77'", "Maxim De Cuyper 90' +2", "Danny Welbeck 90' +10"],
+                'gameweek' => 6,
+            ],
+            (object) [
+                'home_team' => (object)['name' => 'Crystal Palace', 'short_name' => 'CRY'],
+                'away_team' => (object)['name' => 'Liverpool', 'short_name' => 'LIV'],
+                'score_home' => 2,
+                'score_away' => 1,
+                'scorers_home' => ["Ismaïla Sarr 9'", "Edward Nketiah 90' +7"],
+                'scorers_away' => ["Federico Chiesa 87'"],
+                'gameweek' => 6,
+            ],
+        ]);
         
         // Get league standings (sample data - replace with your actual data)
         $leagueStandings = [
@@ -103,7 +106,7 @@ class DashboardController extends Controller
         
         return view('dashboard', compact(
             'fantasyTeam', 
-            'upcomingFixtures', 
+            'topGames', 
             'leagueStandings', 
             'recentNews',
             'userStats'

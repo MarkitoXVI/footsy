@@ -6,16 +6,25 @@ use Illuminate\Http\Request;
 use App\Models\Player;
 use App\Models\FantasyTeam;
 
-class PlayerController extends Controller
+class PlayersController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $players = Player::with('team')->get();
-        return view('players.index', compact('players'));
+        // Get all teams
+        $teams = \App\Models\Team::withCount('players')->get();
+
+        // Get selected team ID (first one by default)
+        $teamId = $request->query('team_id', $teams->first()?->id);
+
+        // Load that team with its players
+        $selectedTeam = \App\Models\Team::with('players')->find($teamId);
+
+        return view('players.index', compact('teams', 'selectedTeam', 'teamId'));
     }
+
 
     /**
      * Show the form for selecting players by position.

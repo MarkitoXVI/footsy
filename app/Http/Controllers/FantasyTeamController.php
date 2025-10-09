@@ -28,140 +28,74 @@ class FantasyTeamController extends Controller
      * Parāda formu jauna resursa izveidei.
      */
     public function create()
-    {
-        $players = Player::all()->groupBy('position');
-        return view('fantasy-team.create', compact('players'));
-    }
+{
+    $players = \App\Models\Player::with('team')
+        ->orderByDesc('total_points')
+        ->get();
+
+    $teams = \App\Models\Team::orderBy('name')->get();
+
+    return view('fantasy-team.create', compact('players', 'teams'));
+}
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        Log::info('Team creation request received', $request->all());
-        
-        DB::beginTransaction();
-        
-        try {
-            $user = Auth::user();
-            
-            // Check if user already has a team
-            $existingTeam = FantasyTeam::where('user_id', $user->id)->first();
-            if ($existingTeam) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You already have a fantasy team!'
-                ], 400);
-            }
+{
+    $request->validate([
+        'players' => 'required|string'
+    ]);
 
-            // Validate the request
-            $validated = $request->validate([
-                'team_name' => 'required|string|max:255',
-                'formation' => 'required|string',
-                'players' => 'required|array',
-                'total_budget' => 'required|numeric',
-                'spent_budget' => 'required|numeric'
-            ]);
-
-            // Create the fantasy team
-            $fantasyTeam = FantasyTeam::create([
-                'user_id' => $user->id,
-                'team_name' => $validated['team_name'],
-                'formation' => $validated['formation'],
-                'total_budget' => $validated['total_budget'],
-                'spent_budget' => $validated['spent_budget'],
-                'remaining_budget' => $validated['total_budget'] - $validated['spent_budget']
-            ]);
-
-            // Attach players to the team
-            $this->attachPlayersToTeam($fantasyTeam, $validated['players']);
-
-            DB::commit();
-
-            Log::info('Team created successfully', ['team_id' => $fantasyTeam->id]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Team created successfully!',
-                'team_id' => $fantasyTeam->id,
-                'redirect_url' => route('fantasy-team.index')
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to create team: ' . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create team: ' . $e->getMessage()
-            ], 500);
-        }
+    $playerIds = explode(',', $request->players);
+    if (count($playerIds) > 15) {
+        return back()->withErrors('You can only select up to 15 players.');
     }
 
-    private function attachPlayersToTeam($fantasyTeam, $playersData)
-    {
-        $playerData = [];
-        
-        // Starting goalkeeper
-        if (!empty($playersData['goalkeeper'])) {
-            $playerData[$playersData['goalkeeper']] = [
-                'is_substitute' => false,
-                'position_order' => 1
-            ];
-        }
-        
-        // Defenders
-        if (!empty($playersData['defenders'])) {
-            foreach ($playersData['defenders'] as $index => $defenderId) {
-                if (!empty($defenderId)) {
-                    $playerData[$defenderId] = [
-                        'is_substitute' => false,
-                        'position_order' => 2 + $index
-                    ];
-                }
-            }
-        }
-        
-        // Midfielders
-        if (!empty($playersData['midfielders'])) {
-            foreach ($playersData['midfielders'] as $index => $midfielderId) {
-                if (!empty($midfielderId)) {
-                    $playerData[$midfielderId] = [
-                        'is_substitute' => false,
-                        'position_order' => 2 + count($playersData['defenders'] ?? []) + $index
-                    ];
-                }
-            }
-        }
-        
-        // Forwards
-        if (!empty($playersData['forwards'])) {
-            foreach ($playersData['forwards'] as $index => $forwardId) {
-                if (!empty($forwardId)) {
-                    $playerData[$forwardId] = [
-                        'is_substitute' => false,
-                        'position_order' => 2 + count($playersData['defenders'] ?? []) + count($playersData['midfielders'] ?? []) + $index
-                    ];
-                }
-            }
-        }
-        
-        // Substitutes
-        $substituteOrder = 1;
-        if (!empty($playersData['substitutes'])) {
-            foreach ($playersData['substitutes'] as $substituteId) {
-                if (!empty($substituteId)) {
-                    $playerData[$substituteId] = [
-                        'is_substitute' => true,
-                        'position_order' => $substituteOrder++
-                    ];
-                }
-            }
-        }
+    // Save team (simplified)
+    $team = \App\Models\FantasyTeam::create([
+        'user_id' => auth()->id(),
+        'name' => 'My Team',
+        'budget_spent' => \App\Models\Player::whereIn('id', $playerIds)->sum('price'),
+    ]);
 
-        // Attach players with additional data
-        if (!empty($playerData)) {
-            $fantasyTeam->players()->attach($playerData);
-        }
-    }
+    $team->players()->attach($playerIds);
+
+    return redirect()->route('fantasy-team.index')->with('success', 'Team created successfully!');
+}
+
+
+
+  public function edit($id)
+{
+    $fantasyTeam = FantasyTeam::with('players')->findOrFail($id);
+
+    // all available players (to show in modal for substitutions)
+    $players = Player::all();
+
+    // build structured teamData to preload JS
+    $formation = explode('-', $fantasyTeam->formation);
+    $defendersCount = (int)$formation[0];
+    $midfieldersCount = (int)$formation[1];
+    $forwardsCount = (int)$formation[2];
+
+    $starting = $fantasyTeam->players->where('pivot.is_substitute', false)->sortBy('pivot.position_order');
+    $subs = $fantasyTeam->players->where('pivot.is_substitute', true)->sortBy('pivot.position_order');
+
+    $teamData = [
+        'total_budget'   => $fantasyTeam->total_budget,
+        'spent_budget'   => $fantasyTeam->spent_budget,
+        'remaining_budget' => $fantasyTeam->remaining_budget,
+        'formation'      => $fantasyTeam->formation,
+        'gk'             => $starting->where('position', 'Goalkeeper')->values()->map->only(['id','name','team','position','price']),
+        'defenders'      => $starting->where('position', 'Defender')->take($defendersCount)->values()->map->only(['id','name','team','position','price']),
+        'midfielders'    => $starting->where('position', 'Midfielder')->take($midfieldersCount)->values()->map->only(['id','name','team','position','price']),
+        'forwards'       => $starting->where('position', 'Forward')->take($forwardsCount)->values()->map->only(['id','name','team','position','price']),
+        'subs'           => $subs->values()->map->only(['id','name','team','position','price']),
+    ];
+
+    return view('fantasy-team.edit', compact('fantasyTeam', 'players', 'teamData'));
+}
+
 }

@@ -419,6 +419,24 @@
             color: var(--gray);
             font-size: 0.85rem;
         }
+        /* Fixtures preview (aligned with fixtures page) */
+        .fixture-preview-list { list-style: none; padding: 0; margin: 0; }
+        .fixture-preview-item { padding: 1rem 0; border-bottom: 1px solid var(--light-gray); }
+        .fixture-preview-item:last-child { border-bottom: none; }
+        .fixture-link { text-decoration: none; color: inherit; display: block; }
+        .fixture-teams { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .team-side { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+        .team-right { justify-content: flex-end; text-align: right; }
+        .team-logo { width: 32px; height: 32px; border-radius: 50%; background: var(--light); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--dark); }
+        .team-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fixture-meta { text-align: center; color: var(--gray); font-size: 0.85rem; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 140px; }
+        .fixture-meta .kickoff { font-weight: 600; color: var(--primary); }
+        .fixture-meta .venue { font-size: 0.8rem; }
+        .scoreline { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--primary); margin-top: 0.25rem; }
+        .scorers-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1rem; align-items: start; justify-items: stretch; margin-top: 0.5rem; }
+        .scorers-list { list-style: none; padding: 0; margin: 0; font-size: 0.8rem; color: var(--gray); }
+        .scorers-home { text-align: left; }
+        .scorers-away { text-align: right; }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -536,6 +554,12 @@
         <a href="{{ route('fixtures.index') }}" class="nav-link {{ request()->routeIs('fixtures.*') ? 'active' : '' }}">
             <i class="fas fa-calendar-alt"></i>
             <span>Fixtures</span>
+        </a>
+    </li>
+     <li class="nav-item">
+        <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
+            <i class="fas fa-question-circle"></i>
+            <span>Help and Support</span>
         </a>
     </li>
     <li class="nav-item">
@@ -739,41 +763,67 @@
                     </div>
                 
                              Upcoming Fixtures Section -->
-@if(isset($upcomingFixtures) && count($upcomingFixtures) > 0)
+@if(isset($topGames) && count($topGames) > 0)
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Upcoming Fixtures</h3>
+            <h3 class="card-title">Top Games</h3>
             <a href="{{ route('fixtures.index') }}" class="view-all">View All</a>
         </div>
         
-        <ul class="match-list">
-            @foreach($upcomingFixtures as $fixture)
-                <li class="match-item">
-                    <div class="match-teams">
-                        <div class="team">
-                            <div class="team-avatar">
-                                {{ isset($fixture->home_team->short_name) ? substr($fixture->home_team->short_name, 0, 3) : (isset($fixture->homeTeam) ? substr($fixture->homeTeam->short_name, 0, 3) : 'HOM') }}
+        <ul class="fixture-preview-list">
+            @foreach($topGames as $fixture)
+                <li class="fixture-preview-item">
+                    <a href="{{ isset($fixture->id) ? route('fixtures.show', $fixture->id) : route('fixtures.index') }}" class="fixture-link">
+                        <div class="fixture-teams">
+                            <div class="team-side">
+                                <div class="team-logo">
+                                    {{ isset($fixture->homeTeam) ? substr($fixture->homeTeam->short_name, 0, 3) : (isset($fixture->home_team) ? substr($fixture->home_team->short_name, 0, 3) : 'HOM') }}
+                                </div>
+                                <div class="team-name">
+                                    {{ isset($fixture->homeTeam) ? $fixture->homeTeam->name : (isset($fixture->home_team) ? $fixture->home_team->name : 'Home Team') }}
+                                </div>
                             </div>
-                            <span>{{ isset($fixture->home_team->name) ? $fixture->home_team->name : (isset($fixture->homeTeam) ? $fixture->homeTeam->name : 'Home Team') }}</span>
-                        </div>
-                        <div class="vs">VS</div>
-                        <div class="team">
-                            <div class="team-avatar">
-                                {{ isset($fixture->away_team->short_name) ? substr($fixture->away_team->short_name, 0, 3) : (isset($fixture->awayTeam) ? substr($fixture->awayTeam->short_name, 0, 3) : 'AWY') }}
+                            <div class="fixture-meta">
+                                @if(isset($fixture->score_home) && isset($fixture->score_away))
+                                    <div class="scoreline">{{ $fixture->score_home }} - {{ $fixture->score_away }}</div>
+                                @endif
+                                @if(!empty($fixture->kickoff_time ?? null))
+                                    <div class="kickoff">
+                                        @if($fixture->kickoff_time instanceof \Carbon\Carbon)
+                                            {{ $fixture->kickoff_time->format('D, M j • g:i A') }}
+                                        @else
+                                            {{ \Carbon\Carbon::parse($fixture->kickoff_time)->format('D, M j • g:i A') }}
+                                        @endif
+                                    </div>
+                                @endif
+                                @if(!empty($fixture->stadium ?? ''))
+                                    <div class="venue">{{ $fixture->stadium }}</div>
+                                @endif
+                                @if(isset($fixture->scorers_home) || isset($fixture->scorers_away))
+                                    <div class="scorers-row">
+                                        <ul class="scorers-list scorers-home">
+                                            @foreach(($fixture->scorers_home ?? []) as $sh)
+                                                <li>{{ $sh }}</li>
+                                            @endforeach
+                                        </ul>
+                                        <ul class="scorers-list scorers-away">
+                                            @foreach(($fixture->scorers_away ?? []) as $sa)
+                                                <li>{{ $sa }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                             </div>
-                            <span>{{ isset($fixture->away_team->name) ? $fixture->away_team->name : (isset($fixture->awayTeam) ? $fixture->awayTeam->name : 'Away Team') }}</span>
+                            <div class="team-side team-right">
+                                <div class="team-name">
+                                    {{ isset($fixture->awayTeam) ? $fixture->awayTeam->name : (isset($fixture->away_team) ? $fixture->away_team->name : 'Away Team') }}
+                                </div>
+                                <div class="team-logo">
+                                    {{ isset($fixture->awayTeam) ? substr($fixture->awayTeam->short_name, 0, 3) : (isset($fixture->away_team) ? substr($fixture->away_team->short_name, 0, 3) : 'AWY') }}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="match-details">
-                        <span>Premier League</span>
-                        <span>
-                            @if($fixture->kickoff_time instanceof \Carbon\Carbon)
-                                {{ $fixture->kickoff_time->format('D, M j • g:i A') }}
-                            @else
-                                {{ \Carbon\Carbon::parse($fixture->kickoff_time)->format('D, M j • g:i A') }}
-                            @endif
-                        </span>
-                    </div>
+                    </a>
                 </li>
             @endforeach
         </ul>

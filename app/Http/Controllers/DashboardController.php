@@ -9,15 +9,20 @@ use App\Models\FantasyTeam;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the dashboard.
-     */
     public function index()
     {
-        // Get user's fantasy team (if exists)
+        // Get user's fantasy team
         $fantasyTeam = Auth::user()->fantasyTeam;
-        
-        // Top Games (Gameweek 6) - explicit selection with results and scorers
+
+        // Make sure players are in array form (not string)
+        $players = [];
+        if ($fantasyTeam && $fantasyTeam->players) {
+            $players = is_string($fantasyTeam->players)
+                ? json_decode($fantasyTeam->players, true)
+                : $fantasyTeam->players;
+        }
+
+        // Top Games (sample data)
         $topGames = collect([
             (object) [
                 'home_team' => (object)['name' => 'Brentford', 'short_name' => 'BRE'],
@@ -47,8 +52,8 @@ class DashboardController extends Controller
                 'gameweek' => 6,
             ],
         ]);
-        
-        // Get league standings (sample data - replace with your actual data)
+
+        // Sample League Standings
         $leagueStandings = [
             (object)[
                 'position' => 1,
@@ -75,8 +80,8 @@ class DashboardController extends Controller
                 'points' => 1248
             ]
         ];
-        
-        // Get recent news (sample data - replace with your actual data)
+
+        // Sample Recent News
         $recentNews = [
             (object)[
                 'title' => 'Haaland injury update',
@@ -94,24 +99,62 @@ class DashboardController extends Controller
                 'time' => '1 day ago'
             ]
         ];
-        
-        // Get user stats
+
+        // Compute user stats (fallbacks if no team)
         $userStats = [
             'global_rank' => $fantasyTeam ? 124 : 'N/A',
-            'total_points' => $fantasyTeam ? $fantasyTeam->total_points : 0,
+            'total_points' => $fantasyTeam->total_points ?? 0,
             'leagues_joined' => 3,
             'free_transfers' => 2,
             'has_team' => (bool) $fantasyTeam
         ];
-        
-        return view('dashboard', compact(
-            'fantasyTeam', 
-            'topGames', 
-            'leagueStandings', 
-            'recentNews',
-            'userStats'
-        ));
+
+        // Fetch top players globally (from FPL API)
+$bootstrap = \Illuminate\Support\Facades\Http::timeout(20)
+    ->get('https://fantasy.premierleague.com/api/bootstrap-static/')
+    ->json();
+
+$topPlayers = collect($bootstrap['elements'] ?? [])
+    ->sortByDesc('total_points')
+    ->take(5)
+    ->map(function ($p) use ($bootstrap) {
+        $teams = collect($bootstrap['teams'] ?? [])->keyBy('id');
+        $team = $teams[$p['team']] ?? null;
+
+        $positions = [
+            1 => 'GK',
+            2 => 'DEF',
+            3 => 'MID',
+            4 => 'FWD',
+        ];
+
+        return (object)[
+            'id' => $p['id'],
+            'name' => $p['web_name'],
+            'web_name' => $p['web_name'],
+            'position' => $positions[$p['element_type']] ?? '-',
+            'team' => (object)[
+                'name' => $team['name'] ?? 'Unknown',
+                'short_name' => $team['short_name'] ?? 'UNK',
+            ],
+            'total_points' => $p['total_points'],
+            'event_points' => $p['event_points'],
+            'points' => $p['total_points'], // alias for compatibility
+            'price' => $p['now_cost'] / 10,
+        ];
+    });
+
+       return view('dashboard', compact(
+    'fantasyTeam',
+    'players',
+    'topGames',
+    'leagueStandings',
+    'recentNews',
+    'userStats',
+    'topPlayers' // ✅ added here
+));
+
     }
 
-    // ... other methods
+    
 }

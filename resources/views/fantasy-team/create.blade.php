@@ -31,15 +31,18 @@
       font-family: 'Montserrat', sans-serif;
       margin-top: 0;
       font-size: 1.4rem;
+      margin-bottom: 1rem;
     }
 
-    .sidebar input, .sidebar select {
+    .sidebar input,
+    .sidebar select {
       width: 100%;
-      padding: 0.6rem 0.9rem;
+      padding: 0.65rem 0.9rem;
       border: none;
       border-radius: 6px;
       margin-bottom: 1rem;
       font-size: 0.9rem;
+      box-sizing: border-box;
     }
 
     .sidebar input {
@@ -56,6 +59,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 250px);
     }
 
     .player-card {
@@ -88,7 +93,7 @@
       font-weight: 600;
     }
 
-    /* RIGHT PANEL (TRANSFERS / PITCH) */
+    /* RIGHT PANEL (PITCH + STATUS) */
     .main {
       flex: 1;
       display: flex;
@@ -122,78 +127,109 @@
 
     /* PITCH AREA */
     .pitch-container {
-        position: relative;
-        width: 100%;
-        max-width: 900px;
-        margin: 2rem auto;
-        border-radius: 15px;
-        overflow: hidden;
-        background: linear-gradient(180deg, #4db36a 0%, #2f8e5c 100%);
-        aspect-ratio: 2 / 3; /* ensures the field keeps its shape */
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      height: 820px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      background:
+        linear-gradient(180deg, #4db36a 0%, #2f8e5c 100%),
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccer_field_-_empty.svg/1280px-Soccer_field_-_empty.svg.png') no-repeat center center;
+      background-size: cover;
+      background-position: center;
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 26px;
     }
 
-    .pitch-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: 1;
-        opacity: 0.15; /* faint lines visible */
+    .pitch-row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      align-items: center;
     }
-
-    .player-spot {
-        position: absolute;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        z-index: 2; /* ensures players show above pitch */
-    }
-
-    .gk-row  { top: 85%; }
-    .def-row { top: 65%; }
-    .mid-row { top: 45%; }
-    .fwd-row { top: 25%; }
 
     .field-player {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.9);
-        border-radius: 10px;
-        padding: 0.5rem 0.4rem;
-        text-align: center;
-        min-width: 80px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        transition: 0.2s;
+      grid-column: span 2;
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      padding: 0.55rem 0.6rem;
+      min-width: 92px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      transition: transform 0.2s ease, background 0.2s ease;
     }
 
     .field-player-img {
-        width: 55px;
-        height: 70px;
-        object-fit: cover;
-        border-radius: 8px;
-        margin-bottom: 0.3rem;
-        }
-
-        .field-player-name {
-        font-size: 0.75rem;
-        text-transform: capitalize;
-        }
-
-    .field-player:hover {
-        transform: translateY(-2px);
-        background: rgba(58,94,229,0.9);
-        color: white;
+      width: 60px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 0.35rem;
     }
 
-    /* SUBMIT BUTTON */
+    .field-player-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      line-height: 1.1;
+    }
+
+    .field-player:hover {
+      transform: translateY(-3px);
+      background: rgba(58,94,229,0.92);
+      color: #fff;
+    }
+
+    /* BENCH */
+    .bench-container {
+      max-width: 900px;
+      margin: 2rem;
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .bench-container h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #1a2238;
+    }
+
+    .bench-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .bench-player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 0.8rem 0.6rem;
+      width: 80px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .bench-player img {
+      width: 55px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 0.3rem;
+    }
+
     .btn-submit {
       background: linear-gradient(135deg,#3a5ee5,#2a48c5);
       border: none;
@@ -214,6 +250,44 @@
       margin-top: 0.5rem;
       text-align: center;
       font-size: 0.9rem;
+    }
+
+    /* TEAM NAME BOX */
+    .team-name-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+      max-width: 600px;
+    }
+
+    .team-name-box label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      color: #1a2238;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .team-name-box input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border: 1px solid #d3d9e2;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #1a2238;
+      background: #f5f8fb;
+      transition: 0.2s;
+    }
+
+    .team-name-box input:focus {
+      border-color: #3a5ee5;
+      outline: none;
+      background: #fff;
     }
   </style>
 </head>
@@ -240,7 +314,7 @@
         data-name="{{ strtolower($p->web_name) }}"
         data-price="{{ $p->price }}"
         onclick="togglePlayer(this)">
-    <div class="info">
+        <div class="info">
           <strong>{{ $p->web_name }}</strong>
           <span>{{ $p->position_label }} • {{ $p->team->short_name ?? '-' }}</span>
         </div>
@@ -250,33 +324,39 @@
     </div>
   </div>
 
-  <!-- RIGHT: Transfers / Pitch -->
+  <!-- RIGHT: Pitch & Status -->
   <div class="main">
     <div class="top-bar">
-      <h1>Transfers</h1>
+      <h1>Create Team</h1>
       <div class="status-box">
         <div class="status-item">Players Selected: <span id="playerCount">0</span>/15</div>
         <div class="status-item">Budget Remaining: £<span id="budgetRemaining">100.0</span>m</div>
-        <div class="status-item">Free Transfers: 1</div>
       </div>
     </div>
 
-    <div class="pitch-container">
-    <img
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccer_field_-_empty.svg/1280px-Soccer_field_-_empty.svg.png"
-        alt="Football Pitch"
-        class="pitch-img"
-    >
+    <form id="teamForm" action="{{ route('fantasy-team.store') }}" method="POST">
+      @csrf
+      <div class="team-name-box">
+        <label for="teamName">Team Name</label>
+        <input type="text" id="teamName" name="team_name" placeholder="Enter your team name..." maxlength="30" required>
+      </div>
 
-    <div class="player-spot fwd-row" id="fwdRow"></div>
-    <div class="player-spot mid-row" id="midRow"></div>
-    <div class="player-spot def-row" id="defRow"></div>
-    <div class="player-spot gk-row" id="gkRow"></div>
-    </div>
+      <div class="pitch-container">
+        <div class="pitch-row" id="fwdRow"></div>
+        <div class="pitch-row" id="midRow"></div>
+        <div class="pitch-row" id="defRow"></div>
+        <div class="pitch-row" id="gkRow"></div>
+      </div>
 
+      <div class="bench-container">
+        <h3>Bench</h3>
+        <div class="bench-row" id="benchRow"></div>
+      </div>
 
-    <div class="warning" id="warningMessage"></div>
-    <button type="submit" class="btn-submit">Save Team</button>
+      <input type="hidden" name="players" id="selectedPlayersInput">
+      <div class="warning" id="warningMessage"></div>
+      <button type="submit" class="btn-submit">Save Team</button>
+    </form>
   </div>
 
 <script>
@@ -289,36 +369,22 @@ const BUDGET = 100.0;
 const warning = document.getElementById('warningMessage');
 const playerCount = document.getElementById('playerCount');
 const budgetRemaining = document.getElementById('budgetRemaining');
-const fieldRows = {
-  GK: document.getElementById('gkRow'),
-  DEF: document.getElementById('defRow'),
-  MID: document.getElementById('midRow'),
-  FWD: document.getElementById('fwdRow')
-};
 
-function addPlayerBubble(player, container) {
+function addPlayerBubble(player) {
   const div = document.createElement('div');
   div.className = 'field-player';
-
-  // Use the same image source logic as in your player cards
   const imgSrc = `https://resources.premierleague.com/premierleague/photos/players/110x140/p${player.id}.png`;
-
   div.innerHTML = `
-    <img src="${imgSrc}"
-         onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
-         alt="${player.name}"
-         class="field-player-img">
+    <img src="${imgSrc}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';" alt="${player.name}" class="field-player-img">
     <div class="field-player-name">${player.name}</div>
   `;
-  
-  container.appendChild(div);
+  return div;
 }
-
 
 function togglePlayer(card) {
   const id = card.dataset.id;
   const team = card.dataset.team;
-  const pos = card.dataset.position;
+  const pos = normalizePosition(card.dataset.position);
   const price = parseFloat(card.dataset.price);
   const name = card.dataset.name;
   const exists = selectedPlayers.find(p => p.id === id);
@@ -333,8 +399,7 @@ function togglePlayer(card) {
     if (selectedPlayers.length >= MAX_PLAYERS) return showWarning("Max 15 players.");
     if (totalCost > BUDGET) return showWarning("Not enough budget.");
     if ((teamCount[team] || 0) >= MAX_PER_TEAM) return showWarning(`Max 3 players from ${team}.`);
-
-    selectedPlayers.push({id, team, pos, price, name});
+    selectedPlayers.push({ id, team, pos, price, name });
     teamCount[team] = (teamCount[team] || 0) + 1;
     card.classList.add('selected');
     warning.textContent = "";
@@ -346,35 +411,85 @@ function togglePlayer(card) {
   budgetRemaining.textContent = (BUDGET - spent).toFixed(1);
 }
 
-function showWarning(msg){ warning.textContent = msg; }
+function showWarning(msg) { warning.textContent = msg; }
 
 function updateField() {
-  Object.values(fieldRows).forEach(row => row.innerHTML = '');
+  ['gkRow','defRow','midRow','fwdRow','benchRow'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+
   const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
   selectedPlayers.forEach(p => { if (grouped[p.pos]) grouped[p.pos].push(p); });
 
-  const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
-  Object.entries(layout).forEach(([pos, max]) => {
-    grouped[pos].slice(0, max).forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'field-player';
-      div.textContent = p.name;
-      fieldRows[pos].appendChild(div);
+  const layoutMax = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
+  const columns = {
+    GK: [6], DEF: [2, 5, 8, 11], MID: [2, 5, 8, 11], FWD: [5, 8]
+  };
+
+  Object.entries(layoutMax).forEach(([pos, max]) => {
+    const rowEl = document.getElementById(pos.toLowerCase() + 'Row');
+    const players = grouped[pos].slice(0, max);
+    players.forEach((p, i) => {
+      const el = addPlayerBubble(p);
+      const col = (columns[pos] && columns[pos][i]) ? columns[pos][i] : 7;
+      el.style.gridColumn = `${col} / span 2`;
+      rowEl.appendChild(el);
     });
+  });
+
+  const allStarters = Object.entries(layoutMax).map(([pos, max]) => grouped[pos].slice(0, max)).flat();
+  const benchPlayers = selectedPlayers.filter(p => !allStarters.includes(p));
+  const benchRow = document.getElementById('benchRow');
+  benchPlayers.slice(0, 4).forEach(p => {
+    const b = document.createElement('div');
+    b.className = 'bench-player';
+    b.innerHTML = `
+      <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.id}.png"
+           onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';" alt="${p.name}">
+      <span>${p.name}</span>`;
+    benchRow.appendChild(b);
   });
 }
 
-document.getElementById('searchPlayer').addEventListener('input', filterPlayers);
-document.getElementById('filterPosition').addEventListener('change', filterPlayers);
+function normalizePosition(pos) {
+  const map = {
+    'GKP': 'GK', 'GK': 'GK', 'Goalkeeper': 'GK',
+    'DEF': 'DEF', 'Defender': 'DEF',
+    'MID': 'MID', 'Midfielder': 'MID',
+    'FWD': 'FWD', 'Forward': 'FWD'
+  };
+  return map[pos] || 'BENCH';
+}
+
+// === SEARCH + FILTER ===
+const searchInput = document.getElementById('searchPlayer');
+const positionFilter = document.getElementById('filterPosition');
 function filterPlayers() {
-  const searchVal = searchPlayer.value.toLowerCase();
-  const posVal = filterPosition.value;
+  const searchVal = searchInput.value.toLowerCase();
+  const posVal = positionFilter.value;
   document.querySelectorAll('.player-card').forEach(card => {
     const matchesName = card.dataset.name.includes(searchVal);
     const matchesPos = !posVal || card.dataset.position === posVal;
     card.style.display = matchesName && matchesPos ? 'flex' : 'none';
   });
 }
+searchInput.addEventListener('input', filterPlayers);
+positionFilter.addEventListener('change', filterPlayers);
+
+// === FORM SUBMIT ===
+document.getElementById('teamForm').addEventListener('submit', function(e) {
+  if (selectedPlayers.length < 11) {
+    e.preventDefault();
+    return showWarning("You need at least 11 players to save your team.");
+  }
+  const teamName = document.getElementById('teamName').value.trim();
+  if (!teamName) {
+    e.preventDefault();
+    return showWarning("Please enter a team name before saving.");
+  }
+  document.getElementById('selectedPlayersInput').value = JSON.stringify(selectedPlayers);
+});
 </script>
 
 </body>

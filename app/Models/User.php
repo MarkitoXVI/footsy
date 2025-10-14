@@ -53,11 +53,10 @@ class User extends Authenticatable
      * Get the leagues the user participates in.
      */
     public function leagues()
-    {
-        return $this->belongsToMany(League::class, 'league_user')
-                    ->withPivot('points', 'rank')
-                    ->withTimestamps();
-    }
+{
+    return $this->belongsToMany(League::class);
+}
+
 
     /**
      * Get the user's notifications.

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>My Fantasy Team - Footsy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Team - Footsy Fantasy Football</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,40 +11,33 @@
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
             --secondary: #34c759;
-            --danger: #e53e3e;
-            --warning: #f59e0b;
             --dark: #1a2238;
             --light: #f8f9fa;
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --sidebar-width: 260px;
+            --header-height: 70px;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--dark);
-            background-color: #f5f7ff;
+            background-color: #f5f8fb;
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Sidebar Styles */
+
+        /* Sidebar */
         .sidebar {
-            width: 260px;
+            width: var(--sidebar-width);
             background: var(--dark);
             color: white;
             height: 100vh;
@@ -53,7 +46,7 @@
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        
+
         .sidebar-header {
             padding: 1.5rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -61,7 +54,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .sidebar-logo {
             width: 36px;
             height: 36px;
@@ -74,22 +67,22 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
-        
+
         .sidebar-title {
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
             font-size: 1.4rem;
         }
-        
+
         .sidebar-nav {
             padding: 1.5rem 0;
         }
-        
+
         .nav-item {
             list-style: none;
             margin-bottom: 0.25rem;
         }
-        
+
         .nav-link {
             display: flex;
             align-items: center;
@@ -99,29 +92,29 @@
             transition: all 0.3s;
             border-left: 4px solid transparent;
         }
-        
+
         .nav-link:hover, .nav-link.active {
             background: rgba(255, 255, 255, 0.05);
             color: white;
             border-left-color: var(--primary);
         }
-        
+
         .nav-link i {
             margin-right: 12px;
             width: 20px;
             text-align: center;
         }
-        
+
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 260px;
+            margin-left: var(--sidebar-width);
             position: relative;
         }
-        
+
         /* Header */
         .header {
-            height: 70px;
+            height: var(--header-height);
             background: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             padding: 0 2rem;
@@ -132,20 +125,62 @@
             top: 0;
             z-index: 100;
         }
-        
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--light-gray);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+
+        .search-bar i {
+            color: var(--gray);
+            margin-right: 0.5rem;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+        }
+
         .user-menu {
             display: flex;
             align-items: center;
             gap: 1.5rem;
         }
-        
+
+        .notification-bell {
+            position: relative;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--secondary);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .user-profile {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
         }
-        
+
         .user-avatar {
             width: 40px;
             height: 40px;
@@ -157,392 +192,320 @@
             color: white;
             font-weight: 600;
         }
-        
+
         .user-info {
             display: flex;
             flex-direction: column;
         }
-        
+
         .user-name {
             font-weight: 600;
             font-size: 0.95rem;
         }
-        
+
         .user-role {
             font-size: 0.8rem;
             color: var(--gray);
         }
-        
-        /* Team Content */
-        .team-content {
+
+        /* Page Content */
+        .page {
             padding: 2rem;
         }
-        
-        .team-header {
-            margin-bottom: 2rem;
-        }
-        
-        .team-title {
+
+        h1 {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
-        
-        .team-subtitle {
-            color: var(--gray);
-        }
-        
-        /* Budget Display */
-        .budget-display {
+
+        .team-info {
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .budget-info {
+
+        .team-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .team-stats {
             display: flex;
             gap: 2rem;
         }
-        
-        .budget-item {
-            display: flex;
-            flex-direction: column;
+
+        .stat {
+            text-align: center;
         }
-        
-        .budget-value {
+
+        .stat-value {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-        }
-        
-        .budget-total {
             color: var(--primary);
         }
-        
-        .budget-spent {
-            color: var(--danger);
-        }
-        
-        .budget-remaining {
-            color: var(--secondary);
-        }
-        
-        .budget-label {
+
+        .stat-label {
             font-size: 0.9rem;
             color: var(--gray);
         }
-        
-        .formation-selector {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+
+        /* Chips Section */
+        .chips-section {
+            max-width: 900px;
+            margin: 0 auto 2rem;
         }
-        
-        .formation-label {
-            font-weight: 600;
-        }
-        
-        .formation-display {
-            padding: 0.5rem 1rem;
-            background: var(--light-gray);
-            border-radius: 6px;
-            font-weight: 600;
-        }
-        
-        /* Team Layout */
-        .team-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-        
-        /* Starting XI */
-        .starting-xi {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .section-title {
+
+        .chips-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--light-gray);
-        }
-        
-        /* Football Pitch - More Spacious */
-        .pitch-container {
-            background: linear-gradient(#2e7d32, #1b5e20);
-            border: 2px solid #1b5e20;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pitch {
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 L100 50 M50 0 L50 100 M0 0 L100 100 M100 0 L0 100' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1' fill='none'/%3E%3Ccircle cx='50' cy='50' r='10' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1' fill='none'/%3E%3C/svg%3E");
-            background-size: 100px 100px;
-            min-height: 600px; /* Increased height for more space */
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            position: relative;
-        }
-        
-        /* Player Positions - More Spacious Layout */
-        .position-row {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            width: 100%;
-            position: absolute;
-        }
-        
-        .goalkeeper-row { 
-            top: 3%; 
-            left: 0; 
-            right: 0; 
-        }
-        .defenders-row { 
-            top: 20%; 
-            left: 0; 
-            right: 0; 
-        }
-        .midfielders-row { 
-            top: 45%; 
-            left: 0; 
-            right: 0; 
-        }
-        .forwards-row { 
-            top: 75%; 
-            left: 0; 
-            right: 0; 
-        }
-        
-        /* Player Card - Larger for better visibility */
-        .player-card {
-            width: 100px; /* Increased width */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s ease;
-            margin: 0 10px; /* Added spacing between players */
-        }
-        
-        .player-avatar {
-            width: 80px; /* Larger avatar */
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 1.2rem;
-            position: relative;
-            border: 2px solid white;
-            background: var(--gradient);
-            color: white;
-        }
-        
-        .player-price {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: var(--warning);
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-        
-        .player-position {
-            color: white;
-            font-size: 0.8rem;
-            text-align: center;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-            margin-bottom: 0.25rem;
-        }
-        
-        .player-name {
-            color: white;
-            font-size: 0.85rem; /* Slightly larger text */
-            text-align: center;
-            margin-top: 0.25rem;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-weight: 600;
-        }
-        
-        .player-team {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.65rem;
-            text-align: center;
-            margin-top: 0.1rem;
-        }
-        
-        /* Substitute Bench */
-        .substitute-bench {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .bench-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        
-        .bench-player {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid var(--light-gray);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            gap: 1rem;
-        }
-        
-        .bench-player.filled {
-            border-style: solid;
-            border-color: var(--light-gray);
-        }
-        
-        .bench-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1rem;
-            border: 2px solid var(--primary);
-            background: var(--gradient);
-            color: white;
-        }
-        
-        .bench-info {
-            flex: 1;
-        }
-        
-        .bench-position {
-            font-size: 0.8rem;
-            color: var(--gray);
-            margin-bottom: 0.25rem;
-        }
-        
-        .bench-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .bench-price {
-            font-size: 0.8rem;
-            color: var(--warning);
-            font-weight: 600;
-        }
-        
-        /* Form Actions */
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--light-gray);
-        }
-        
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(58, 94, 229, 0.3);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(58, 94, 229, 0.1);
-        }
-        
-        .btn:disabled {
-            background: var(--light-gray);
-            color: var(--gray);
-            cursor: not-allowed;
-        }
-        
-        /* No Team State */
-        .no-team-state {
-            background: white;
-            border-radius: 12px;
-            padding: 3rem;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            color: var(--light-gray);
-            margin-bottom: 1.5rem;
-        }
-        
-        .empty-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.6rem;
             margin-bottom: 1rem;
             color: var(--dark);
         }
-        
-        .empty-text {
+
+        .chips-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .chip-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .chip-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .chip-card.active {
+            border-color: var(--primary);
+            background: rgba(58, 94, 229, 0.05);
+        }
+
+        .chip-card.used {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .chip-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(58, 94, 229, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .chip-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .chip-description {
+            font-size: 0.85rem;
             color: var(--gray);
-            margin-bottom: 2rem;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            margin-bottom: 1rem;
+            line-height: 1.4;
         }
-        
+
+        .chip-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .chip-status.available {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--secondary);
+        }
+
+        .chip-status.used {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--gray);
+        }
+
+        .chip-action {
+            margin-top: 0.5rem;
+        }
+
+        .btn-chip {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-chip:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-chip:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+        }
+
+
+        .pitch-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            height: 820px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            background:
+                linear-gradient(180deg, #4db36a 0%, #2f8e5c 100%),
+                url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccer_field_-_empty.svg/1280px-Soccer_field_-_empty.svg.png') no-repeat center center;
+            background-size: cover;
+            display: grid;
+            grid-template-rows: repeat(4, 1fr);
+            gap: 26px;
+            padding: 2rem;
+        }
+
+        .pitch-row {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            align-items: center;
+        }
+
+        .field-player {
+            grid-column: span 2;
+            justify-self: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 0.55rem 0.6rem;
+            min-width: 92px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            transition: 0.2s ease;
+            position: relative;
+        }
+
+        .field-player:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .field-player-img {
+            width: 60px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 0.35rem;
+        }
+
+        .field-player-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+
+        .player-position {
+            font-size: 0.7rem;
+            color: var(--gray);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .bench-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .bench-header {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .bench-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .bench-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem 0.8rem;
+            width: 90px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            transition: 0.2s ease;
+            position: relative;
+        }
+
+        .bench-player:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+        }
+
+        .bench-player img {
+            width: 55px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .bench-player span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .bench-position {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
         /* Responsive Design */
-        @media (max-width: 1200px) {
-            .team-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-        
         @media (max-width: 768px) {
             .sidebar {
                 width: 70px;
@@ -572,72 +535,76 @@
                 margin-left: 70px;
             }
             
-            .header {
-                padding: 0 1rem;
+            .search-bar {
+                width: 200px;
             }
             
             .user-info {
                 display: none;
             }
             
-            .budget-display {
+            .team-info {
                 flex-direction: column;
                 gap: 1rem;
-                align-items: flex-start;
+                text-align: center;
             }
             
-            .budget-info {
-                flex-wrap: wrap;
+            .team-stats {
+                justify-content: center;
             }
             
-            .bench-grid {
-                grid-template-columns: 1fr;
+            .pitch-container {
+                height: 700px;
+                padding: 1.5rem;
             }
             
-            .pitch {
-                min-height: 500px;
+            .field-player {
+                min-width: 80px;
+                padding: 0.5rem;
             }
             
-            .player-card {
-                width: 80px;
-            }
-            
-            .player-avatar {
-                width: 65px;
+            .field-player-img {
+                width: 50px;
                 height: 65px;
             }
         }
-        
+
         @media (max-width: 576px) {
-            .team-content {
-                padding: 1rem;
-            }
-            
             .header {
                 padding: 0 1rem;
             }
             
-            .pitch {
-                min-height: 450px;
+            .search-bar {
+                display: none;
             }
             
-            .player-card {
-                width: 70px;
+            .page {
+                padding: 1rem;
             }
             
-            .player-avatar {
-                width: 55px;
-                height: 55px;
-                font-size: 1rem;
+            .pitch-container {
+                height: 600px;
+                gap: 20px;
             }
             
-            .player-name {
-                font-size: 0.75rem;
+            .field-player {
+                min-width: 70px;
+            }
+            
+            .field-player-img {
+                width: 45px;
+                height: 60px;
+            }
+            
+            .bench-player {
+                width: 80px;
+                padding: 0.8rem 0.6rem;
             }
         }
     </style>
 </head>
 <body>
+
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="sidebar-header">
@@ -683,7 +650,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
+                <a href="{{ route('help') }}" class="nav-link">
                     <i class="fas fa-question-circle"></i>
                     <span>Help and Support</span>
                 </a>
@@ -695,7 +662,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
@@ -711,9 +677,15 @@
     <div class="main-content">
         <!-- Header -->
         <header class="header">
-            <div></div> <!-- Empty div for spacing -->
-            
+            <h2>My Fantasy Team</h2>
             <div class="user-menu">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                </div>
                 <div class="user-profile">
                     <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
                     <div class="user-info">
@@ -724,298 +696,165 @@
             </div>
         </header>
 
-        <!-- Team Content -->
-        <div class="team-content">
-            <div class="team-header">
-                <h1 class="team-title">My Fantasy Team</h1>
-                <p class="team-subtitle">Manage your squad and track your budget</p>
+        <div class="page">
+            <div class="team-info">
+                <div class="team-name">{{ $team->team_name }}</div>
+                <div class="team-stats">
+                    <div class="stat">
+                        <div class="stat-value">{{ $totalPoints ?? 0 }}</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{ $teamValue ?? '£0.0' }}m</div>
+                        <div class="stat-label">Team Value</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">{{ $freeTransfers ?? 1 }}</div>
+                        <div class="stat-label">Free Transfers</div>
+                    </div>
+                </div>
             </div>
 
-            @if($fantasyTeam)
-                <!-- Budget Display -->
-                <div class="budget-display">
-                    <div class="budget-info">
-                        <div class="budget-item">
-                            <div class="budget-value budget-total">£{{ number_format($fantasyTeam->total_budget, 1) }}M</div>
-                            <div class="budget-label">Total Budget</div>
-                        </div>
-                        <div class="budget-item">
-                            <div class="budget-value budget-spent">£{{ number_format($fantasyTeam->spent_budget, 1) }}M</div>
-                            <div class="budget-label">Money Spent</div>
-                        </div>
-                        <div class="budget-item">
-                            <div class="budget-value budget-remaining">£{{ number_format($fantasyTeam->remaining_budget, 1) }}M</div>
-                            <div class="budget-label">Remaining</div>
-                        </div>
-                    </div>
-                    <div class="formation-selector">
-                        <span class="formation-label">Formation:</span>
-                        <div class="formation-display">{{ $fantasyTeam->formation }}</div>
-                    </div>
+            <!-- CHIPS SECTION -->
+        <div class="chips-container">
+            <div class="chip-card">
+                <i class="fas fa-users chip-icon"></i>
+                <div class="chip-info">
+                    <h3>Bench Boost</h3>
+                    <p>Play all 15 players' points this week</p>
                 </div>
+                <div class="chip-status available">Available</div>
+                <button class="btn-chip" onclick="activateChip('bench-boost')">Activate</button>
+                
+            </div>
 
-                <!-- Team Layout -->
-                <div class="team-layout">
-                    <!-- Starting XI -->
-                    <div class="starting-xi">
-                        <h3 class="section-title">Starting XI - {{ $fantasyTeam->formation }}</h3>
-                        
-                        <div class="pitch-container">
-                            <div class="pitch">
-                                @php
-                                    // Get formation numbers
-                                    $formation = explode('-', $fantasyTeam->formation);
-                                    $defendersCount = (int)$formation[0];
-                                    $midfieldersCount = (int)$formation[1];
-                                    $forwardsCount = (int)$formation[2];
-                                    
-                                    // Get players grouped by position and substitute status
-                                    $startingPlayers = $fantasyTeam->players->where('pivot.is_substitute', false)->sortBy('pivot.position_order');
-                                    $substitutePlayers = $fantasyTeam->players->where('pivot.is_substitute', true)->sortBy('pivot.position_order');
-                                    
-                                    // Organize players by position according to formation
-                                    $goalkeepers = $startingPlayers->where('position', 'Goalkeeper')->take(1);
-                                    $defenders = $startingPlayers->where('position', 'Defender')->take($defendersCount);
-                                    $midfielders = $startingPlayers->where('position', 'Midfielder')->take($midfieldersCount);
-                                    $forwards = $startingPlayers->where('position', 'Forward')->take($forwardsCount);
-                                @endphp
-
-                                <!-- Goalkeeper -->
-                                <div class="position-row goalkeeper-row">
-                                    @foreach($goalkeepers as $player)
-                                    <div class="player-card">
-                                        <div class="player-avatar">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->abbreviation ?? substr($player->team->name, 0, 3) }}
-                                            @else
-                                                {{ substr($player->team ?? 'N/A', 0, 3) }}
-                                            @endif
-                                            <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
-                                        </div>
-                                        <div class="player-position">Goalkeeper</div>
-                                        @php
-                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
-                                        @endphp
-                                        <div class="player-name">{{ $displayName }}</div>
-                                        <div class="player-team">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->name }}
-                                            @else
-                                                {{ $player->team ?? 'No Team' }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                
-                                <!-- Defenders -->
-                                <div class="position-row defenders-row">
-                                    @foreach($defenders as $player)
-                                    <div class="player-card">
-                                        <div class="player-avatar">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->abbreviation ?? substr($player->team->name, 0, 3) }}
-                                            @else
-                                                {{ substr($player->team ?? 'N/A', 0, 3) }}
-                                            @endif
-                                            <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
-                                        </div>
-                                        <div class="player-position">Defender</div>
-                                        @php
-                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
-                                        @endphp
-                                        <div class="player-name">{{ $displayName }}</div>
-                                        <div class="player-team">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->name }}
-                                            @else
-                                                {{ $player->team ?? 'No Team' }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                
-                                <!-- Midfielders -->
-                                <div class="position-row midfielders-row">
-                                    @foreach($midfielders as $player)
-                                    <div class="player-card">
-                                        <div class="player-avatar">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->abbreviation ?? substr($player->team->name, 0, 3) }}
-                                            @else
-                                                {{ substr($player->team ?? 'N/A', 0, 3) }}
-                                            @endif
-                                            <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
-                                        </div>
-                                        <div class="player-position">Midfielder</div>
-                                        @php
-                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
-                                        @endphp
-                                        <div class="player-name">{{ $displayName }}</div>
-                                        <div class="player-team">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->name }}
-                                            @else
-                                                {{ $player->team ?? 'No Team' }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                
-                                <!-- Forwards -->
-                                <div class="position-row forwards-row">
-                                    @foreach($forwards as $player)
-                                    <div class="player-card">
-                                        <div class="player-avatar">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->abbreviation ?? substr($player->team->name, 0, 3) }}
-                                            @else
-                                                {{ substr($player->team ?? 'N/A', 0, 3) }}
-                                            @endif
-                                            <div class="player-price">£{{ number_format($player->price, 1) }}M</div>
-                                        </div>
-                                        <div class="player-position">Forward</div>
-                                        @php
-                                            $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-                                            if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
-                                        @endphp
-                                        <div class="player-name">{{ $displayName }}</div>
-                                        <div class="player-team">
-                                            @if($player->team && is_object($player->team))
-                                                {{ $player->team->name }}
-                                            @else
-                                                {{ $player->team ?? 'No Team' }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Substitute Bench -->
-                    <div class="substitute-bench">
-                        <h3 class="section-title">Substitute Bench</h3>
-                        
-                        <div class="bench-grid">
-                            @foreach($substitutePlayers as $player)
-                            <div class="bench-player filled">
-                                <div class="bench-avatar">
-                                    @if($player->team && is_object($player->team))
-                                        {{ $player->team->abbreviation ?? substr($player->team->name, 0, 3) }}
-                                    @else
-                                        {{ substr($player->team ?? 'N/A', 0, 3) }}
-                                    @endif
-                                </div>
-                                <div class="bench-info">
-                                    <div class="bench-position">{{ $player->position }}</div>
-                                    @php
-                                        $displayName = trim(($player->first_name ?? '') . ' ' . ($player->last_name ?? ''));
-                                        if ($displayName === '') { $displayName = $player->name ?? 'Unknown'; }
-                                    @endphp
-                                    <div class="bench-name">{{ $displayName }}</div>
-                                    <div class="bench-price">£{{ number_format($player->price, 1) }}M</div>
-                                </div>
-                            </div>
-                            @endforeach
-                            
-                            <!-- Fill empty bench slots -->
-                            @for($i = $substitutePlayers->count(); $i < 4; $i++)
-                            <div class="bench-player">
-                                <div class="bench-avatar" style="background: var(--light-gray); border-color: var(--light-gray); color: var(--gray);">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div class="bench-info">
-                                    <div class="bench-position">Empty</div>
-                                    <div class="bench-name">No Player</div>
-                                    <div class="bench-price">-</div>
-                                </div>
-                            </div>
-                            @endfor
-                        </div>
-                    </div>
+            <div class="chip-card">
+                <i class="fas fa-crown chip-icon"></i>
+                <div class="chip-info">
+                    <h3>Triple Captain</h3>
+                    <p>Triple your captain’s points</p>
                 </div>
+                <div class="chip-status available">Available</div>
+                <button class="btn-chip" onclick="activateChip('triple-captain')">Activate</button>
+            </div>
 
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <a href="{{ route('transfers.index') }}" class="btn btn-primary">
-                        <i class="fas fa-exchange-alt"></i> Make Transfers
-                    </a>
-                    <a href="{{ route('fantasy-team.edit', $fantasyTeam) }}" class="btn btn-secondary">
-                        <i class="fas fa-edit"></i> Edit Team
-                    </a>
+            <div class="chip-card">
+                <i class="fas fa-random chip-icon"></i>
+                <div class="chip-info">
+                    <h3>Wildcard</h3>
+                    <p>Unlimited transfers for one week</p>
                 </div>
-            @else
-                <!-- No Team State -->
-                <div class="no-team-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h2 class="empty-title">No Fantasy Team Created</h2>
-                    <div class="empty-text">
-                        You haven't created your fantasy team yet. Build your dream squad by selecting players within your budget 
-                        and choose your preferred formation to compete in leagues.
-                    </div>
-                    <a href="{{ route('fantasy-team.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Create Your Team
-                    </a>
+                <div class="chip-status available">Available</div>
+                <button class="btn-chip" onclick="activateChip('wildcard')">Activate</button>
+            </div>
+
+            <div class="chip-card">
+                <i class="fas fa-sync-alt chip-icon"></i>
+                <div class="chip-info">
+                    <h3>Free Hit</h3>
+                    <p>Change your team for one week</p>
                 </div>
-            @endif
+                <div class="chip-status available">Available</div>
+                <button class="btn-chip" onclick="activateChip('free-hit')">Activate</button>
+            </div>
+        </div>
+
+
+            <div class="pitch-container">
+                <div class="pitch-row" id="fwdRow"></div>
+                <div class="pitch-row" id="midRow"></div>
+                <div class="pitch-row" id="defRow"></div>
+                <div class="pitch-row" id="gkRow"></div>
+            </div>
+
+            <div class="bench-container">
+                <h3 class="bench-header">Bench</h3>
+                <div class="bench-row" id="benchRow"></div>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate player cards on load
-            const playerCards = document.querySelectorAll('.player-card');
-            playerCards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-                card.style.animation = 'fadeInUp 0.6s ease-out forwards';
-            });
+<script>
+    const players = @json($mapped);
 
-            // Animate bench players
-            const benchPlayers = document.querySelectorAll('.bench-player');
-            benchPlayers.forEach((player, index) => {
-                player.style.animationDelay = `${index * 0.1 + 0.6}s`;
-                player.style.animation = 'fadeIn 0.5s ease-out forwards';
-            });
+    // Group players by position (using "position" key)
+    const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
+    players.forEach(p => {
+        if (grouped[p.position]) grouped[p.position].push(p);
+    });
+
+    // Layout formation
+    const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
+    const columns = {
+        GK: [6],
+        DEF: [2, 5, 8, 11],
+        MID: [2, 5, 8, 11],
+        FWD: [5, 8]
+    };
+
+    // Position labels
+    const positionLabels = {
+        'GK': 'Goalkeeper',
+        'DEF': 'Defender',
+        'MID': 'Midfielder',
+        'FWD': 'Forward'
+    };
+
+    // Render players on pitch
+    Object.entries(layout).forEach(([pos, max]) => {
+        const row = document.getElementById(pos.toLowerCase() + 'Row');
+        grouped[pos].slice(0, max).forEach((p, i) => {
+            const div = document.createElement('div');
+            div.className = 'field-player';
+            div.style.gridColumn = `${columns[pos][i]} / span 2`;
+            div.innerHTML = `
+                <div class="player-points">${p.event_points ?? 0}</div>
+                <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png"
+                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
+                     alt="${p.web_name}" class="field-player-img">
+                <div class="field-player-name">${p.web_name}</div>
+                <div class="player-position">${positionLabels[pos]}</div>
+            `;
+            row.appendChild(div);
         });
+    });
 
-        // Add CSS animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                }
-                to {
-                    opacity: 1;
-                }
-            }
-            
-            .player-card, .bench-player {
-                opacity: 0;
-            }
+    // Calculate bench (players not in formation)
+    const starters = Object.entries(layout)
+        .flatMap(([pos, max]) => grouped[pos].slice(0, max));
+
+    const benchPlayers = players.filter(p => !starters.some(s => s.id === p.id));
+    const benchRow = document.getElementById('benchRow');
+
+    benchPlayers.slice(0, 4).forEach(p => {
+        const b = document.createElement('div');
+        b.className = 'bench-player';
+        b.innerHTML = `
+            <div class="player-points">${p.event_points ?? 0}</div>
+            <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
+                 alt="${p.web_name}">
+            <span>${p.web_name}</span>
+            <div class="bench-position">${positionLabels[p.position]}</div>
         `;
-        document.head.appendChild(style);
-    </script>
+        benchRow.appendChild(b);
+    });
+
+    // Chip activation (unchanged)
+    function activateChip(chipType) {
+        const chipNames = {
+            'bench-boost': 'Bench Boost',
+            'triple-captain': 'Triple Captain',
+            'wildcard': 'Wildcard',
+            'free-hit': 'Free Hit'
+        };
+        const chipName = chipNames[chipType] || chipType;
+
+        if (confirm(`Activate ${chipName}?`)) {
+            alert(`${chipName} activated successfully!`);
+        }
+    }
+</script>
+
 </body>
 </html>

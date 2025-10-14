@@ -708,7 +708,6 @@
                 <div class="league-header">
                     <div>
                         <h3 class="league-name">Premier Champions</h3>
-                        <div class="league-code">Code: CHAMP2024</div>
                     </div>
                     <span class="league-status status-joined">Joined</span>
                 </div>
@@ -738,12 +737,11 @@
                 <div class="league-header">
                     <div>
                         <h3 class="league-name">Global Fantasy League</h3>
-                        <div class="league-code">Code: GLOBAL24</div>
                     </div>
                     <span class="league-status status-joined">Joined</span>
                 </div>
                 <p class="league-description">International fantasy football competition</p>
-                <p class="league-admin">Admin: You • Created: October 1, 2024</p>
+                <p class="league-admin">Admin: FPL • Created: October 1, 2024</p>
                 <div class="league-details">
                     <div class="league-detail">
                         <span class="detail-value">8/∞</span>

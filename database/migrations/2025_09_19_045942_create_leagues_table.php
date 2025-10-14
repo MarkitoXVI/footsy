@@ -12,13 +12,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->enum('type', ['public', 'private'])->default('public');
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
-            $table->boolean('is_public')->default(true);
-            $table->integer('max_participants')->nullable();
-            $table->string('scoring_system')->default('standard');
+            $table->enum('privacy', ['public', 'private'])->default('public');
+            $table->text('description')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
+
     }
 
     public function down()

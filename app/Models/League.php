@@ -11,38 +11,27 @@ class League extends Model
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
      */
-     protected $fillable = [
+    protected $fillable = [
         'name',
         'code',
         'privacy',
         'description',
-        'user_id',
+        'user_id', // admin (creator) of the league
     ];
 
     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
+     * Relationships
      */
-    protected $casts = [
-        'is_public' => 'boolean',
-    ];
 
-    /**
-     * Get the admin of the league.
-     */
-    public function admin()
+    // The admin (creator) of the league
+    public function user()
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Get the users participating in the league.
-     */
-    public function participants()
+    // The users participating in the league (many-to-many)
+    public function users()
     {
         return $this->belongsToMany(User::class, 'league_user')
                     ->withPivot('points', 'rank')
@@ -50,18 +39,28 @@ class League extends Model
     }
 
     /**
-     * Get the top participants in the league.
+     * Accessors / Helper Methods
      */
+
+    // Get top participants
     public function topParticipants($limit = 5)
     {
-        return $this->participants()->orderBy('rank')->limit($limit)->get();
+        return $this->users()->orderBy('pivot_rank')->limit($limit)->get();
     }
 
-    /**
-     * Check if a user is in the league.
-     */
+    // Check if a user is already in this league
     public function hasUser($userId)
     {
-        return $this->participants()->where('user_id', $userId)->exists();
+        return $this->users()->where('user_id', $userId)->exists();
+    }
+
+    // Automatically generate a random join code if missing
+    protected static function booted()
+    {
+        static::creating(function ($league) {
+            if (empty($league->code)) {
+                $league->code = strtoupper(substr(md5(uniqid()), 0, 8));
+            }
+        });
     }
 }

@@ -622,7 +622,6 @@
     </div>
 </div>
 
-<!-- My Team Card - Only show if user has a team -->
 @if($userStats['has_team'])
     <div class="card">
         <div class="card-header">
@@ -631,21 +630,28 @@
         </div>
         
         <ul class="player-list">
-            <!-- Sample player data - replace with actual team players -->
-            <li class="player-item">
-                <div class="player-avatar">HK</div>
-                <div class="player-info">
-                    <div class="player-name">Harry Kane</div>
-                    <div class="player-details">
-                        <span>TOT • FWD</span>
-                        <span>£12.5m</span>
+            @forelse($topPlayers as $player)
+                <li class="player-item">
+                    <div class="player-avatar">
+                        {{ strtoupper(substr($player->name, 0, 2)) }}
                     </div>
-                </div>
-                <div class="player-points">12 pts</div>
-            </li>
-            <!-- More players... -->
+                    <div class="player-info">
+                        <div class="player-name">{{ $player->name }}</div>
+                        <div class="player-details">
+                            {{ $player->team->short_name ?? ($player->team->name ?? 'N/A') }}
+                            <span>£{{ $player->price }}m</span>
+                        </div>
+                    </div>
+                    <div class="player-points">{{ $player->points }} pts</div>
+                </li>
+            @empty
+                <li class="player-item">
+                    <div class="player-info">No players found.</div>
+                </li>
+            @endforelse
         </ul>
     </div>
+
 @else
     <!-- Prompt to create a team -->
     <div class="card" style="text-align: center; padding: 2rem;">

@@ -85,7 +85,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Fantasy Team Management Routes
-    Route::resource('fantasy-team', FantasyTeamController::class);
+   Route::middleware(['auth'])->group(function() {
+    Route::get('/fantasy-team/create', [FantasyTeamController::class, 'create'])
+    ->name('fantasy-team.create');
+    Route::get('/fantasy-team', [FantasyTeamController::class, 'index'])->name('fantasy-team.index');
+    Route::post('/fantasy-team/store', [FantasyTeamController::class, 'store'])->name('fantasy-team.store');
+});
 
     // Player Selection Routes (NEW - Add these)
     Route::prefix('players')->group(function () {

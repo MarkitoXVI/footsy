@@ -29,23 +29,14 @@ class LeagueController extends Controller
      */
 
     public function index()
-    {
-        // Fetch leagues created by the logged-in user
-        $myLeagues = League::with('user')
-            ->withCount('participants')
-            ->where('user_id', Auth::id())
-            ->get();
+{
+    $myLeagues = auth()->user()->leagues()->get();
+    $otherLeagues = \App\Models\League::whereDoesntHave('users', function($q) {
+        $q->where('user_id', auth()->id());
+    })->get();
 
-        // Fetch public leagues not created by the user
-        $otherLeagues = League::with('user')
-            ->withCount('participants')
-            ->where('privacy', 'public')
-            ->where('user_id', '!=', Auth::id())
-            ->get();
-
-        return view('leagues.index', compact('myLeagues', 'otherLeagues'));
-    }
-
+    return view('leagues.index', compact('myLeagues', 'otherLeagues'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -84,23 +75,18 @@ class LeagueController extends Controller
     /**
      * Join a league.
      */
-    public function join(League $league)
-    {
-        $userId = Auth::id();
+    public function join($id)
+{
+    $league = \App\Models\League::findOrFail($id);
 
-        // Prevent joining twice and admin self-join
-        $alreadyMember = $league->participants()->where('user_id', $userId)->exists();
-        if (!$alreadyMember && $league->admin_id !== $userId) {
-            // Respect capacity if set
-            if ($league->max_participants && ($league->participants()->count() + 1) > $league->max_participants) {
-                return redirect()->route('leagues.index')->with('success', 'League is full.');
-            }
-
-            $league->participants()->attach($userId, ['points' => 0, 'rank' => 0]);
-        }
-
-        return redirect()->route('leagues.index');
+    // Attach the user if not already joined
+    if (! $league->users()->where('user_id', auth()->id())->exists()) {
+        $league->users()->attach(auth()->id());
     }
+
+    return redirect()->route('leagues.index')->with('success', 'Successfully joined "' . $league->name . '"!');
+}
+
 
     /**
      * Leave a league.

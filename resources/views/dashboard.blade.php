@@ -419,6 +419,7 @@
             color: var(--gray);
             font-size: 0.85rem;
         }
+        
         /* Fixtures preview (aligned with fixtures page) */
         .fixture-preview-list { list-style: none; padding: 0; margin: 0; }
         .fixture-preview-item { padding: 1rem 0; border-bottom: 1px solid var(--light-gray); }
@@ -438,10 +439,49 @@
         .scorers-home { text-align: left; }
         .scorers-away { text-align: right; }
         
+        /* Button styles */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Layout classes */
+        .left-column {
+            grid-column: 1;
+        }
+        
+        .right-column {
+            grid-column: 2;
+        }
+        
         /* Responsive Design */
         @media (max-width: 992px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .left-column, .right-column {
+                grid-column: 1;
             }
         }
         
@@ -520,65 +560,59 @@
         </div>
         
         <ul class="sidebar-nav">
-    <li class="nav-item">
-        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="fas fa-home"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('fantasy-team.index') }}" class="nav-link {{ request()->routeIs('team.*') ? 'active' : '' }}">
-            <i class="fas fa-users"></i>
-            <span>My Team</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('leagues.index') }}" class="nav-link {{ request()->routeIs('leagues.*') ? 'active' : '' }}">
-            <i class="fas fa-trophy"></i>
-            <span>Leagues</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('statistics.index') }}" class="nav-link {{ request()->routeIs('statistics.*') ? 'active' : '' }}">
-            <i class="fas fa-chart-line"></i>
-            <span>Statistics</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('transfers.index') }}" class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
-            <i class="fas fa-exchange-alt"></i>
-            <span>Transfers</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('fixtures.index') }}" class="nav-link {{ request()->routeIs('fixtures.*') ? 'active' : '' }}">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Fixtures</span>
-        </a>
-    </li>
-     <li class="nav-item">
-        <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
-            <i class="fas fa-question-circle"></i>
-            <span>Help and Support</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <!-- Authentication -->
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Log Out</span>
-            </a>
-        </form>
-    </li>
-</ul>
+            <li class="nav-item">
+                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('fantasy-team.index') }}" class="nav-link {{ request()->routeIs('team.*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span>My Team</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('leagues.index') }}" class="nav-link {{ request()->routeIs('leagues.*') ? 'active' : '' }}">
+                    <i class="fas fa-trophy"></i>
+                    <span>Leagues</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('statistics.index') }}" class="nav-link {{ request()->routeIs('statistics.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('fixtures.index') }}" class="nav-link {{ request()->routeIs('fixtures.*') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Fixtures</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help and Support</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('profile.edit') }}" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <!-- Authentication -->
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Log Out</span>
+                    </a>
+                </form>
+            </li>
+        </ul>
     </aside>
 
     <!-- Main Content -->
@@ -606,71 +640,32 @@
             </div>
         </header>
 
+        <!-- Dashboard Content -->
+        <div class="dashboard">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-content">
+                    <h2>Welcome back, {{ Auth::user()->name }}!</h2>
+                    @if($userStats['has_team'])
+                        <p>Ready for the next gameweek? Check your team's performance below.</p>
+                    @else
+                        <p>You haven't created a fantasy team yet. <a href="{{ route('fantasy-team.create') }}" style="color: white; text-decoration: underline;">Create your team now</a> to start playing!</p>
+                    @endif
+                </div>
+                <div class="welcome-image">
+                    <i class="fas fa-futbol" style="font-size: 5rem; opacity: 0.2;"></i>
+                </div>
+            </div>
 
-<!-- Welcome Banner -->
-<div class="welcome-banner">
-    <div class="welcome-content">
-        <h2>Welcome back, {{ Auth::user()->name }}!</h2>
-        @if($userStats['has_team'])
-            <p>Your team is currently ranked {{ $userStats['global_rank'] }}th overall. You have 2 upcoming matches this week.</p>
-        @else
-            <p>You haven't created a fantasy team yet. <a href="{{ route('fantasy-team.create') }}" style="color: white; text-decoration: underline;">Create your team now</a> to start playing!</p>
-        @endif
-    </div>
-    <div class="welcome-image">
-        <i class="fas fa-futbol" style="font-size: 5rem; opacity: 0.2;"></i>
-    </div>
-</div>
-
-@if($userStats['has_team'])
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">My Team</h3>
-            <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
-        </div>
-        
-        <ul class="player-list">
-            @forelse($topPlayers as $player)
-                <li class="player-item">
-                    <div class="player-avatar">
-                        {{ strtoupper(substr($player->name, 0, 2)) }}
-                    </div>
-                    <div class="player-info">
-                        <div class="player-name">{{ $player->name }}</div>
-                        <div class="player-details">
-                            {{ $player->team->short_name ?? ($player->team->name ?? 'N/A') }}
-                            <span>£{{ $player->price }}m</span>
-                        </div>
-                    </div>
-                    <div class="player-points">{{ $player->points }} pts</div>
-                </li>
-            @empty
-                <li class="player-item">
-                    <div class="player-info">No players found.</div>
-                </li>
-            @endforelse
-        </ul>
-    </div>
-
-@else
-    <!-- Prompt to create a team -->
-    <div class="card" style="text-align: center; padding: 2rem;">
-        <h3>You don't have a fantasy team yet</h3>
-        <p>Create your fantasy team to start competing with other managers</p>
-        <a href="{{ route('fantasy-team.create') }}" class="btn btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">
-            Create Your Team
-        </a>
-    </div>
-@endif
-
-            <!-- Stats Cards 
+            <!-- Stats Cards -->
+            @if($userStats['has_team'])
             <div class="dashboard-stats">
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-trophy"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>124th</h3>
+                        <h3>{{ $userStats['global_rank'] ?? 'N/A' }}</h3>
                         <p>Global Rank</p>
                     </div>
                 </div>
@@ -680,7 +675,7 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>224</h3>
+                        <h3>{{ $userStats['total_points'] ?? 57 }}</h3>
                         <p>Total Points</p>
                     </div>
                 </div>
@@ -690,7 +685,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>2</h3>
+                        <h3>{{ $userStats['leagues_joined'] ?? 0 }}</h3>
                         <p>Leagues Joined</p>
                     </div>
                 </div>
@@ -700,141 +695,126 @@
                         <i class="fas fa-exchange-alt"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>1/1</h3>    
+                        <h3>{{ $userStats['free_transfers'] ?? '0/1' }}</h3>    
                         <p>Free Transfers</p>
                     </div>
                 </div>
-            </div> -->
+            </div>
+            @endif
 
-            <!-- Main Dashboard Grid
+            <!-- Main Dashboard Grid -->
             <div class="dashboard-grid">
-                 Left Column 
+                <!-- Left Column -->
                 <div class="left-column">
-                     My Team Card 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">My Team</h3>
-                            <a href="#" class="view-all">Manage Team</a>
+                    @if($userStats['has_team'])
+                        <!-- My Team Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">My Team</h3>
+                                <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
+                            </div>
+                            
+                            <ul class="player-list">
+                                @forelse($topPlayers as $player)
+                                    <li class="player-item">
+                                        <div class="player-avatar">
+                                            {{ strtoupper(substr($player->name, 0, 2)) }}
+                                        </div>
+                                        <div class="player-info">
+                                            <div class="player-name">{{ $player->name }}</div>
+                                            <div class="player-details">
+                                                {{ $player->team->short_name ?? ($player->team->name ?? 'N/A') }}
+                                                <span>£{{ $player->price }}m</span>
+                                            </div>
+                                        </div>
+                                        <div class="player-points">{{ $player->points }} pts</div>
+                                    </li>
+                                @empty
+                                    <li class="player-item">
+                                        <div class="player-info">No players found.</div>
+                                    </li>
+                                @endforelse
+                            </ul>
                         </div>
-                        
-                        <ul class="player-list">
-                            <li class="player-item">
-                                <div class="player-avatar">HK</div>
-                                <div class="player-info">
-                                    <div class="player-name">Harry Kane</div>
-                                    <div class="player-details">
-                                        <span>TOT • FWD</span>
-                                        <span>£12.5m</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">12 pts</div>
-                            </li>
-                            
-                            <li class="player-item">
-                                <div class="player-avatar">KS</div>
-                                <div class="player-info">
-                                    <div class="player-name">Kevin De Bruyne</div>
-                                    <div class="player-details">
-                                        <span>MCI • MID</span>
-                                        <span>£11.0m</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">8 pts</div>
-                            </li>
-                            
-                            <li class="player-item">
-                                <div class="player-avatar">MS</div>
-                                <div class="player-info">
-                                    <div class="player-name">Mohamed Salah</div>
-                                    <div class="player-details">
-                                        <span>LIV • FWD</span>
-                                        <span>£13.0m</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">6 pts</div>
-                            </li>
-                            
-                            <li class="player-item">
-                                <div class="player-avatar">TS</div>
-                                <div class="player-info">
-                                    <div class="player-name">Trent Alexander-Arnold</div>
-                                    <div class="player-details">
-                                        <span>LIV • DEF</span>
-                                        <span>£8.5m</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">5 pts</div>
-                            </li>
-                        </ul>
-                    </div>
-                
-                             Upcoming Fixtures Section -->
-@if(isset($topGames) && count($topGames) > 0)
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Top Games</h3>
-            <a href="{{ route('fixtures.index') }}" class="view-all">View All</a>
-        </div>
-        
-        <ul class="fixture-preview-list">
-            @foreach($topGames as $fixture)
-                <li class="fixture-preview-item">
-                    <a href="{{ isset($fixture->id) ? route('fixtures.show', $fixture->id) : route('fixtures.index') }}" class="fixture-link">
-                        <div class="fixture-teams">
-                            <div class="team-side">
-                                <div class="team-logo">
-                                    {{ isset($fixture->homeTeam) ? substr($fixture->homeTeam->short_name, 0, 3) : (isset($fixture->home_team) ? substr($fixture->home_team->short_name, 0, 3) : 'HOM') }}
-                                </div>
-                                <div class="team-name">
-                                    {{ isset($fixture->homeTeam) ? $fixture->homeTeam->name : (isset($fixture->home_team) ? $fixture->home_team->name : 'Home Team') }}
-                                </div>
-                            </div>
-                            <div class="fixture-meta">
-                                @if(isset($fixture->score_home) && isset($fixture->score_away))
-                                    <div class="scoreline">{{ $fixture->score_home }} - {{ $fixture->score_away }}</div>
-                                @endif
-                                @if(!empty($fixture->kickoff_time ?? null))
-                                    <div class="kickoff">
-                                        @if($fixture->kickoff_time instanceof \Carbon\Carbon)
-                                            {{ $fixture->kickoff_time->format('D, M j • g:i A') }}
-                                        @else
-                                            {{ \Carbon\Carbon::parse($fixture->kickoff_time)->format('D, M j • g:i A') }}
-                                        @endif
-                                    </div>
-                                @endif
-                                @if(!empty($fixture->stadium ?? ''))
-                                    <div class="venue">{{ $fixture->stadium }}</div>
-                                @endif
-                                @if(isset($fixture->scorers_home) || isset($fixture->scorers_away))
-                                    <div class="scorers-row">
-                                        <ul class="scorers-list scorers-home">
-                                            @foreach(($fixture->scorers_home ?? []) as $sh)
-                                                <li>{{ $sh }}</li>
-                                            @endforeach
-                                        </ul>
-                                        <ul class="scorers-list scorers-away">
-                                            @foreach(($fixture->scorers_away ?? []) as $sa)
-                                                <li>{{ $sa }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="team-side team-right">
-                                <div class="team-name">
-                                    {{ isset($fixture->awayTeam) ? $fixture->awayTeam->name : (isset($fixture->away_team) ? $fixture->away_team->name : 'Away Team') }}
-                                </div>
-                                <div class="team-logo">
-                                    {{ isset($fixture->awayTeam) ? substr($fixture->awayTeam->short_name, 0, 3) : (isset($fixture->away_team) ? substr($fixture->away_team->short_name, 0, 3) : 'AWY') }}
-                                </div>
-                            </div>
+                    @else
+                        <!-- Prompt to create a team -->
+                        <div class="card" style="text-align: center; padding: 2rem;">
+                            <h3>You don't have a fantasy team yet</h3>
+                            <p>Create your fantasy team to start competing with other managers</p>
+                            <a href="{{ route('fantasy-team.create') }}" class="btn btn-primary" style="margin-top: 1rem; display: inline-block; width: auto;">
+                                Create Your Team
+                            </a>
                         </div>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                    @endif
+
+                    <!-- Upcoming Fixtures Section -->
+                    @if(isset($topGames) && count($topGames) > 0)
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Top Games</h3>
+                                <a href="{{ route('fixtures.index') }}" class="view-all">View All</a>
+                            </div>
+                            
+                            <ul class="fixture-preview-list">
+                                @foreach($topGames as $fixture)
+                                    <li class="fixture-preview-item">
+                                        <a href="{{ isset($fixture->id) ? route('fixtures.show', $fixture->id) : route('fixtures.index') }}" class="fixture-link">
+                                            <div class="fixture-teams">
+                                                <div class="team-side">
+                                                    <div class="team-logo">
+                                                        {{ isset($fixture->homeTeam) ? substr($fixture->homeTeam->short_name, 0, 3) : (isset($fixture->home_team) ? substr($fixture->home_team->short_name, 0, 3) : 'HOM') }}
+                                                    </div>
+                                                    <div class="team-name">
+                                                        {{ isset($fixture->homeTeam) ? $fixture->homeTeam->name : (isset($fixture->home_team) ? $fixture->home_team->name : 'Home Team') }}
+                                                    </div>
+                                                </div>
+                                                <div class="fixture-meta">
+                                                    @if(isset($fixture->score_home) && isset($fixture->score_away))
+                                                        <div class="scoreline">{{ $fixture->score_home }} - {{ $fixture->score_away }}</div>
+                                                    @endif
+                                                    @if(!empty($fixture->kickoff_time ?? null))
+                                                        <div class="kickoff">
+                                                            @if($fixture->kickoff_time instanceof \Carbon\Carbon)
+                                                                {{ $fixture->kickoff_time->format('D, M j • g:i A') }}
+                                                            @else
+                                                                {{ \Carbon\Carbon::parse($fixture->kickoff_time)->format('D, M j • g:i A') }}
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                    @if(!empty($fixture->stadium ?? ''))
+                                                        <div class="venue">{{ $fixture->stadium }}</div>
+                                                    @endif
+                                                    @if(isset($fixture->scorers_home) || isset($fixture->scorers_away))
+                                                        <div class="scorers-row">
+                                                            <ul class="scorers-list scorers-home">
+                                                                @foreach(($fixture->scorers_home ?? []) as $sh)
+                                                                    <li>{{ $sh }}</li>
+                                                                @endforeach
+                                                            </ul>
+                                                            <ul class="scorers-list scorers-away">
+                                                                @foreach(($fixture->scorers_away ?? []) as $sa)
+                                                                    <li>{{ $sa }}</li>
+                                                                @endforeach
+                                                            </ul>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="team-side team-right">
+                                                    <div class="team-name">
+                                                        {{ isset($fixture->awayTeam) ? $fixture->awayTeam->name : (isset($fixture->away_team) ? $fixture->away_team->name : 'Away Team') }}
+                                                    </div>
+                                                    <div class="team-logo">
+                                                        {{ isset($fixture->awayTeam) ? substr($fixture->awayTeam->short_name, 0, 3) : (isset($fixture->away_team) ? substr($fixture->away_team->short_name, 0, 3) : 'AWY') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </div>
                 
                 <!-- Right Column -->
                 <div class="right-column">
@@ -842,7 +822,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">League Standings</h3>
-                            <a href="#" class="view-all">View All</a>
+                            <a href="{{ route('leagues.index') }}" class="view-all">View All</a>
                         </div>
                         
                         <ul class="player-list">
@@ -880,14 +860,14 @@
                             </li>
                             
                             <li class="player-item" style="background: rgba(58, 94, 229, 0.05); border-radius: 8px;">
-                                <div class="player-avatar">4</div>
+                                <div class="player-avatar">124</div>
                                 <div class="player-info">
                                     <div class="player-name">{{ Auth::user()->name }}</div>
                                     <div class="player-details">
                                         <span>Your Team</span>
                                     </div>
                                 </div>
-                                <div class="player-points">0</div>
+                                <div class="player-points">{{ $userStats['total_points'] ?? 0 }}</div>
                             </li>
                         </ul>
                     </div>

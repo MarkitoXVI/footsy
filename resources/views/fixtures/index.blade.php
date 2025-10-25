@@ -268,15 +268,20 @@
             color: white;
         }
         
-        .calendar-day.has-fixtures::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            width: 4px;
-            height: 4px;
-            background: var(--secondary);
-            border-radius: 50%;
+        .calendar-day.has-fixtures {
+            background: linear-gradient(135deg, rgba(58, 94, 229, 0.15), rgba(58, 94, 229, 0.25));
+            border: 1px solid rgba(58, 94, 229, 0.4);
+            font-weight: 600;
+            color: var(--primary);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(58, 94, 229, 0.2);
         }
+
+        .calendar-day.has-fixtures:hover {
+            background: linear-gradient(135deg, rgba(58, 94, 229, 0.25), rgba(58, 94, 229, 0.35));
+            transform: scale(1.05);
+        }
+
         
         .calendar-day.other-month {
             color: var(--light-gray);
@@ -574,12 +579,12 @@
                     <span>Statistics</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="{{ route('transfers.index') }}" class="nav-link">
                     <i class="fas fa-exchange-alt"></i>
                     <span>Transfers</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link active">
                     <i class="fas fa-calendar-alt"></i>
@@ -672,358 +677,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Fixtures data organized by date
-            const fixturesData = {
-                '2025-09-27': [
-                    {
-                        homeTeam: 'Brentford',
-                        homeLogo: 'BRE',
-                        awayTeam: 'Manchester United',
-                        awayLogo: 'MUN',
-                        time: '14:30',
-                        venue: 'Gtech Community Stadium',
-                        score: '3 - 1',
-                        homeScorers: ['Igor Thiago 8\'', 'Igor Thiago 20\'', 'Mathias Jensen 90+5\''],
-                        awayScorers: ['Benjamin Šeško 26\'']
-                    },
-                    {
-                        homeTeam: 'Leeds United',
-                        homeLogo: 'LEE',
-                        awayTeam: 'Bournemouth',
-                        awayLogo: 'BOU',
-                        time: '17:00',
-                        venue: 'Elland Road',
-                        score: '2 - 2',
-                        homeScorers: ['Joe Rodon 37\'', 'Sean Longstaff 54\''],
-                        awayScorers: ['Antione Semenyo 26\'', 'Eli Junior Kroupi 90+3\'']
-                    },
-                    {
-                        homeTeam: 'Chelsea',
-                        homeLogo: 'CHE',
-                        awayTeam: 'Brighton',
-                        awayLogo: 'BHA',
-                        time: '17:00',
-                        venue: 'Stamford Bridge',
-                        score: '1 - 3',
-                        homeScorers: ['Enzo Fernández 24\''],
-                        awayScorers: ['Danny Welbeck 77\'', 'Maxim De Cuyper 90+2', 'Danny Welbeck 90+10']
-                    },
-                    {
-                        homeTeam: 'Manchester City',
-                        homeLogo: 'MCI',
-                        awayTeam: 'Burnley',
-                        awayLogo: 'BUR',
-                        time: '17:00',
-                        venue: 'Etihad Stadium',
-                        score: '5 - 1',
-                        homeScorers: ['Maxime Estève 12\' (OG)', 'Matheus Nunes 61\'', 'Maxime Estève 65\' (OG)', 'Erling Haaland 90\'', 'Erling Haaland 90+3'],
-                        awayScorers: ['Jaidon Anthony 38\'']
-                    },
-                    {
-                        homeTeam: 'Crystal Palace',
-                        homeLogo: 'CRY',
-                        awayTeam: 'Liverpool',
-                        awayLogo: 'LIV',
-                        time: '17:00',
-                        venue: 'Selhurst Park',
-                        score: '2 - 1',
-                        homeScorers: ['Ismaïla Sarr 9\'', 'Edward Nketiah 90+7'],
-                        awayScorers: ['Federico Chiesa 87\'']
-                    },
-                    {
-                        homeTeam: 'Nottingham Forest',
-                        homeLogo: 'NOT',
-                        awayTeam: 'Sunderland',
-                        awayLogo: 'SUN',
-                        time: '19:30',
-                        venue: 'City Ground',
-                        score: '0 - 1',
-                        homeScorers: [],
-                        awayScorers: ['Omar Alderete 38\'']
-                    },
-                    {
-                        homeTeam: 'Tottenham',
-                        homeLogo: 'TOT',
-                        awayTeam: 'Wolves',
-                        awayLogo: 'WOL',
-                        time: '22:00',
-                        venue: 'Tottenham Hotspur Stadium',
-                        score: '1 - 1',
-                        homeScorers: ['João Palhinha 90+4'],
-                        awayScorers: ['Santiago Bueno 54\'']
-                    }
-                ],
-                '2025-09-28': [
-                    {
-                        homeTeam: 'Aston Villa',
-                        homeLogo: 'AST',
-                        awayTeam: 'Fulham',
-                        awayLogo: 'FUL',
-                        time: '16:00',
-                        venue: 'Villa Park',
-                        score: '3 - 1',
-                        homeScorers: ['Ollie Watkins 37\'', 'John McGinn 49\'', 'Emiliano Buendía 51\''],
-                        awayScorers: ['Raúl Jiménez 3\'']
-                    },
-                    {
-                        homeTeam: 'Newcastle',
-                        homeLogo: 'NEW',
-                        awayTeam: 'Arsenal',
-                        awayLogo: 'ARS',
-                        time: '18:30',
-                        venue: 'St. James\' Park',
-                        score: '1 - 2',
-                        homeScorers: ['Nick Woltemade 34\''],
-                        awayScorers: ['Mikel Merino 84\'', 'Gabriel Magalhães 90+6']
-                    }
-                ],
-                '2025-09-29': [
-                    {
-                        homeTeam: 'Everton',
-                        homeLogo: 'EVE',
-                        awayTeam: 'West Ham',
-                        awayLogo: 'WHU',
-                        time: '22:00',
-                        venue: 'Hill Dickinson Stadium',
-                        score: '1 - 1',
-                        homeScorers: ['Michael Keane 18\''],
-                        awayScorers: ['Jarrod Bowen 65\'']
-                    },
-                ],
-                '2025-10-03': [
-                    {
-                        homeTeam: 'Bournemouth',
-                        homeLogo: 'BOU',
-                        awayTeam: 'Fulham',
-                        awayLogo: 'FUL',
-                        time: '22:00',
-                        venue: 'Vitality Stadium',
-                        score: '3 - 1',
-                        homeScorers: ['Antoine Semenyo 78\'', 'Antoine Semenyo 90+6\'', 'Justin Kluivert 84\''],
-                        awayScorers: ['Ryan Sessegnon 70\'']
-                    }
-                ],
-                '2025-10-04': [
-                    {
-                        homeTeam: 'Leeds United',
-                        homeLogo: 'LEE',
-                        awayTeam: 'Tottenham',
-                        awayLogo: 'TOT',
-                        time: '14:30',
-                        venue: 'Elland Road',
-                        score: '1 - 2',
-                        homeScorers: ['Noah Okafor 34\''],
-                        awayScorers: ['Mathys Tel 23\'', 'Mohammed Kudus 57\'']
-                    },
-                    {
-                        homeTeam: 'Manchester United',
-                        homeLogo: 'MUN',
-                        awayTeam: 'Sunderland',
-                        awayLogo: 'SUN',
-                        time: '17:00',
-                        venue: 'Old Trafford',
-                        score: '2 - 0',
-                        homeScorers: ['Mason Mount 8\'', 'Benjamin Šeško 31\''],
-                        awayScorers: [null]
-                    },
-                    {
-                        homeTeam: 'Arsenal',
-                        homeLogo: 'ARS',
-                        awayTeam: 'West Ham',
-                        awayLogo: 'WHU',
-                        time: '17:00',
-                        venue: 'Emirates Stadium',
-                        score: '2 - 0',
-                        homeScorers: ['Declan Rice 38\'', 'Bukayo Saka 67\' (pen)'],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Chelsea',
-                        homeLogo: 'CHE',
-                        awayTeam: 'Liverpool',
-                        awayLogo: 'LIV',
-                        time: '19:30',
-                        venue: 'Stamford Bridge',
-                        score: '2 - 1',
-                        homeScorers: ['Moisés Caicedo 14\'', 'Estêvão 90+5\''],
-                        awayScorers: ['Cody Gakpo 63\'']
-                    }
-                ],
-                '2025-10-05': [
-                    {
-                        homeTeam: 'Everton',
-                        homeLogo: 'EVE',
-                        awayTeam: 'Crystal Palace',
-                        awayLogo: 'CRY',
-                        time: '16:00',
-                        venue: 'Hill Dickinson Stadium',
-                        score: '2 - 1',
-                        homeScorers: ['Iliman Ndiaye 76\' (pen)', 'Jack Grealish 90+3\''],
-                        awayScorers: ['Daniel Muñoz 37\'']
-                    },
-                    {
-                        homeTeam: 'Newcastle',
-                        homeLogo: 'NEW',
-                        awayTeam: 'Nottingham Forest',
-                        awayLogo: 'NFO',
-                        time: '16:00',
-                        venue: 'St. James\' Park',
-                        score: '2 - 0',
-                        homeScorers: ['Bruno Guimarães 58\'', 'Nick Woltemade 84\' (pen)'],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Wolverhampton',
-                        homeLogo: 'WOL',
-                        awayTeam: 'Brighton',
-                        awayLogo: 'BHA',
-                        time: '16:00',
-                        venue: 'Molineux Stadium',
-                        score: '1 - 1',
-                        homeScorers: ['Bart Verbruggen 21\' (OG)'],
-                        awayScorers: ['Jan Paul van Hecke 86\'']
-                    },
-                    {
-                        homeTeam: 'Aston Villa',
-                        homeLogo: 'AST',
-                        awayTeam: 'Burnley',
-                        awayLogo: 'BUR',
-                        time: '16:00',
-                        venue: 'Villa Park',
-                        score: '2 - 1',
-                        homeScorers: ['Donyell Malen 25\'', 'Donyell Malen 63\''],
-                        awayScorers: ['Lesley Ugochukwu 78\'']
-                    },
-                    {
-                        homeTeam: 'Brentford',
-                        homeLogo: 'BRE',
-                        awayTeam: 'Manchester City',
-                        awayLogo: 'MCI',
-                        time: '18:30',
-                        venue: 'Gtech Community Stadium',
-                        score: '0 - 1',
-                        homeScorers: [],
-                        awayScorers: ['Erling Haaland 9\'']
-                    }
-                ],
-                 '2025-10-18': [
-                    {
-                        homeTeam: 'Nottingham Forest',
-                        homeLogo: 'NOT',
-                        awayTeam: 'Chelsea',
-                        awayLogo: 'CHE',
-                        time: '14:30',
-                        venue: 'City Ground',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Brighton',
-                        homeLogo: 'BHA',
-                        awayTeam: 'Newcastle United',
-                        awayLogo: 'NEW',
-                        time: '17:00',
-                        venue: 'Amex Stadium',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Burnley',
-                        homeLogo: 'BUR',
-                        awayTeam: 'Leeds United',
-                        awayLogo: 'LEE',
-                        time: '17:00',
-                        venue: 'Turf Moor',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Crystal Palace',
-                        homeLogo: 'CRY',
-                        awayTeam: 'Bournemouth',
-                        awayLogo: 'BOU',
-                        time: '17:00',
-                        venue: 'Selhurst Park',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Manchester City',
-                        homeLogo: 'MCI',
-                        awayTeam: 'Everton',
-                        awayLogo: 'EVE',
-                        time: '17:00',
-                        venue: 'Etihad Stadium',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Sunderland',
-                        homeLogo: 'SUN',
-                        awayTeam: 'Wolverhampton',
-                        awayLogo: 'WOL',
-                        time: '17:00',
-                        venue: 'Stadium of Light',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Fulham',
-                        homeLogo: 'FUL',
-                        awayTeam: 'Arsenal',
-                        awayLogo: 'ARS',
-                        time: '19:30',
-                        venue: 'Craven Cottage',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    }
-                ],
-                '2025-10-19': [
-                    {
-                        homeTeam: 'Tottenham',
-                        homeLogo: 'TOT',
-                        awayTeam: 'Aston Villa',
-                        awayLogo: 'AST',
-                        time: '16:00',
-                        venue: 'Tottenham Hotspur Stadium',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    },
-                    {
-                        homeTeam: 'Liverpool',
-                        homeLogo: 'LIV',
-                        awayTeam: 'Manchester United',
-                        awayLogo: 'MUN',
-                        time: '18:30',
-                        venue: 'Anfield',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    }
-                ],
-                '2025-10-20': [
-                    {
-                        homeTeam: 'West Ham',
-                        homeLogo: 'WHU',
-                        awayTeam: 'Brentford',
-                        awayLogo: 'BRE',
-                        time: '22:00',
-                        venue: 'London Stadium',
-                        score: null,
-                        homeScorers: [],
-                        awayScorers: []
-                    }
-                ]
-            };
-
-            
+           const fixturesData = @json($fixturesByDate);
 
             // Calendar functionality
             let currentDate = new Date();
@@ -1141,46 +795,83 @@
                             <ul class="fixtures-list">
                     `;
                     
-                    fixtures.forEach(fixture => {
-                        fixturesHTML += `
-                            <li class="fixture-item">
-                                <div class="teams">
-                                    <div class="home-team">
-                                        <div class="team-logo">${fixture.homeLogo}</div>
-                                        <div class="team-name">${fixture.homeTeam}</div>
-                                    </div>
-                                    ${fixture.score ? `
-                                        <div class="score-block">
-                                            <ul class="scorers-list home-scorers">
-                                                ${fixture.homeScorers.map(scorer => `<li>${scorer}</li>`).join('')}
-                                            </ul>
-                                            <div class="scoreline">${fixture.score}</div>
-                                            <ul class="scorers-list away-scorers">
-                                                ${fixture.awayScorers.map(scorer => `<li>${scorer}</li>`).join('')}
-                                            </ul>
-                                        </div>
-                                    ` : `<div class="vs">vs</div>`}
-                                    <div class="away-team">
-                                        <div class="team-name">${fixture.awayTeam}</div>
-                                        <div class="team-logo">${fixture.awayLogo}</div>
-                                    </div>
-                                </div>
-                                <div class="fixture-details">
-                                    <div class="fixture-time">${fixture.time}</div>
-                                    <div class="fixture-venue">${fixture.venue}</div>
-                                </div>
-                            </li>
-                        `;
-                    });
-                    
-                    fixturesHTML += `
-                            </ul>
+                   fixtures.forEach(fixture => {
+                const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : null;
+
+                fixturesHTML += `
+                    <li class="fixture-item">
+                        <div class="teams">
+                            <div class="home-team">
+                                <div class="team-logo">${fixture.home_short}</div>
+                                <div class="team-name">${fixture.home_team}</div>
+                            </div>
+                            ${score ? `<div class="vs">${score}</div>` : `<div class="vs">vs</div>`}
+                            <div class="away-team">
+                                <div class="team-name">${fixture.away_team}</div>
+                                <div class="team-logo">${fixture.away_short}</div>
+                            </div>
                         </div>
-                    `;
-                    
-                    fixturesDisplay.innerHTML = fixturesHTML;
+                        <div class="fixture-details">
+                            <div class="fixture-time">${new Date(fixture.kickoff_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            <div class="fixture-venue">Matchweek ${fixture.event ?? '-'}</div>
+                        </div>
+                    </li>
+                `;
+            });
+
+            fixturesDisplay.innerHTML = fixturesHTML;
+
+        fixturesDisplay.innerHTML = fixturesHTML;
+
+        // 🎯 Add click-to-open modal with detailed info
+        document.querySelectorAll('.fixture-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                const fixture = fixtures[index]; // get full data for this fixture
+                const home = fixture.home_team;
+                const away = fixture.away_team;
+                const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
+                const kickoff = new Date(fixture.kickoff_time).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const venue = fixture.venue ?? 'Unknown Stadium';
+                const matchweek = fixture.event ?? '-';
+                const status = fixture.finished ? 'Finished' : 'Scheduled';
+
+                // Format goalscorers if available
+                let goalsHTML = '';
+                if (fixture.goals && fixture.goals.length > 0) {
+                    goalsHTML = '<h4 style="margin-top:1rem;">Goalscorers</h4><ul style="list-style:none;padding:0;">';
+                    fixture.goals.forEach(goal => {
+                        goalsHTML += `<li>${goal.player} (${goal.minute}')</li>`;
+                    });
+                    goalsHTML += '</ul>';
+                } else if (fixture.finished) {
+                    goalsHTML = '<p><em>No goals recorded.</em></p>';
                 } else {
-                    fixturesDisplay.innerHTML = `
+                    goalsHTML = '<p><em>Match not started.</em></p>';
+                }
+
+                // Build modal HTML
+                const modalBody = document.getElementById('modalBody');
+                modalBody.innerHTML = `
+                    <div class="teams">
+                        <div class="team"><div class="team-name">${home}</div></div>
+                        <div class="score">${score}</div>
+                        <div class="team"><div class="team-name">${away}</div></div>
+                    </div>
+                    <div class="info">
+                        <p><strong>Status:</strong> ${status}</p>
+                        <p><strong>Kick-off:</strong> ${kickoff}</p>
+                        <p><strong>Venue:</strong> ${venue}</p>
+                        <p><strong>Matchweek:</strong> ${matchweek}</p>
+                        ${goalsHTML}
+                    </div>
+                `;
+
+                document.getElementById('matchModal').classList.add('active');
+            });
+        });
+
+        } else {
+            fixturesDisplay.innerHTML = `
                         <div class="date-card">
                             <div class="date-header">
                                 <div class="date-title">${new Date(dateString).toLocaleDateString('en-US', { 
@@ -1237,6 +928,113 @@
                 }
             });
         });
+
+        // Close modal logic
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('matchModal');
+            if (e.target.classList.contains('close-modal') || e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('matchModal').classList.remove('active');
+            }
+        });
     </script>
+    <!-- Match Info Modal -->
+    <div id="matchModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2 class="modal-title">Match Details</h2>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+        background: #fff;
+        border-radius: 14px;
+        width: 90%;
+        max-width: 500px;
+        padding: 2rem;
+        position: relative;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        animation: popIn 0.25s ease;
+    }
+    @keyframes popIn { 
+        from { transform: scale(0.9); opacity: 0; } 
+        to { transform: scale(1); opacity: 1; } 
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1.2rem;
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        color: var(--gray);
+        cursor: pointer;
+    }
+    .close-modal:hover { color: var(--primary); }
+
+    .modal-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-body {
+        font-size: 1rem;
+        color: var(--dark);
+        line-height: 1.5;
+    }
+    .modal-body .teams {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .modal-body .team {
+        text-align: center;
+    }
+    .modal-body .team-name {
+        font-weight: 600;
+    }
+    .modal-body .score {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    .modal-body .info {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin-top: 1rem;
+    }
+
+    .modal-body ul li {
+        padding: 4px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .modal-body ul li:last-child {
+        border-bottom: none;
+    }
+    </style>    
 </body>
 </html>

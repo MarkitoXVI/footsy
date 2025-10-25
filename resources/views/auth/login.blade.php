@@ -468,7 +468,7 @@
                             <div class="user-avatar">PJ</div>
                             <div>
                                 <strong>Paul Johnson</strong>
-                                <div>Footsy User for over 8 years</div>
+                                <div>Footsy User for over a month</div>
                             </div>
                         </div>
                     </div>
@@ -540,9 +540,8 @@
                             <span>Or sign in with</span>
                         </div>
                         
-                       <a href="{{ route('google.login') }}" 
-                        class="flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 
-                                text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg transition duration-150 ease-in-out">
+                       <!-- Google Sign In Button -->
+                        <a href="{{ route('google.login') }}" class="btn btn-google">
                             <i class="fab fa-google"></i>
                             <span>Sign in with Google</span>
                         </a>

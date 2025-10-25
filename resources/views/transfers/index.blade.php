@@ -1,6 +1,35 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+// Make sure we always have a collection of associative arrays
+$players = collect($fantasyTeam->players ?? [])
+    ->map(function ($p) {
+        // Convert any string items to structured placeholder
+        if (is_string($p)) {
+            return [
+                'id' => null,
+                'name' => $p,
+                'position' => '-',
+                'team' => 'Unknown',
+                'price' => 0,
+                'points' => 0,
+            ];
+        }
+
+        // Ensure keys exist for all array players
+        return [
+            'id' => $p['id'] ?? null,
+            'name' => $p['name'] ?? ($p['web_name'] ?? 'Unknown'),
+            'position' => $p['position'] ?? ($p['position_label'] ?? '-'),
+            'team' => $p['team'] ?? 'Unknown',
+            'price' => $p['price'] ?? 0,
+            'points' => $p['points'] ?? 0,
+        ];
+    });
+@endphp
+
+
 <div class="transfers-container">
     <!-- Header -->
     <div class="transfers-header">
@@ -37,7 +66,7 @@
             <div class="section-header">
                 <div class="section-title">
                     <h3>My Team</h3>
-                    <span class="player-count">{{ $fantasyTeam->players->count() }} players</span>
+                    <span class="player-count">{{ $players->count() }} players</span>
                 </div>
                 <div class="section-actions">
                     <button class="action-btn" onclick="autoSelectTeam()">
@@ -47,13 +76,13 @@
             </div>
             
             <div class="players-grid" id="myTeamPlayers">
-                @foreach($fantasyTeam->players as $player)
-                <div class="player-card" data-player-id="{{ $player->id }}" 
-                     data-position="{{ $player->position }}" 
-                     data-price="{{ $player->price }}" 
-                     data-name="{{ $player->first_name }} {{ $player->last_name }}"
-                     data-team="{{ $player->team->name ?? 'Unknown' }}"
-                     data-form="{{ $player->form ?? 0 }}"
+                @foreach($players as $player)
+                <div class="player-card" data-player-id="{{ $player['id'] ?? '' }}"
+                     data-position="{{ $player['position'] ?? '' }}" 
+                     data-price="{{ $player['price'] ?? '' }}" 
+                     data-name="{{ $player['first_name'] ?? '' }} {{ $player['last_name'] ?? '' }}"
+                     data-team="{{ $player['team']['name'] ?? 'Unknown' }}"
+                     data-form="{{ $player['form'] ?? 0 }}"
                      onclick="selectPlayer(this)">
                     <div class="player-header">
                         <div class="player-team-badge" data-team="{{ $player->team->name ?? 'Unknown' }}">

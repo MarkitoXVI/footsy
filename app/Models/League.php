@@ -9,58 +9,40 @@ class League extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     */
     protected $fillable = [
         'name',
-        'code',
-        'privacy',
         'description',
-        'user_id', // admin (creator) of the league
+        'privacy',
+        'max_participants',
+        'code',
+        'user_id',
     ];
 
-    /**
-     * Relationships
-     */
-
-    // The admin (creator) of the league
-    public function user()
+    // 🔹 The admin (creator) of the league
+    public function admin()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // The users participating in the league (many-to-many)
+    // 🔹 Many-to-many relation: users participating in this league
     public function users()
     {
         return $this->belongsToMany(User::class, 'league_user')
-                    ->withPivot('points', 'rank')
-                    ->withTimestamps();
+            ->withPivot('rank')
+            ->withTimestamps();
     }
 
-    /**
-     * Accessors / Helper Methods
-     */
-
-    // Get top participants
-    public function topParticipants($limit = 5)
+    // 🔹 Alias for clarity — 'participants' = 'users'
+    public function participants()
     {
-        return $this->users()->orderBy('pivot_rank')->limit($limit)->get();
+        return $this->users();
     }
 
-    // Check if a user is already in this league
-    public function hasUser($userId)
-    {
-        return $this->users()->where('user_id', $userId)->exists();
-    }
-
-    // Automatically generate a random join code if missing
     protected static function booted()
-    {
-        static::creating(function ($league) {
-            if (empty($league->code)) {
-                $league->code = strtoupper(substr(md5(uniqid()), 0, 8));
-            }
-        });
-    }
+{
+    static::deleting(function ($league) {
+        $league->participants()->detach();
+    });
+}
+
 }

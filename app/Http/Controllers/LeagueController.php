@@ -30,13 +30,15 @@ class LeagueController extends Controller
 
     public function index()
 {
-    $myLeagues = auth()->user()->leagues()->get();
-    $otherLeagues = \App\Models\League::whereDoesntHave('users', function($q) {
-        $q->where('user_id', auth()->id());
-    })->get();
+    $myLeagues = auth()->user()->leagues()->with('admin')->get();
+    $otherLeagues = League::with('admin')
+        ->whereDoesntHave('users', function($q) {
+            $q->where('user_id', auth()->id());
+        })->get();
 
     return view('leagues.index', compact('myLeagues', 'otherLeagues'));
 }
+
 
     /**
      * Show the form for creating a new resource.
@@ -49,27 +51,32 @@ class LeagueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-        public function store(Request $request)
+       public function store(Request $request)
         {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'privacy' => 'required|in:public,private',
-                'description' => 'nullable|string|max:500',
+                'type' => 'required|in:public,private',
+                'league_description' => 'nullable|string|max:500',
+                'max_participants' => 'nullable|integer|min:2|max:100',
             ]);
 
-            // Automatically generate a code for joining
             $code = strtoupper(Str::random(8));
 
-            // Create the league and assign it to the current user
             $league = League::create([
                 'name' => $validated['name'],
-                'privacy' => $validated['privacy'],
-                'description' => $validated['description'] ?? null,
+                'privacy' => $validated['type'],
+                'description' => $validated['league_description'] ?? null,
+                'max_participants' => $validated['max_participants'] ?? 20,
                 'code' => $code,
-                'user_id' => auth()->id(), // <-- VERY IMPORTANT
+                'user_id' => auth()->id(),
             ]);
 
-            return redirect()->route('leagues.index')->with('success', 'League created successfully!');
+            // ✅ Make the creator also a participant in their league
+            $league->users()->attach(auth()->id());
+
+            return redirect()
+                ->route('leagues.index')
+                ->with('success', 'League created successfully and you have been added as a participant!');
         }
 
     /**
@@ -105,4 +112,22 @@ class LeagueController extends Controller
 
         return redirect()->route('leagues.index');
     }
+
+    /**
+ * Remove the specified league from storage.
+ */
+public function destroy(League $league)
+{
+    // Make sure only the admin can delete their own league
+    if ($league->user_id !== auth()->id()) {
+        return redirect()->route('leagues.index')
+            ->with('error', 'You do not have permission to delete this league.');
+    }
+
+    $league->delete();
+
+    return redirect()->route('leagues.index')
+        ->with('success', 'League deleted successfully!');
+}
+
 }

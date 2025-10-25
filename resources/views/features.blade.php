@@ -429,20 +429,6 @@
 
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Social Features</h3>
-                <p>Connect with other managers and share your fantasy football journey</p>
-                <ul class="feature-list">
-                    <li><i class="fas fa-check"></i> Manager profiles and achievements</li>
-                    <li><i class="fas fa-check"></i> League chat and banter</li>
-                    <li><i class="fas fa-check"></i> Team sharing options</li>
-                    <li><i class="fas fa-check"></i> Weekly performance comparisons</li>
-                </ul>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">
                     <i class="fas fa-mobile-alt"></i>
                 </div>
                 <h3>Mobile Experience</h3>
@@ -460,11 +446,11 @@
             <h2>Footsy By The Numbers</h2>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-value">50k+</div>
+                    <div class="stat-value">2 or 3</div>
                     <div class="stat-label">Active Managers</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">500+</div>
+                    <div class="stat-value">5</div>
                     <div class="stat-label">Leagues Created</div>
                 </div>
                 <div class="stat-item">
@@ -472,8 +458,8 @@
                     <div class="stat-label">Uptime Reliability</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">10k+</div>
-                    <div class="stat-label">Daily Transfers</div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Daily Transfers yet</div>
                 </div>
             </div>
         </div>
@@ -492,10 +478,10 @@
                         "Footsy has completely transformed how I play fantasy football. The live stats and analytics help me make informed decisions that have taken me from mid-table to champion in my league!"
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">MJ</div>
+                        <div class="author-avatar">NC</div>
                         <div class="author-info">
-                            <h4>Michael Johnson</h4>
-                            <p>League Champion 2023</p>
+                            <h4>Nathan Coles</h4>
+                            <p>My great friend</p>
                         </div>
                     </div>
                 </div>
@@ -504,10 +490,10 @@
                         "The private league feature is fantastic! I've created a league with my coworkers, and the banter in the chat has made our workdays much more enjoyable. Footsy brings people together."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">SR</div>
+                        <div class="author-avatar">BJ</div>
                         <div class="author-info">
-                            <h4>Sarah Roberts</h4>
-                            <p>Office League Creator</p>
+                            <h4>Bharat Jain</h4>
+                            <p>My friend</p>
                         </div>
                     </div>
                 </div>
@@ -516,10 +502,10 @@
                         "As a stats nerd, I love the depth of analytics Footsy provides. The player comparison tools and form guides have helped me identify hidden gems that other managers miss."
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">DP</div>
+                        <div class="author-avatar">PJ</div>
                         <div class="author-info">
-                            <h4>David Peterson</h4>
-                            <p>Fantasy Analyst</p>
+                            <h4>Paul Johnson</h4>
+                            <p>We have a little beef</p>
                         </div>
                     </div>
                 </div>

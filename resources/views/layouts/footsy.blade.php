@@ -386,12 +386,12 @@
                     <span>Leagues</span>
                 </a>
             </li>
-            <li class="nav-item">
+            /* <li class="nav-item">
                 <a href="{{ route('statistics.index') }}" class="nav-link {{ request()->routeIs('statistics.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i>
                     <span>Statistics</span>
                 </a>
-            </li>
+            </li> */
             <li class="nav-item">
                 <a href="{{ route('transfers.index') }}" class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
                     <i class="fas fa-exchange-alt"></i>

@@ -268,6 +268,12 @@
             color: var(--secondary);
         }
         
+        .status-admin {
+            background: rgba(58, 94, 229, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
         .status-public {
             background: rgba(58, 94, 229, 0.1);
             color: var(--primary);
@@ -617,12 +623,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('transfers.index') }}" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transfers</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Fixtures</span>
@@ -703,396 +703,319 @@
             <div class="league-section">
                 <h2 class="section-title">My Leagues</h2>
 
-            {{-- Default Standard Leagues --}}
-            <div class="league-card">
-                <div class="league-header">
-                    <div>
-                        <h3 class="league-name">Premier Champions</h3>
+                <!-- Leagues where user is admin -->
+                @if($myLeagues->where('is_admin', true)->count() > 0)
+                    @foreach($myLeagues->where('is_admin', true) as $league)
+                        <div class="league-card">
+                            <div class="league-header">
+                                <div>
+                                    <h3 class="league-name">{{ $league->name }}</h3>
+                                    <div class="league-code">Code: {{ $league->code }}</div>
+                                </div>
+                                <span class="league-status status-admin">Admin</span>
+                            </div>
+                            <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
+                            <p class="league-admin">Admin: {{ Auth::user()->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
+                            <div class="league-details">
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
+                                    <span class="detail-label">Participants</span>
+                                </div>
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
+                                    <span class="detail-label">Privacy</span>
+                                </div>
+                                <div class="league-detail">
+                                    <span class="detail-value">-</span>
+                                    <span class="detail-label">Your Rank</span>
+                                </div>
+                            </div>
+                            <div class="league-actions">
+                                <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">Manage League</a>
+                                <form method="POST" action="{{ route('leagues.destroy', $league->id) }}" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="league-btn btn-danger" onclick="deleteLeague({{ $league->id }}, '{{ $league->name }}')">Delete League</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3 class="empty-title">No Leagues Created</h3>
+                        <p class="empty-text">You haven't created any leagues yet. Create your first league to start competing with friends!</p>
+                        <a href="{{ route('leagues.create') }}" class="create-league-btn">
+                            <i class="fas fa-plus"></i> Create Your First League
+                        </a>
                     </div>
-                    <span class="league-status status-joined">Joined</span>
-                </div>
-                <p class="league-description">Standard scoring league for serious competitors</p>
-                <p class="league-admin">Admin: John Smith • Created: September 15, 2024</p>
-                <div class="league-details">
-                    <div class="league-detail">
-                        <span class="detail-value">12/20</span>
-                        <span class="detail-label">Participants</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">Private</span>
-                        <span class="detail-label">Privacy</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">3rd</span>
-                        <span class="detail-label">Your Rank</span>
-                    </div>
-                </div>
-                <div class="league-actions">
-                    <a class="league-btn btn-primary" href="{{ route('leagues.show', 1) }}">View Standings</a>
-                    <button class="league-btn btn-danger" onclick="leaveLeague(1, 'Premier Champions')">Leave League</button>
-                </div>
+                @endif
+
+                <!-- Leagues where user is participant (not admin) -->
+                @if($myLeagues->where('is_admin', false)->count() > 0)
+                    @foreach($myLeagues->where('is_admin', false) as $league)
+                        <div class="league-card">
+                            <div class="league-header">
+                                <div>
+                                    <h3 class="league-name">{{ $league->name }}</h3>
+                                </div>
+                                <span class="league-status status-joined">Joined</span>
+                            </div>
+                            <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
+                            <p class="league-admin">Admin: {{ $league->admin->name ?? 'Unknown' }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
+                            <div class="league-details">
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
+                                    <span class="detail-label">Participants</span>
+                                </div>
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
+                                    <span class="detail-label">Privacy</span>
+                                </div>
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ $league->user_rank ?? '-' }}</span>
+                                    <span class="detail-label">Your Rank</span>
+                                </div>
+                            </div>
+                            <div class="league-actions">
+                                <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">View Standings</a>
+                                <button class="league-btn btn-danger" onclick="leaveLeague({{ $league->id }}, '{{ $league->name }}')">Leave League</button>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
             </div>
 
-            <div class="league-card">
-                <div class="league-header">
-                    <div>
-                        <h3 class="league-name">Global Fantasy League</h3>
-                    </div>
-                    <span class="league-status status-joined">Joined</span>
-                </div>
-                <p class="league-description">International fantasy football competition</p>
-                <p class="league-admin">Admin: FPL • Created: October 1, 2024</p>
-                <div class="league-details">
-                    <div class="league-detail">
-                        <span class="detail-value">8/∞</span>
-                        <span class="detail-label">Participants</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">Public</span>
-                        <span class="detail-label">Privacy</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">1st</span>
-                        <span class="detail-label">Your Rank</span>
-                    </div>
-                </div>
-                <div class="league-actions">
-                    <a class="league-btn btn-primary" href="{{ route('leagues.show', 2) }}">View Standings</a>
-                    <button class="league-btn btn-danger" onclick="deleteLeague(2, 'Global Fantasy League')">Delete League</button>
-                </div>
-            </div>
+            <!-- Other Leagues Section -->
+            <div class="league-section">
+                <h2 class="section-title">Other Leagues</h2>
 
-            {{-- Dynamically added user-created leagues --}}
-            @forelse($myLeagues as $league)
-                <div class="league-card">
-                    <div class="league-header">
-                        <div>
-                            <h3 class="league-name">{{ $league->name }}</h3>
-                            <div class="league-code">Code: {{ $league->code }}</div>
+                <!-- Public leagues the user hasn't joined -->
+                @if($otherLeagues->count() > 0)
+                    @foreach($otherLeagues as $league)
+                        <div class="league-card">
+                            <div class="league-header">
+                                <div>
+                                    <h3 class="league-name">{{ $league->name }}</h3>
+                                    <div class="league-code">Code: {{ $league->code }}</div>
+                                </div>
+                                <span class="league-status status-public">Public</span>
+                            </div>
+                            <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
+                            <p class="league-admin">Admin: {{ $league->admin->name ?? 'Unknown' }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
+                            <div class="league-details">
+                                <div class="league-detail">
+                                    <span class="detail-value">{{ $league->participants_count ?? 0 }}</span>
+                                    <span class="detail-label">Participants</span>
+                                </div>
+                                <div class="league-detail">
+                                    <span class="detail-value">Public</span>
+                                    <span class="detail-label">Privacy</span>
+                                </div>
+                            </div>
+                            <div class="league-actions">
+                                <form method="POST" action="{{ route('leagues.join', $league->id) }}">
+                                    @csrf
+                                    <button type="submit" class="league-btn btn-primary">Join League</button>
+                                </form>
+                                <a class="league-btn btn-secondary" href="{{ route('leagues.show', $league->id) }}">View Details</a>
+                            </div>
                         </div>
-                        <span class="league-status status-joined">Joined</span>
-                    </div>
-                    <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
-                    <p class="league-admin">Admin: {{ $league->user->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
-
-                    <div class="league-details">
-                        <div class="league-detail">
-                            <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
-                            <span class="detail-label">Participants</span>
+                    @endforeach
+                @else
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="league-detail">
-                            <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
-                            <span class="detail-label">Privacy</span>
-                        </div>
-                        <div class="league-detail">
-                            <span class="detail-value">-</span>
-                            <span class="detail-label">Your Rank</span>
-                        </div>
+                        <h3 class="empty-title">No Other Leagues Available</h3>
+                        <p class="empty-text">There are no other public leagues available to join at the moment.</p>
                     </div>
-
-                    <div class="league-actions">
-                        <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">View Standings</a>
-                        <form method="POST" action="{{ route('leagues.destroy', $league->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="league-btn btn-danger">Delete League</button>
-                        </form>
-                    </div>
-                </div>
-            @empty
-                {{-- Optional message if user has no custom leagues --}}
-            @endforelse
-        </div>
-
-
-       <!-- Other Leagues Section -->
-        <div class="league-section">
-            <h2 class="section-title">Other Leagues</h2>
-
-            {{-- Default global leagues --}}
-            <div class="league-card">
-                <div class="league-header">
-                    <div>
-                        <h3 class="league-name">Weekend Warriors</h3>
-                        <div class="league-code">Code: WEEKEND</div>
-                    </div>
-                    <span class="league-status status-public">Public</span>
-                </div>
-                <p class="league-description">Casual weekend fantasy football fun</p>
-                <p class="league-admin">Admin: Mike Johnson • Created: September 20, 2024</p>
-                <div class="league-details">
-                    <div class="league-detail">
-                        <span class="detail-value">15/30</span>
-                        <span class="detail-label">Participants</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">Public</span>
-                        <span class="detail-label">Privacy</span>
-                    </div>
-                </div>
-                <div class="league-actions">
-                    <button class="league-btn btn-primary" onclick="joinLeague(3, 'Weekend Warriors')">Join League</button>
-                    <a class="league-btn btn-secondary" href="{{ route('leagues.show', 3) }}">View Details</a>
-                </div>
-            </div>
-
-            <div class="league-card">
-                <div class="league-header">
-                    <div>
-                        <h3 class="league-name">Elite Competitors</h3>
-                        <div class="league-code">Code: ELITE2024</div>
-                    </div>
-                    <span class="league-status status-private">Private</span>
-                </div>
-                <p class="league-description">Invite-only league for top players</p>
-                <p class="league-admin">Admin: Sarah Wilson • Created: August 10, 2024</p>
-                <div class="league-details">
-                    <div class="league-detail">
-                        <span class="detail-value">18/20</span>
-                        <span class="detail-label">Participants</span>
-                    </div>
-                    <div class="league-detail">
-                        <span class="detail-value">Private</span>
-                        <span class="detail-label">Privacy</span>
-                    </div>
-                </div>
-                <div class="league-actions">
-                    <button class="league-btn btn-primary" onclick="requestToJoin(4, 'Elite Competitors')">Request to Join</button>
-                    <a class="league-btn btn-secondary" href="{{ route('leagues.show', 4) }}">View Details</a>
-                </div>
-            </div>
-
-            {{-- Dynamically added public leagues --}}
-            @foreach($otherLeagues as $league)
-                <div class="league-card">
-                    <div class="league-header">
-                        <div>
-                            <h3 class="league-name">{{ $league->name }}</h3>
-                            <div class="league-code">Code: {{ $league->code }}</div>
-                        </div>
-                        <span class="league-status status-public">Public</span>
-                    </div>
-                    <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
-                    <p class="league-admin">Admin: {{ $league->user->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
-                    <div class="league-details">
-                        <div class="league-detail">
-                            <span class="detail-value">{{ $league->participants_count ?? 0 }}</span>
-                            <span class="detail-label">Participants</span>
-                        </div>
-                        <div class="league-detail">
-                            <span class="detail-value">Public</span>
-                            <span class="detail-label">Privacy</span>
-                        </div>
-                    </div>
-                    <div class="league-actions">
-                        <form method="POST" action="{{ route('leagues.join', $league->id) }}">
-                            @csrf
-                            <button type="submit" class="league-btn btn-primary">Join League</button>
-                        </form>
-                        <a class="league-btn btn-secondary" href="{{ route('leagues.show', $league->id) }}">View Details</a>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-
-
-    <!-- Confirmation Modal -->
-    <div class="modal" id="confirmationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="modalMessage">Are you sure you want to perform this action?</p>
-            </div>
-            <div class="modal-actions">
-                <button class="league-btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="league-btn btn-primary" id="confirmAction">Confirm</button>
+                @endif
             </div>
         </div>
-    </div>
 
-    <script>
-        // League data storage
-        const leaguesData = {
-            1: { id: 1, name: 'Premier Champions', type: 'private', admin: false },
-            2: { id: 2, name: 'Global Fantasy League', type: 'public', admin: true },
-            3: { id: 3, name: 'Weekend Warriors', type: 'public', admin: false },
-            4: { id: 4, name: 'Elite Competitors', type: 'private', admin: false }
-        };
+        <!-- Confirmation Modal -->
+        <div class="modal" id="confirmationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage">Are you sure you want to perform this action?</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="league-btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="league-btn btn-primary" id="confirmAction">Confirm</button>
+                </div>
+            </div>
+        </div>
 
-        // Modal functionality
-        let currentAction = null;
-        let currentLeagueId = null;
+        <script>
+            // Modal functionality
+            let currentAction = null;
+            let currentLeagueId = null;
 
-        function showModal(title, message, confirmCallback) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-            document.getElementById('confirmationModal').style.display = 'flex';
-            currentAction = confirmCallback;
-        }
+            function showModal(title, message, confirmCallback) {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('confirmationModal').style.display = 'flex';
+                currentAction = confirmCallback;
+            }
 
-        function closeModal() {
-            document.getElementById('confirmationModal').style.display = 'none';
-            currentAction = null;
-            currentLeagueId = null;
-        }
+            function closeModal() {
+                document.getElementById('confirmationModal').style.display = 'none';
+                currentAction = null;
+                currentLeagueId = null;
+            }
 
-        function showSuccess(message) {
-            const successMessage = document.getElementById('successMessage');
-            const successText = document.getElementById('successText');
-            successText.textContent = message;
-            successMessage.style.display = 'flex';
-            
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        // League actions
-        function joinLeague(leagueId, leagueName) {
-            showModal(
-                'Join League',
-                `Are you sure you want to join "${leagueName}"?`,
-                () => {
-                    // Simulate API call
-                    setTimeout(() => {
-                        showSuccess(`Successfully joined "${leagueName}"!`);
-                        closeModal();
-                        // In real app, refresh the page or update UI
-                    }, 1000);
-                }
-            );
-            currentLeagueId = leagueId;
-        }
-
-        function requestToJoin(leagueId, leagueName) {
-            showModal(
-                'Request to Join',
-                `Send a join request for "${leagueName}"? The admin will need to approve your request.`,
-                () => {
-                    // Simulate API call
-                    setTimeout(() => {
-                        showSuccess(`Join request sent for "${leagueName}". Waiting for approval.`);
-                        closeModal();
-                    }, 1000);
-                }
-            );
-            currentLeagueId = leagueId;
-        }
-
-        function leaveLeague(leagueId, leagueName) {
-            showModal(
-                'Leave League',
-                `Are you sure you want to leave "${leagueName}"? You will lose all your progress in this league.`,
-                () => {
-                    // Simulate API call
-                    setTimeout(() => {
-                        showSuccess(`Successfully left "${leagueName}".`);
-                        closeModal();
-                        // In real app, remove the league card from UI
-                        const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
-                        if (leagueCard) {
-                            leagueCard.style.display = 'none';
-                        }
-                    }, 1000);
-                }
-            );
-            currentLeagueId = leagueId;
-        }
-
-        function deleteLeague(leagueId, leagueName) {
-            showModal(
-                'Delete League',
-                `Are you sure you want to delete "${leagueName}"? This action cannot be undone and all league data will be permanently lost.`,
-                () => {
-                    // Simulate API call
-                    setTimeout(() => {
-                        showSuccess(`League "${leagueName}" has been deleted successfully.`);
-                        closeModal();
-                        // In real app, remove the league card from UI
-                        const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
-                        if (leagueCard) {
-                            leagueCard.style.display = 'none';
-                        }
-                    }, 1000);
-                }
-            );
-            currentLeagueId = leagueId;
-        }
-
-        // Search and filter functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('.search-input');
-            const leagueCards = document.querySelectorAll('.league-card');
-            const filterSelect = document.querySelector('.filter-select');
-
-            // Modal confirm button
-            document.getElementById('confirmAction').addEventListener('click', function() {
-                if (currentAction) {
-                    currentAction();
-                }
-            });
-
-            // Search functionality
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
+            function showSuccess(message) {
+                const successMessage = document.getElementById('successMessage');
+                const successText = document.getElementById('successText');
+                successText.textContent = message;
+                successMessage.style.display = 'flex';
                 
-                leagueCards.forEach(card => {
-                    const leagueName = card.querySelector('.league-name').textContent.toLowerCase();
-                    const leagueDescription = card.querySelector('.league-description').textContent.toLowerCase();
-                    
-                    if (leagueName.includes(searchTerm) || leagueDescription.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            // League actions
+            function joinLeague(leagueId, leagueName) {
+                showModal(
+                    'Join League',
+                    `Are you sure you want to join "${leagueName}"?`,
+                    () => {
+                        // Simulate API call
+                        setTimeout(() => {
+                            showSuccess(`Successfully joined "${leagueName}"!`);
+                            closeModal();
+                            // In real app, refresh the page or update UI
+                        }, 1000);
+                    }
+                );
+                currentLeagueId = leagueId;
+            }
+
+            function leaveLeague(leagueId, leagueName) {
+                showModal(
+                    'Leave League',
+                    `Are you sure you want to leave "${leagueName}"? You will lose all your progress in this league.`,
+                    () => {
+                        // Simulate API call
+                        setTimeout(() => {
+                            showSuccess(`Successfully left "${leagueName}".`);
+                            closeModal();
+                            // In real app, remove the league card from UI
+                            const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
+                            if (leagueCard) {
+                                leagueCard.style.display = 'none';
+                            }
+                        }, 1000);
+                    }
+                );
+                currentLeagueId = leagueId;
+            }
+
+            function deleteLeague(leagueId, leagueName) {
+                showModal(
+                    'Delete League',
+                    `Are you sure you want to delete "${leagueName}"? This action cannot be undone and all league data will be permanently lost.`,
+                    () => {
+                        // Submit the form for this league
+                        const form = document.querySelector(`form[action*="/leagues/${leagueId}"]`);
+                        if (form) {
+                            form.submit();
+                        } else {
+                            // Fallback if form not found
+                            setTimeout(() => {
+                                showSuccess(`League "${leagueName}" has been deleted successfully.`);
+                                closeModal();
+                                // In real app, remove the league card from UI
+                                const leagueCard = document.querySelector(`[onclick*="${leagueId}"]`)?.closest('.league-card');
+                                if (leagueCard) {
+                                    leagueCard.style.display = 'none';
+                                }
+                            }, 1000);
+                        }
+                    }
+                );
+                currentLeagueId = leagueId;
+            }
+
+            // Search and filter functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.querySelector('.search-input');
+                const leagueCards = document.querySelectorAll('.league-card');
+                const filterSelect = document.querySelector('.filter-select');
+
+                // Modal confirm button
+                document.getElementById('confirmAction').addEventListener('click', function() {
+                    if (currentAction) {
+                        currentAction();
                     }
                 });
-            });
 
-            // Filter functionality
-            filterSelect.addEventListener('change', function() {
-                const filterValue = this.value;
-                
-                leagueCards.forEach(card => {
-                    const statusElement = card.querySelector('.league-status');
-                    if (!statusElement) return;
+                // Search functionality
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
                     
-                    const status = statusElement.textContent.toLowerCase();
-                    
-                    switch (filterValue) {
-                        case 'all':
+                    leagueCards.forEach(card => {
+                        const leagueName = card.querySelector('.league-name').textContent.toLowerCase();
+                        const leagueDescription = card.querySelector('.league-description').textContent.toLowerCase();
+                        
+                        if (leagueName.includes(searchTerm) || leagueDescription.includes(searchTerm)) {
                             card.style.display = 'block';
-                            break;
-                        case 'joined':
-                            card.style.display = status === 'joined' ? 'block' : 'none';
-                            break;
-                        case 'public':
-                            card.style.display = status === 'public' ? 'block' : 'none';
-                            break;
-                        case 'private':
-                            card.style.display = status === 'private' ? 'block' : 'none';
-                            break;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+
+                // Filter functionality
+                filterSelect.addEventListener('change', function() {
+                    const filterValue = this.value;
+                    
+                    leagueCards.forEach(card => {
+                        const statusElement = card.querySelector('.league-status');
+                        if (!statusElement) return;
+                        
+                        const status = statusElement.textContent.toLowerCase();
+                        
+                        switch (filterValue) {
+                            case 'all':
+                                card.style.display = 'block';
+                                break;
+                            case 'joined':
+                                card.style.display = (status === 'joined' || status === 'admin') ? 'block' : 'none';
+                                break;
+                            case 'public':
+                                card.style.display = status === 'public' ? 'block' : 'none';
+                                break;
+                            case 'private':
+                                card.style.display = status === 'private' ? 'block' : 'none';
+                                break;
+                        }
+                    });
+                });
+
+                // Close modal when clicking outside
+                document.getElementById('confirmationModal').addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+
+                // Close modal with Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closeModal();
                     }
                 });
             });
-
-            // Close modal when clicking outside
-            document.getElementById('confirmationModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal();
-                }
-            });
-
-            // Close modal with Escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeModal();
-                }
-            });
-        });
-    </script>
+        </script>
+    </div>
 </body>
 </html>

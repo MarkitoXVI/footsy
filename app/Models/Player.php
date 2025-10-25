@@ -18,6 +18,12 @@ class Player extends Model
 
     public function team(){ return $this->belongsTo(Team::class); }
 
+    public function fantasyTeams()
+{
+    return $this->belongsToMany(FantasyTeam::class, 'fantasy_team_player');
+}
+
+
     public function getFullNameAttribute(){ return "{$this->first_name} {$this->second_name}"; }
 
     public function getPhotoUrlAttribute()

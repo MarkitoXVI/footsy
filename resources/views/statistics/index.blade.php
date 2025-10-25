@@ -93,7 +93,7 @@
             <li class="nav-item"><a href="{{ route('fantasy-team.index') }}" class="nav-link"><i class="fas fa-users"></i><span>My Team</span></a></li>
             <li class="nav-item"><a href="{{ route('leagues.index') }}" class="nav-link"><i class="fas fa-trophy"></i><span>Leagues</span></a></li>
             <li class="nav-item"><a href="{{ route('statistics.index') }}" class="nav-link active"><i class="fas fa-chart-line"></i><span>Statistics</span></a></li>
-            <li class="nav-item"><a href="{{ route('transfers.index') }}" class="nav-link"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a></li>
+            <!-- <li class="nav-item"><a href="{{ route('transfers.index') }}" class="nav-link"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a></li> -->
             <li class="nav-item"><a href="{{ route('fixtures.index') }}" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Fixtures</span></a></li>
             <li class="nav-item"><a href="{{ route('help') }}" class="nav-link"><i class="fas fa-question-circle"></i><span>Help</span></a></li>
             <li class="nav-item"><a href="{{ route('profile.edit') }}" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a></li>
@@ -113,6 +113,32 @@
 
         <div class="page">
             <h1 style="font-family:'Montserrat',sans-serif;font-size:1.8rem;margin-bottom:1rem;">Your Team Summary</h1>
+
+        <!-- Stats Switcher (Dropdown) -->
+        <div class="stats-dropdown" style="position:relative; display:inline-block; margin-bottom: 2rem;">
+            <button class="stats-dropdown-btn" id="statsSwitcherBtn" aria-expanded="false">
+                <i class="fas fa-chart-bar"></i>
+                <span id="statsSwitcherLabel">
+                    @if(request()->routeIs('statistics.players')) Player Statistics
+                    @elseif(request()->routeIs('statistics.teams')) Team Statistics
+                    @else Overview
+                    @endif
+                </span>
+                <i class="fas fa-chevron-down" style="margin-left:.35rem;"></i>
+            </button>
+
+            <div class="stats-dropdown-content" id="statsSwitcherMenu" role="menu" aria-hidden="true" style="z-index: 101;">
+                <a href="{{ route('statistics.index') }}" class="{{ request()->routeIs('statistics.index') ? 'active' : '' }}">
+                    <i class="fas fa-chart-pie"></i> Overview
+                </a>
+                <a href="{{ route('statistics.players') }}" class="{{ request()->routeIs('statistics.players') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i> Player Stats
+                </a>
+                <a href="{{ route('statistics.teams') }}" class="{{ request()->routeIs('statistics.teams') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i> Team Stats
+                </a>
+            </div>
+        </div>
 
             <div class="cards">
                 <div class="card"><h3>Total Points</h3><div class="value">{{ $totalPoints ?? 0 }}</div></div>
@@ -214,5 +240,35 @@
 });
 
     </script>
+
+    <script>
+  (function () {
+    const wrapper = document.querySelector('.stats-dropdown');
+    const btn = document.getElementById('statsSwitcherBtn');
+    const menu = document.getElementById('statsSwitcherMenu');
+
+    function closeMenu() {
+      wrapper.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = wrapper.classList.toggle('open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+  })();
+</script>
+
 </body>
 </html>

@@ -11,13 +11,13 @@ return new class extends Migration
         Schema::create('leagues', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
-            $table->enum('privacy', ['public', 'private'])->default('public');
             $table->text('description')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->integer('max_participants')->default(20);
+            $table->enum('privacy', ['public', 'private'])->default('public');
+            $table->string('code')->unique();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
-
     }
 
     public function down()

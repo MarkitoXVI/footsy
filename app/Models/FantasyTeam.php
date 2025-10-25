@@ -12,16 +12,24 @@ class FantasyTeam extends Model
     protected $fillable = [
         'user_id',
         'team_name',
-        'players', // JSON string in DB
+        'budget',
+        'players', // JSON field
     ];
 
     protected $casts = [
-        'players' => 'array', // 👈 decode to array automatically
+        'players' => 'array',
     ];
 
-    // If you want a Collection:
     public function getPlayersCollectionAttribute()
     {
         return collect($this->players ?? []);
     }
+
+    public function players()
+{
+    return $this->belongsToMany(Player::class, 'fantasy_team_player')
+        ->withPivot(['is_starter', 'position'])
+        ->withTimestamps();
+}
+
 }

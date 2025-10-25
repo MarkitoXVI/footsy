@@ -13,22 +13,24 @@ class TransfersController extends Controller
      * Show transfer page for user’s team
      */
     public function index()
-    {
-        $fantasyTeam = FantasyTeam::with('players')->where('user_id', Auth::id())->first();
+{
+    $fantasyTeam = FantasyTeam::where('user_id', Auth::id())->first();
 
-        if (!$fantasyTeam) {
-            return redirect()->route('fantasy-team.index')
-                ->with('error', 'You must create a team before making transfers.');
-        }
-
-        // Get all player IDs already in this team
-        $currentPlayerIds = $fantasyTeam->players->pluck('id')->toArray();
-
-        // Show all players except ones already in team
-        $availablePlayers = Player::whereNotIn('id', $currentPlayerIds)->get();
-
-        return view('transfers.index', compact('fantasyTeam', 'availablePlayers'));
+    if (!$fantasyTeam) {
+        return redirect()->route('fantasy-team.index')
+            ->with('error', 'You must create a team before making transfers.');
     }
+
+    // ✅ Safely handle JSON player list
+    $currentPlayerIds = collect($fantasyTeam->players ?? [])->pluck('id')->toArray();
+
+    // Show all players except ones already in team
+    $availablePlayers = Player::whereNotIn('id', $currentPlayerIds)->get();
+
+    return view('transfers.index', compact('fantasyTeam', 'availablePlayers'));
+}
+
+
 
     /**
      * Handle transfers
@@ -54,7 +56,8 @@ class TransfersController extends Controller
         }
 
         // Keep track of current players
-        $currentPlayerIds = $team->players->pluck('id')->toArray();
+       $currentPlayerIds = collect(json_decode($fantasyTeam->players, true))->pluck('id')->toArray();
+
         $spentBudget = $team->spent_budget;
 
         foreach ($transfers as $transfer) {
@@ -104,11 +107,22 @@ class TransfersController extends Controller
             }
 
             // Perform the swap
-            $team->players()->detach($outPlayer->id);
-            $team->players()->attach($inPlayer->id, [
-                'is_substitute' => false, // default, or inherit?
-                'position_order' => 0
-            ]);
+            $players = collect($team->players ?? []);
+
+// Remove outgoing player
+$players = $players->reject(fn($p) => $p['id'] == $outPlayer->id);
+
+// Add incoming player
+$players->push([
+    'id' => $inPlayer->id,
+    'name' => $inPlayer->web_name,
+    'position' => $inPlayer->position,
+    'price' => $inPlayer->price,
+]);
+
+$team->players = $players->values()->toArray();
+$team->save();
+
 
             // Update spent budget
             $spentBudget = $newSpent;

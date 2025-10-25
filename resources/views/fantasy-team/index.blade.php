@@ -637,12 +637,12 @@
                     <span>Statistics</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="{{ route('transfers.index') }}" class="nav-link">
                     <i class="fas fa-exchange-alt"></i>
                     <span>Transfers</span>
                 </a>
-            </li>
+            </li> -->
             <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
@@ -777,13 +777,39 @@
 <script>
     const players = @json($mapped);
 
-    // Group players by position (using "position" key)
+    // Calculate total points from starting players only
+    function calculateTotalPoints() {
+        const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
+        const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
+        
+        players.forEach(p => {
+            if (grouped[p.position]) grouped[p.position].push(p);
+        });
+
+        // Get only starting players based on formation
+        const startingPlayers = Object.entries(layout)
+            .flatMap(([pos, max]) => grouped[pos].slice(0, max));
+
+        return startingPlayers.reduce((total, player) => {
+            return total + (player.event_points || 0);
+        }, 0);
+    }
+
+    // Update the total points display
+    function updateTotalPointsDisplay() {
+        const totalPoints = calculateTotalPoints();
+        const statValueElement = document.querySelector('.stat-value');
+        if (statValueElement) {
+            statValueElement.textContent = totalPoints;
+        }
+    }
+
+    // Rest of your existing code for rendering players...
     const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
     players.forEach(p => {
         if (grouped[p.position]) grouped[p.position].push(p);
     });
 
-    // Layout formation
     const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
     const columns = {
         GK: [6],
@@ -792,7 +818,6 @@
         FWD: [5, 8]
     };
 
-    // Position labels
     const positionLabels = {
         'GK': 'Goalkeeper',
         'DEF': 'Defender',
@@ -800,7 +825,6 @@
         'FWD': 'Forward'
     };
 
-    // Render players on pitch
     Object.entries(layout).forEach(([pos, max]) => {
         const row = document.getElementById(pos.toLowerCase() + 'Row');
         grouped[pos].slice(0, max).forEach((p, i) => {
@@ -819,7 +843,6 @@
         });
     });
 
-    // Calculate bench (players not in formation)
     const starters = Object.entries(layout)
         .flatMap(([pos, max]) => grouped[pos].slice(0, max));
 
@@ -840,7 +863,9 @@
         benchRow.appendChild(b);
     });
 
-    // Chip activation (unchanged)
+    // Update total points display after rendering players
+    updateTotalPointsDisplay();
+
     function activateChip(chipType) {
         const chipNames = {
             'bench-boost': 'Bench Boost',

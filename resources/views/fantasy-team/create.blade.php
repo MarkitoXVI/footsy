@@ -337,8 +337,8 @@
     <form id="teamForm" action="{{ route('fantasy-team.store') }}" method="POST">
       @csrf
       <div class="team-name-box">
-        <label for="teamName">Team Name</label>
-        <input type="text" id="teamName" name="team_name" placeholder="Enter your team name..." maxlength="30" required>
+        <label for="team_name">Team Name</label>
+        <input type="text" id="team_name" name="team_name" placeholder="Enter your team name..." maxlength="30" required>
       </div>
 
       <div class="pitch-container">
@@ -483,7 +483,7 @@ document.getElementById('teamForm').addEventListener('submit', function(e) {
     e.preventDefault();
     return showWarning("You need at least 11 players to save your team.");
   }
-  const teamName = document.getElementById('teamName').value.trim();
+  const teamName = document.getElementById('team_name').value.trim();
   if (!teamName) {
     e.preventDefault();
     return showWarning("Please enter a team name before saving.");

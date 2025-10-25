@@ -35,7 +35,7 @@ class FantasyTeamController extends Controller
     // Merge saved team with live API data
     $mapped = collect($savedPlayers ?? [])->map(function ($p) use ($elements, $fplTeams) {
         $savedId  = $p['id'] ?? null;
-        $savedNm  = $p['name'] ?? null;
+        $savedNm  = $p['team_name'] ?? null;
         $savedPos = $p['pos'] ?? null;
         $savedTm  = $p['team'] ?? null;
         $savedPr  = (float)($p['price'] ?? 0);
@@ -96,7 +96,6 @@ class FantasyTeamController extends Controller
     ));
 }
 
-
     /**
      * Create a new team (load players from API)
      */
@@ -128,43 +127,33 @@ class FantasyTeamController extends Controller
 
         return view('fantasy-team.create', compact('players'));
     }
+    
 
     /**
      * Store or update the fantasy team.
      */
     public function store(Request $request)
 {
-    $request->validate([
-        'team_name' => 'required|string|max:30',
-        'players'   => 'required',
+    $validated = $request->validate([
+        'team_name' => 'required|string|max:255',
+        'players'   => 'required|string',
     ]);
 
-    $players = $request->input('players');
-
-    // ✅ Always store as JSON string, no matter what the frontend sends
-    if (is_string($players)) {
-        // If it's already a JSON string, verify it's valid JSON
-        json_decode($players);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            // It's just a plain string, wrap it safely
-            $players = json_encode([$players]);
-        }
-    } elseif (is_array($players) || is_object($players)) {
-        $players = json_encode($players);
-    } else {
-        $players = json_encode([]);
+    $players = json_decode($validated['players'], true);
+    if (!is_array($players) || count($players) < 11) {
+        return back()->with('error', 'You must select at least 11 players.')->withInput();
     }
 
-    // ✅ Now it's always a string
     FantasyTeam::updateOrCreate(
         ['user_id' => auth()->id()],
         [
-            'team_name' => $request->team_name,
-            'players'   => $players,
+            'team_name' => $validated['team_name'],
+            'players'   => json_encode($players),
         ]
     );
 
-    return redirect()->route('fantasy-team.index')->with('success', 'Team saved successfully!');
+    return redirect()->route('fantasy-team.index')->with('success', 'Team created successfully!');
 }
+
 
 }

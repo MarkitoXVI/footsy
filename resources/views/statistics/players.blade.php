@@ -555,12 +555,12 @@
                 <span>Statistics</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a href="{{ route('transfers.index') }}" class="nav-link">
                 <i class="fas fa-exchange-alt"></i>
                 <span>Transfers</span>
             </a>
-        </li>
+        </li> -->
         <li class="nav-item">
             <a href="{{ route('fixtures.index') }}" class="nav-link">
                 <i class="fas fa-calendar-alt"></i>

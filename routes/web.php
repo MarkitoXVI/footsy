@@ -5,7 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FantasyTeamController;
 use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\PlayersController;
-use App\Http\Controllers\FixtureController;
+use App\Http\Controllers\FixturesController;
 use App\Http\Controllers\TransfersController;
 use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
@@ -119,11 +119,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/players/search', [PlayersController::class, 'search'])->name('players.search');
     
     // Fixture Routes
-    Route::prefix('fixtures')->group(function () {
-        Route::get('/', [FixtureController::class, 'index'])->name('fixtures.index');
-        Route::get('/upcoming', [FixtureController::class, 'upcoming'])->name('fixtures.upcoming');
-        Route::get('/{fixture}', [FixtureController::class, 'show'])->name('fixtures.show');
-    });
+    Route::get('/fixtures', [FixturesController::class, 'index'])
+     ->name('fixtures.index');
     
     // Transfer Routes
     Route::prefix('transfers')->group(function () {

@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Footsy Fantasy Football</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
+            --primary-light: #5b7ae8;
             --secondary: #34c759;
             --dark: #1a2238;
             --light: #f8f9fa;
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-light: linear-gradient(135deg, #e8edff, #dce4ff);
         }
         
         * {
@@ -27,11 +29,28 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--dark);
-            background-color: #f5f7ff;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+        
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(58, 94, 229, 0.02) 0px, rgba(58, 94, 229, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
         }
         
         .container {
@@ -39,13 +58,20 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 1;
         }
         
         /* Header Styles */
         header {
-            background: var(--gradient);
-            padding: 1.5rem 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: rgba(26, 34, 56, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(58, 94, 229, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.2);
         }
         
         nav {
@@ -57,23 +83,26 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.8rem;
             text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
+            color: white;
             font-weight: bold;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(58, 94, 229, 0.3);
         }
         
         /* Main Content */
@@ -82,22 +111,24 @@
             align-items: center;
             justify-content: center;
             flex-grow: 1;
-            padding: 2rem 0;
+            padding: 3rem 0;
         }
         
         .auth-container {
             display: flex;
             width: 100%;
             max-width: 1000px;
-            background: white;
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(58, 94, 229, 0.15);
+            border: 1px solid rgba(58, 94, 229, 0.15);
         }
         
         .auth-left {
             flex: 1;
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             padding: 3rem;
             display: flex;
@@ -115,7 +146,7 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent);
         }
         
         .auth-left::after {
@@ -126,7 +157,7 @@
             width: 250px;
             height: 250px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
         }
         
         .auth-left h2 {
@@ -135,6 +166,7 @@
             margin-bottom: 1.5rem;
             position: relative;
             z-index: 2;
+            font-weight: 700;
         }
         
         .auth-left p {
@@ -142,20 +174,24 @@
             opacity: 0.9;
             position: relative;
             z-index: 2;
+            line-height: 1.6;
         }
         
         .testimonial {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
             padding: 1.5rem;
             margin-top: 2rem;
             position: relative;
             z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .testimonial p {
             font-style: italic;
             margin-bottom: 1rem;
+            font-size: 0.95rem;
         }
         
         .user {
@@ -166,14 +202,15 @@
         .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: white;
-            color: var(--primary);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 12px;
+            font-size: 1rem;
         }
         
         .auth-right {
@@ -189,8 +226,12 @@
         .auth-header h2 {
             font-family: 'Montserrat', sans-serif;
             font-size: 2rem;
-            color: var(--dark);
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .auth-header p {
@@ -208,7 +249,7 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--dark);
         }
         
@@ -221,7 +262,8 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--primary);
+            font-size: 1rem;
         }
         
         .input-with-icon input {
@@ -231,16 +273,21 @@
         .form-control {
             width: 100%;
             padding: 0.875rem 1rem;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s;
+            font-family: 'Open Sans', sans-serif;
         }
         
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
+        }
+        
+        .form-control.input-error {
+            border-color: #e74c3c;
         }
         
         .password-toggle {
@@ -250,6 +297,11 @@
             transform: translateY(-50%);
             color: var(--gray);
             cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary);
         }
         
         .form-options {
@@ -263,18 +315,24 @@
         .remember-me {
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
         
         .remember-me input {
             margin-right: 0.5rem;
+            cursor: pointer;
+            accent-color: var(--primary);
         }
         
         .forgot-password {
             color: var(--primary);
             text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
         }
         
         .forgot-password:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
         }
         
@@ -283,38 +341,42 @@
             width: 100%;
             padding: 1rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             text-align: center;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .btn-primary {
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 15px rgba(58, 94, 229, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(58, 94, 229, 0.3);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.4);
         }
         
         .btn-google {
             background: white;
             color: var(--dark);
-            border: 1px solid var(--light-gray);
+            border: 2px solid var(--light-gray);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             margin-top: 1rem;
         }
         
         .btn-google:hover {
-            border-color: var(--gray);
+            border-color: var(--primary);
+            background: rgba(58, 94, 229, 0.05);
+            transform: translateY(-2px);
         }
         
         .divider {
@@ -338,6 +400,7 @@
             padding: 0 1rem;
             position: relative;
             color: var(--gray);
+            font-size: 0.9rem;
         }
         
         .auth-footer {
@@ -350,39 +413,40 @@
             color: var(--primary);
             text-decoration: none;
             font-weight: 600;
+            transition: all 0.3s;
         }
         
         .auth-footer a:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
         }
         
         /* Error Messages */
         .error-message {
             color: #e74c3c;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             margin-top: 0.5rem;
-        }
-        
-        .input-error {
-            border-color: #e74c3c;
         }
         
         /* Status Message */
         .status-message {
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 1.5rem;
             text-align: center;
+            font-size: 0.9rem;
         }
         
         .status-success {
-            background-color: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(52, 199, 89, 0.05));
+            color: #2b8c3c;
+            border: 1px solid rgba(52, 199, 89, 0.3);
         }
         
         .status-error {
-            background-color: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.05));
+            color: #c0392b;
+            border: 1px solid rgba(231, 76, 60, 0.3);
         }
         
         /* Footer */
@@ -392,6 +456,7 @@
             padding: 2rem 0;
             text-align: center;
             margin-top: auto;
+            position: relative;
         }
         
         .footer-links {
@@ -399,21 +464,46 @@
             justify-content: center;
             gap: 2rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .footer-links a {
-            color: white;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: opacity 0.3s;
+            transition: all 0.3s;
         }
         
         .footer-links a:hover {
-            opacity: 0.8;
+            color: white;
+            transform: translateY(-2px);
         }
         
         .copyright {
-            opacity: 0.7;
+            opacity: 0.6;
             font-size: 0.9rem;
+        }
+        
+        /* Floating shapes */
+        .floating-shape {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(58, 94, 229, 0.08), rgba(58, 94, 229, 0.03));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: -100px;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: 10%;
+            right: -150px;
         }
         
         /* Responsive Design */
@@ -438,10 +528,35 @@
                 align-items: flex-start;
                 gap: 1rem;
             }
+            
+            .footer-links {
+                gap: 1rem;
+                flex-direction: column;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-container {
+            animation: fadeInUp 0.6s ease forwards;
         }
     </style>
 </head>
 <body>
+    <!-- Floating shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
     <!-- Header with Navigation -->
     <header>
         <div class="container">
@@ -468,7 +583,7 @@
                             <div class="user-avatar">PJ</div>
                             <div>
                                 <strong>Paul Johnson</strong>
-                                <div>Footsy User for over a month</div>
+                                <div style="font-size: 0.85rem; opacity: 0.8;">Footsy User for over a month</div>
                             </div>
                         </div>
                     </div>
@@ -540,12 +655,11 @@
                             <span>Or sign in with</span>
                         </div>
                         
-                       <!-- Google Sign In Button -->
+                        <!-- Google Sign In Button -->
                         <a href="{{ route('google.login') }}" class="btn btn-google">
                             <i class="fab fa-google"></i>
                             <span>Sign in with Google</span>
                         </a>
-
                         
                         <div class="auth-footer">
                             <p>Don't have an account? <a href="{{ route('register') }}">Sign up here</a></p>
@@ -578,40 +692,44 @@
             const passwordToggle = document.getElementById('passwordToggle');
             const passwordField = document.getElementById('password');
             
-            passwordToggle.addEventListener('click', function() {
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
-                
-                // Toggle eye icon
-                const eyeIcon = passwordToggle.querySelector('i');
-                if (type === 'password') {
-                    eyeIcon.classList.remove('fa-eye-slash');
-                    eyeIcon.classList.add('fa-eye');
-                } else {
-                    eyeIcon.classList.remove('fa-eye');
-                    eyeIcon.classList.add('fa-eye-slash');
-                }
-            });
+            if (passwordToggle && passwordField) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+                    
+                    // Toggle eye icon
+                    const eyeIcon = passwordToggle.querySelector('i');
+                    if (type === 'password') {
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                    } else {
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                    }
+                });
+            }
             
             // Form validation
             const form = document.querySelector('.auth-form');
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-                const inputs = form.querySelectorAll('input[required]');
-                
-                inputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.classList.add('input-error');
-                    } else {
-                        input.classList.remove('input-error');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    const inputs = form.querySelectorAll('input[required]');
+                    
+                    inputs.forEach(input => {
+                        if (!input.value.trim()) {
+                            isValid = false;
+                            input.classList.add('input-error');
+                        } else {
+                            input.classList.remove('input-error');
+                        }
+                    });
+                    
+                    if (!isValid) {
+                        e.preventDefault();
                     }
                 });
-                
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
+            }
         });
     </script>
 </body>

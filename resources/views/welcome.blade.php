@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Footsy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <title>Footsy - Ultimate Fantasy Football Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
+            --primary-light: #5b7ae8;
             --secondary: #34c759;
             --dark: #1a2238;
             --light: #f8f9fa;
             --gray: #6c757d;
+            --light-gray: #e9ecef;
             --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-light: linear-gradient(135deg, #e8edff, #dce4ff);
         }
         
         * {
@@ -25,8 +29,26 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--dark);
-            background-color: var(--light);
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
             line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(58, 94, 229, 0.02) 0px, rgba(58, 94, 229, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
         }
         
         .container {
@@ -34,15 +56,20 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 1;
         }
         
         /* Header Styles */
         header {
-            background: var(--gradient);
-            padding: 1.5rem 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 100;
+            background: rgba(26, 34, 56, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(58, 94, 229, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.2);
         }
         
         nav {
@@ -54,23 +81,26 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.8rem;
             text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
+            color: white;
             font-weight: bold;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 15px rgba(58, 94, 229, 0.3);
         }
         
         .nav-links {
@@ -80,39 +110,42 @@
         }
         
         .nav-links a {
-            color: white;
+            color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             font-weight: 500;
-            transition: opacity 0.3s;
+            transition: all 0.3s;
+            font-size: 1rem;
         }
         
         .nav-links a:hover {
-            opacity: 0.8;
+            color: white;
+            transform: translateY(-2px);
         }
         
         .btn {
             display: inline-block;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1.8rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
             cursor: pointer;
+            font-size: 0.95rem;
         }
         
         .btn-primary {
-            background: white;
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(58, 94, 229, 0.3);
         }
         
         .btn-primary:hover {
-            background: rgba(255, 255, 255, 0.9);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 20px rgba(58, 94, 229, 0.4);
         }
         
         .btn-outline {
-            border: 2px solid white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
             background: transparent;
         }
@@ -121,13 +154,14 @@
             background: white;
             color: var(--primary);
             transform: translateY(-2px);
+            border-color: white;
         }
         
         /* Hero Section */
         .hero {
             position: relative;
             padding: 6rem 0;
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary-dark) 100%);
             color: white;
             overflow: hidden;
         }
@@ -135,12 +169,22 @@
         .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(58, 94, 229, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
             width: 60%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="white" opacity="0.05"/></svg>') no-repeat center right;
-            background-size: cover;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
         }
         
         .hero-content {
@@ -154,6 +198,7 @@
             font-size: 3.5rem;
             line-height: 1.2;
             margin-bottom: 1.5rem;
+            font-weight: 800;
         }
         
         .hero p {
@@ -170,6 +215,7 @@
         /* Features Section */
         .features {
             padding: 5rem 0;
+            position: relative;
         }
         
         .section-title {
@@ -180,14 +226,19 @@
         .section-title h2 {
             font-family: 'Montserrat', sans-serif;
             font-size: 2.5rem;
-            color: var(--dark);
+            font-weight: 700;
             margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .section-title p {
             color: var(--gray);
             max-width: 600px;
             margin: 0 auto;
+            font-size: 1.1rem;
         }
         
         .features-grid {
@@ -197,33 +248,41 @@
         }
         
         .feature-card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 2rem;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(58, 94, 229, 0.15);
+            text-align: center;
         }
         
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(58, 94, 229, 0.15);
+            background: white;
+            border-color: rgba(58, 94, 229, 0.3);
         }
         
         .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient);
-            border-radius: 12px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            margin: 0 auto 1.5rem;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 20px rgba(58, 94, 229, 0.2);
         }
         
         .feature-card h3 {
             font-family: 'Montserrat', sans-serif;
             margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
         
         .feature-card p {
@@ -233,65 +292,110 @@
         /* How It Works */
         .how-it-works {
             padding: 5rem 0;
-            background: #f0f4ff;
+            background: linear-gradient(135deg, rgba(58, 94, 229, 0.05), rgba(58, 94, 229, 0.02));
+            position: relative;
         }
         
         .steps {
             display: flex;
             justify-content: space-between;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
+            gap: 1rem;
         }
         
         .step {
             text-align: center;
             flex: 1;
             position: relative;
-            padding: 0 1.5rem;
+            padding: 2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(58, 94, 229, 0.1);
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 10px 30px rgba(58, 94, 229, 0.1);
         }
         
         .step-number {
             width: 50px;
             height: 50px;
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            border-radius: 50%;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
         
         .step h3 {
             font-family: 'Montserrat', sans-serif;
             margin-bottom: 1rem;
+            font-size: 1.2rem;
         }
         
         .step p {
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         
         /* CTA Section */
         .cta {
             padding: 5rem 0;
             text-align: center;
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
         }
         
         .cta h2 {
             font-family: 'Montserrat', sans-serif;
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
         
         .cta p {
             max-width: 600px;
             margin: 0 auto 2rem;
             opacity: 0.9;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
         }
         
         .cta .btn {
@@ -299,6 +403,13 @@
             color: var(--primary);
             padding: 1rem 2rem;
             font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
         
         /* Footer */
@@ -307,6 +418,7 @@
             color: white;
             padding: 3rem 0;
             text-align: center;
+            position: relative;
         }
         
         .footer-links {
@@ -314,24 +426,84 @@
             justify-content: center;
             gap: 2rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
         
         .footer-links a {
-            color: white;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: opacity 0.3s;
+            transition: all 0.3s;
         }
         
         .footer-links a:hover {
-            opacity: 0.8;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
         }
         
         .copyright {
-            opacity: 0.7;
+            opacity: 0.6;
             font-size: 0.9rem;
         }
         
+        /* Floating shapes */
+        .floating-shape {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(58, 94, 229, 0.08), rgba(58, 94, 229, 0.03));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: -100px;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: 10%;
+            right: -150px;
+        }
+        
         /* Responsive Design */
+        @media (max-width: 992px) {
+            .steps {
+                flex-wrap: wrap;
+            }
+            
+            .step {
+                min-width: calc(50% - 1rem);
+            }
+        }
+        
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -343,25 +515,63 @@
             
             .steps {
                 flex-direction: column;
-                gap: 2rem;
+            }
+            
+            .step {
+                min-width: auto;
             }
             
             .nav-links {
                 display: none;
             }
             
-            .mobile-menu-btn {
-                display: block;
+            .section-title h2 {
+                font-size: 2rem;
             }
+            
+            .cta h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: fadeInUp 0.6s ease forwards;
         }
     </style>
 </head>
 <body>
+    <!-- Floating shapes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+
     <!-- Header with Navigation -->
     <header>
         <div class="container">
             <nav>
-                <a href="/" class="logo">
+                <a href="{{ route('home') }}" class="logo">
                     <div class="logo-icon">F</div>
                     Footsy
                 </a>
@@ -398,17 +608,23 @@
             </div>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">⚽</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-futbol"></i>
+                    </div>
                     <h3>Real Player Stats</h3>
                     <p>Access real-time player statistics and performance data to make informed decisions for your fantasy team.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
                     <h3>Compete in Leagues</h3>
                     <p>Create private leagues with friends or join public leagues to compete against managers worldwide.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                     <h3>Live Points Tracking</h3>
                     <p>Watch your points update in real-time as matches progress with our advanced live scoring system.</p>
                 </div>
@@ -459,7 +675,7 @@
 
     <!-- Footer -->
     <footer>
-        <div class="container">
+        <div class="container">     
             <div class="footer-links">
                 <a href="#">About Us</a>
                 <a href="#">Terms of Service</a>
@@ -474,27 +690,24 @@
     </footer>
 
     <script>
-        // Simple animation for feature cards on scroll
+        // Animation for feature cards on scroll
         document.addEventListener('DOMContentLoaded', function() {
-            const featureCards = document.querySelectorAll('.feature-card');
+            const animatedElements = document.querySelectorAll('.feature-card, .step');
             
             function checkScroll() {
-                featureCards.forEach(card => {
-                    const cardPosition = card.getBoundingClientRect().top;
-                    const screenPosition = window.innerHeight / 1.3;
+                animatedElements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.2;
                     
-                    if (cardPosition < screenPosition) {
-                        card.style.opacity = 1;
-                        card.style.transform = 'translateY(0)';
+                    if (elementPosition < screenPosition) {
+                        element.classList.add('animate');
                     }
                 });
             }
             
-            // Initial state for animation
-            featureCards.forEach(card => {
-                card.style.opacity = 0;
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            // Add initial class for animation
+            animatedElements.forEach(element => {
+                element.style.opacity = '0';
             });
             
             window.addEventListener('scroll', checkScroll);

@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Footsy Fantasy Football</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
+            --primary-light: #5b7ae8;
             --secondary: #34c759;
+            --danger: #e53e3e;
             --dark: #1a2238;
             --light: #f8f9fa;
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-light: linear-gradient(135deg, #e8edff, #dce4ff);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+            --header-height: 70px;
         }
         
         * {
@@ -27,56 +33,83 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--dark);
-            background-color: #f5f7ff;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
+            position: relative;
         }
         
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(58, 94, 229, 0.02) 0px, rgba(58, 94, 229, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
         }
         
         /* Sidebar Styles */
         .sidebar {
-            width: 260px;
-            background: var(--dark);
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark) 0%, #1e2a4a 100%);
             color: white;
-            height: 100vh;
             position: fixed;
-            overflow-y: auto;
-            transition: all 0.3s ease;
+            height: 100vh;
+            left: 0;
+            top: 0;
             z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 25px rgba(58, 94, 229, 0.15);
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
         }
         
         .sidebar-header {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .sidebar-logo {
-            width: 36px;
-            height: 36px;
-            background: white;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-weight: bold;
+            color: white;
+            font-weight: 800;
             font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
         
         .sidebar-title {
             font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.4rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-title {
+            opacity: 0;
+            width: 0;
+            display: none;
         }
         
         .sidebar-nav {
@@ -91,37 +124,93 @@
         .nav-link {
             display: flex;
             align-items: center;
+            gap: 14px;
             padding: 0.875rem 1.5rem;
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: all 0.3s;
             border-left: 4px solid transparent;
+            white-space: nowrap;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
         }
         
         .nav-link:hover, .nav-link.active {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(58, 94, 229, 0.2);
             color: white;
             border-left-color: var(--primary);
         }
         
         .nav-link i {
-            margin-right: 12px;
             width: 20px;
             text-align: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .nav-link span {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem 1rem;
+        }
+        
+        /* Burger Menu Button */
+        .burger-menu {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .burger-menu i {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .burger-menu:hover {
+            background: rgba(58, 94, 229, 0.1);
         }
         
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 260px;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             position: relative;
+            z-index: 1;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
         }
         
         /* Header */
         .header {
-            height: 70px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(58, 94, 229, 0.08);
             padding: 0 2rem;
             display: flex;
             align-items: center;
@@ -129,12 +218,23 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
         
-        .user-menu {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .user-profile {
@@ -142,23 +242,26 @@
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .user-profile:hover {
+            background: rgba(58, 94, 229, 0.05);
         }
         
         .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: var(--gradient);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
-        }
-        
-        .user-info {
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.2);
         }
         
         .user-name {
@@ -166,86 +269,80 @@
             font-size: 0.95rem;
         }
         
-        .user-role {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        
         /* Profile Content */
         .profile-content {
             padding: 2rem;
+            flex: 1;
         }
         
+        /* Profile Header */
         .profile-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
-            margin-bottom: 2rem;
+            gap: 2rem;
+            border: 1px solid rgba(58, 94, 229, 0.1);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
         }
         
         .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: var(--gradient);
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-right: 1.5rem;
+            font-size: 3rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(58, 94, 229, 0.3);
+        }
+        
+        .profile-info {
+            flex: 1;
         }
         
         .profile-info h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .profile-info p {
             color: var(--gray);
-        }
-        
-        .profile-stats {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            flex: 1;
-        }
-        
-        .stat-value {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
             margin-bottom: 0.5rem;
         }
         
-        .stat-label {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
+        /* Profile Grid */
         .profile-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 2rem;
         }
         
+        /* Cards */
         .card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
+            border: 1px solid rgba(58, 94, 229, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 12px 30px rgba(58, 94, 229, 0.12);
         }
         
         .card-header {
@@ -254,13 +351,14 @@
             align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
         
-        .card-title {
+        .card-header h2 {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--dark);
         }
         
         .form-group {
@@ -270,17 +368,19 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--dark);
         }
         
         .form-control {
             width: 100%;
             padding: 0.875rem 1rem;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
+            border: 2px solid rgba(58, 94, 229, 0.1);
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s;
+            font-family: 'Open Sans', sans-serif;
+            margin-bottom: 1rem;
         }
         
         .form-control:focus {
@@ -290,58 +390,84 @@
         }
         
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 0.875rem 1.5rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             text-align: center;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
         }
         
         .btn-primary {
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(58, 94, 229, 0.3);
+            box-shadow: 0 6px 20px rgba(58, 94, 229, 0.4);
         }
         
         .btn-danger {
-            background: #dc3545;
-            color: white;
+            background: white;
+            color: var(--danger);
+            border: 2px solid var(--danger);
         }
         
         .btn-danger:hover {
-            background: #bb2d3b;
+            background: rgba(229, 62, 62, 0.1);
             transform: translateY(-2px);
         }
         
+        /* Alerts */
         .alert {
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
         
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(52, 199, 89, 0.05));
+            color: var(--secondary);
+            border: 1px solid rgba(52, 199, 89, 0.3);
         }
         
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .delete-form {
+            display: none;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(58, 94, 229, 0.1);
         }
         
-        .session-status {
-            margin-bottom: 1.5rem;
+        .delete-form.active {
+            display: block;
+        }
+        
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .overlay.active {
+            display: block;
         }
         
         /* Responsive Design */
@@ -353,54 +479,24 @@
         
         @media (max-width: 768px) {
             .sidebar {
-                width: 70px;
-                overflow: visible;
+                transform: translateX(-100%);
             }
             
-            .sidebar-title, .nav-link span {
-                display: none;
-            }
-            
-            .sidebar-header {
-                justify-content: center;
-                padding: 1.5rem 0.5rem;
-            }
-            
-            .nav-link {
-                padding: 1rem;
-                justify-content: center;
-            }
-            
-            .nav-link i {
-                margin-right: 0;
-                font-size: 1.2rem;
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             
             .main-content {
-                margin-left: 70px;
+                margin-left: 0;
             }
             
-            .header {
-                padding: 0 1rem;
-            }
-            
-            .user-info {
+            .user-name {
                 display: none;
             }
             
             .profile-header {
                 flex-direction: column;
                 text-align: center;
-            }
-            
-            .profile-avatar {
-                margin-right: 0;
-                margin-bottom: 1rem;
-            }
-            
-            .profile-stats {
-                flex-direction: column;
-                gap: 1rem;
             }
         }
         
@@ -413,301 +509,278 @@
                 padding: 0 1rem;
             }
         }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card, .profile-header {
+            animation: fadeInUp 0.5s ease forwards;
+        }
     </style>
 </head>
 <body>
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">F</div>
-            <div class="sidebar-title">Footsy</div>
+
+@php $user = Auth::user(); @endphp
+
+<div class="overlay" id="overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">F</div>
+        <div class="sidebar-title">Footsy</div>
+    </div>
+
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a href="{{ route('dashboard') }}" class="nav-link">
+                <i class="fas fa-home"></i><span>Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('fantasy-team.index') }}" class="nav-link">
+                <i class="fas fa-users"></i><span>My Team</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('leagues.index') }}" class="nav-link">
+                <i class="fas fa-trophy"></i><span>Leagues</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('statistics.index') }}" class="nav-link">
+                <i class="fas fa-chart-line"></i><span>Statistics</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('transfers.index') }}" class="nav-link">
+                <i class="fas fa-exchange-alt"></i><span>Transfers</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('fixtures.index') }}" class="nav-link">
+                <i class="fas fa-calendar-alt"></i><span>Fixtures</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('help') }}" class="nav-link">
+                <i class="fas fa-question-circle"></i><span>Help and Support</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('profile.edit') }}" class="nav-link active">
+                <i class="fas fa-user"></i><span>Profile</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="nav-link" style="background:none;border:none;width:100%;text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </button>
+            </form>
+        </li>
+    </ul>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+    <header class="header">
+        <div class="header-left">
+            <button class="burger-menu" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        
-        <ul class="sidebar-nav">
-            <li class="nav-item">
-                <a href="{{ route('dashboard') }}" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('fantasy-team.index') }}" class="nav-link">
-                    <i class="fas fa-users"></i>
-                    <span>My Team</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('leagues.index') }}" class="nav-link">
-                    <i class="fas fa-trophy"></i>
-                    <span>Leagues</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('statistics.index') }}" class="nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Statistics</span>
-                </a>
-            </li>
-            <!-- <li class="nav-item">
-                <a href="{{ route('transfers.index') }}" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transfers</span>
-                </a>
-            </li> -->
-            <li class="nav-item">
-                <a href="{{ route('fixtures.index') }}" class="nav-link">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Fixtures</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('help') }}" class="nav-link {{ request()->routeIs('help') ? 'active' : '' }}">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help and Support</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('profile.edit') }}" class="nav-link active">
-                    <i class="fas fa-user"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
+
+        <div class="user-profile">
+            <div class="user-avatar">{{ substr($user->name, 0, 1) }}</div>
+            <div class="user-name">{{ $user->name }}</div>
+        </div>
+    </header>
+
+    <div class="profile-content">
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+            <div class="profile-avatar">{{ substr($user->name, 0, 1) }}</div>
+            <div class="profile-info">
+                <h1>{{ $user->name }}</h1>
+                <p><i class="fas fa-calendar-alt"></i> Member since {{ $user->created_at->format('F Y') }}</p>
+                <p><i class="fas fa-envelope"></i> {{ $user->email }}</p>
+            </div>
+        </div>
+
+        <!-- ALERT -->
+        @if (session('status') === 'profile-updated')
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> Profile updated successfully
+            </div>
+        @endif
+
+        <div class="profile-grid">
+            <!-- PROFILE FORM -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-user-edit"></i> Profile Information</h2>
+                </div>
+
+                <form method="POST" action="{{ route('profile.update') }}">
                     @csrf
-                    <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Log Out</span>
-                    </a>
-                </form>
-            </li>
-        </ul>
-    </aside>
+                    @method('patch')
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <div></div> <!-- Empty div for spacing -->
-            
-            <div class="user-menu">
-                <div class="user-profile">
-                    <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-                    <div class="user-info">
-                        <div class="user-name">{{ Auth::user()->name }}</div>
-                        <div class="user-role">Team Manager</div>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input id="name" name="name" value="{{ old('name', $user->name) }}" class="form-control" required>
+                        @error('name')
+                            <div class="alert alert-error">{{ $message }}</div>
+                        @enderror
                     </div>
-                </div>
-            </div>
-        </header>
 
-        <!-- Profile Content -->
-        <div class="profile-content">
-            <div class="profile-header">
-                <div class="profile-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-                <div class="profile-info">
-                    <h1>{{ Auth::user()->name }}</h1>
-                    <p>Joined {{ Auth::user()->created_at->format('F Y') }}</p>
-
-                    @if(Auth::user()->favorite_team)
-                        @php
-                            $teamCode = strtoupper(Auth::user()->favorite_team);
-                            $logos = [
-                                'ARS' => 3, 'AVL' => 7, 'BOU' => 91, 'BRE' => 94, 'BHA' => 36,
-                                'CHE' => 8, 'CRY' => 31, 'EVE' => 11, 'FUL' => 54, 'LIV' => 14,
-                                'LUT' => 46, 'MCI' => 43, 'MUN' => 1, 'NEW' => 4, 'NFO' => 17,
-                                'SHU' => 49, 'TOT' => 6, 'WHU' => 21, 'WOL' => 39
-                            ];
-                            $teamId = $logos[$teamCode] ?? null;
-                            $teamLogo = $teamId ? "https://resources.premierleague.com/premierleague/badges/70/t{$teamId}.png" : null;
-                        @endphp
-
-                        <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 10px;">
-                            @if($teamLogo)
-                                <img src="{{ $teamLogo }}" alt="{{ $teamCode }} Logo" width="36" height="36" style="border-radius:50%; background:#f8f9fa;">
-                            @endif
-                            <span style="font-weight:600; color:var(--dark); font-size:0.95rem;">
-                                Favorite Team: {{ $teamCode }}
-                            </span>
-                        </div>
-                    @else
-                        <p style="margin-top:0.5rem; color:var(--gray);">No favorite team selected</p>
-                    @endif
-                </div>
-
-            </div>
-
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <div class="stat-value">0</div>
-                    <div class="stat-label">Global Rank</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">0</div>
-                    <div class="stat-label">Total Points</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">0</div>
-                    <div class="stat-label">Leagues Joined</div>
-                </div>
-            </div>
-
-            <!-- Session Status -->
-            <div class="session-status">
-                @if (session('status') === 'profile-updated')
-                    <div class="alert alert-success">
-                        Profile updated successfully.
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" class="form-control" required>
+                        @error('email')
+                            <div class="alert alert-error">{{ $message }}</div>
+                        @enderror
                     </div>
-                @endif
-            </div>
 
-            <div class="profile-grid">
-                <!-- Update Profile Information -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Profile Information</h2>
-                    </div>
-                    
-                    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-                        @csrf
-                    </form>
-
-                    <form method="post" action="{{ route('profile.update') }}">
-                        @csrf
-                        @method('patch')
-
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input id="name" name="name" type="text" class="form-control" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
-                            @error('name')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input id="email" name="email" type="email" class="form-control" value="{{ old('email', $user->email) }}" required autocomplete="email">
-                            @error('email')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                            <div>
-                                <p>Your email address is unverified.</p>
-                                <button form="send-verification" class="btn">
-                                    Click here to re-send the verification email.
-                                </button>
-                                @if (session('status') === 'verification-link-sent')
-                                    <div class="alert alert-success">
-                                        A new verification link has been sent to your email address.
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Update Password -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Update Password</h2>
-                    </div>
-                    
-                    <form method="post" action="{{ route('password.update') }}">
-                        @csrf
-                        @method('put')
-
-                        <div class="form-group">
-                            <label for="current_password">Current Password</label>
-                            <input id="current_password" name="current_password" type="password" class="form-control" autocomplete="current-password">
-                            @error('current_password')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">New Password</label>
-                            <input id="password" name="password" type="password" class="form-control" autocomplete="new-password">
-                            @error('password')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password_confirmation">Confirm Password</label>
-                            <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" autocomplete="new-password">
-                            @error('password_confirmation')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Update Password</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Delete Account -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Delete Account</h2>
-                    </div>
-                    
-                    <p>Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.</p>
-                    
-                    <button class="btn btn-danger" onclick="document.getElementById('delete-form').style.display='block'">
-                        Delete Account
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
                     </button>
+                </form>
+            </div>
 
-                    <form id="delete-form" method="post" action="{{ route('profile.destroy') }}" style="display: none; margin-top: 1.5rem;">
+            <!-- PASSWORD -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-lock"></i> Update Password</h2>
+                </div>
+
+                <form method="POST" action="{{ route('password.update') }}">
+                    @csrf
+                    @method('put')
+
+                    <div class="form-group">
+                        <label for="current_password">Current Password</label>
+                        <input id="current_password" name="current_password" type="password" placeholder="Enter current password" required class="form-control">
+                        @error('current_password')
+                            <div class="alert alert-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">New Password</label>
+                        <input id="password" name="password" type="password" placeholder="Enter new password" required class="form-control">
+                        @error('password')
+                            <div class="alert alert-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmation">Confirm Password</label>
+                        <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Confirm new password" required class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key"></i> Update Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- DELETE ACCOUNT -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-trash-alt"></i> Delete Account</h2>
+                </div>
+
+                <div class="alert alert-warning" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Once your account is deleted, all of its resources and data will be permanently deleted.</span>
+                </div>
+
+                <button type="button" class="btn btn-danger" onclick="toggleDeleteForm()">
+                    <i class="fas fa-trash-alt"></i> Delete Account
+                </button>
+
+                <div id="deleteForm" class="delete-form">
+                    <form method="POST" action="{{ route('profile.destroy') }}">
                         @csrf
                         @method('delete')
 
                         <div class="form-group">
-                            <label for="delete_password">Password</label>
-                            <input id="delete_password" name="password" type="password" class="form-control" placeholder="Enter your password to confirm deletion" required>
-                            @error('password')
-                                <div class="alert alert-error">{{ $message }}</div>
-                            @enderror
+                            <label for="delete_password">Confirm Password</label>
+                            <input id="delete_password" name="password" type="password" required placeholder="Enter your password to confirm deletion" class="form-control">
                         </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-danger">Permanently Delete Account</button>
-                        </div>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Permanently Delete Account
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Toggle delete form visibility
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButton = document.querySelector('.btn-danger');
-            const deleteForm = document.getElementById('delete-form');
-            
-            if (deleteButton && deleteForm) {
-                deleteButton.addEventListener('click', function() {
-                    deleteForm.style.display = deleteForm.style.display === 'none' ? 'block' : 'none';
-                });
-            }
-            
-            // Show alerts for a limited time
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.style.opacity = '0';
-                    alert.style.transition = 'opacity 0.5s ease';
-                    setTimeout(() => alert.remove(), 500);
-                }, 5000);
-            });
-        });
-    </script>
+<!-- JS FIXES -->
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('mainContent');
+    const overlay = document.getElementById('overlay');
+
+    if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    } else {
+        sidebar.classList.toggle('collapsed');
+        main.classList.toggle('expanded');
+    }
+}
+
+function closeMobileSidebar() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('overlay').classList.remove('active');
+}
+
+// Fixed mobile click bug
+document.addEventListener('click', function(e) {
+    const sidebar = document.getElementById('sidebar');
+
+    if (
+        window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !e.target.closest('.burger-menu')
+    ) {
+        sidebar.classList.remove('mobile-open');
+        document.getElementById('overlay').classList.remove('active');
+    }
+});
+
+// Fixed delete toggle
+function toggleDeleteForm() {
+    document.getElementById('deleteForm').classList.toggle('active');
+}
+
+// Only hide success alerts
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.alert-success').forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
+});
+</script>
+
 </body>
 </html>

@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Help & Rules - Footsy Fantasy Football</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
+            --primary-light: #5b7ae8;
             --secondary: #34c759;
             --danger: #e53e3e;
             --warning: #f59e0b;
@@ -19,6 +20,10 @@
             --gray: #6c757d;
             --light-gray: #e9ecef;
             --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-light: linear-gradient(135deg, #e8edff, #dce4ff);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+            --header-height: 70px;
         }
         
         * {
@@ -30,56 +35,83 @@
         body {
             font-family: 'Open Sans', sans-serif;
             color: var(--dark);
-            background-color: #f5f7ff;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
+            position: relative;
         }
         
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(58, 94, 229, 0.02) 0px, rgba(58, 94, 229, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
         }
         
         /* Sidebar Styles */
         .sidebar {
-            width: 260px;
-            background: var(--dark);
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark) 0%, #1e2a4a 100%);
             color: white;
-            height: 100vh;
             position: fixed;
-            overflow-y: auto;
-            transition: all 0.3s ease;
+            height: 100vh;
+            left: 0;
+            top: 0;
             z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 25px rgba(58, 94, 229, 0.15);
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
         }
         
         .sidebar-header {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .sidebar-logo {
-            width: 36px;
-            height: 36px;
-            background: white;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-weight: bold;
+            color: white;
+            font-weight: 800;
             font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
         
         .sidebar-title {
             font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.4rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-title {
+            opacity: 0;
+            width: 0;
+            display: none;
         }
         
         .sidebar-nav {
@@ -94,37 +126,87 @@
         .nav-link {
             display: flex;
             align-items: center;
+            gap: 14px;
             padding: 0.875rem 1.5rem;
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: all 0.3s;
             border-left: 4px solid transparent;
+            white-space: nowrap;
         }
         
         .nav-link:hover, .nav-link.active {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(58, 94, 229, 0.2);
             color: white;
             border-left-color: var(--primary);
         }
         
         .nav-link i {
-            margin-right: 12px;
             width: 20px;
             text-align: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .nav-link span {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem 1rem;
+        }
+        
+        /* Burger Menu Button */
+        .burger-menu {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .burger-menu i {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .burger-menu:hover {
+            background: rgba(58, 94, 229, 0.1);
         }
         
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 260px;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             position: relative;
+            z-index: 1;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
         }
         
         /* Header */
         .header {
-            height: 70px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(58, 94, 229, 0.08);
             padding: 0 2rem;
             display: flex;
             align-items: center;
@@ -132,6 +214,23 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .user-menu {
@@ -145,18 +244,26 @@
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .user-profile:hover {
+            background: rgba(58, 94, 229, 0.05);
         }
         
         .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: var(--gradient);
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.2);
         }
         
         .user-info {
@@ -177,6 +284,7 @@
         /* Help Content */
         .help-content {
             padding: 2rem;
+            flex: 1;
         }
         
         .help-header {
@@ -186,61 +294,74 @@
         .help-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.8rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .help-subtitle {
             color: var(--gray);
+            font-size: 1rem;
         }
         
         /* Help Navigation */
         .help-nav {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
         
         .help-tab {
             padding: 0.75rem 1.5rem;
-            background: white;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(58, 94, 229, 0.1);
+            border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
         }
         
         .help-tab.active {
-            background: var(--gradient);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            border-color: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
         
         .help-tab:hover:not(.active) {
             border-color: var(--primary);
+            transform: translateY(-2px);
         }
         
         /* Rules Grid */
         .rules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
         
         .rule-card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
             transition: all 0.3s ease;
             border-left: 4px solid var(--primary);
+            border: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .rule-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(58, 94, 229, 0.15);
         }
         
         .rule-card-header {
@@ -253,13 +374,14 @@
         .rule-card-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--dark);
         }
         
         .rule-card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -276,13 +398,19 @@
             line-height: 1.6;
         }
         
+        .rule-card-content strong {
+            color: var(--primary);
+        }
+        
         /* Scoring System */
         .scoring-system {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
             margin-bottom: 2rem;
+            border: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .scoring-header {
@@ -290,12 +418,15 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .scoring-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--dark);
         }
         
         .scoring-tabs {
@@ -305,15 +436,22 @@
         
         .scoring-tab {
             padding: 0.5rem 1rem;
-            border: 1px solid var(--light-gray);
-            border-radius: 6px;
+            border: 1px solid rgba(58, 94, 229, 0.2);
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: white;
         }
         
         .scoring-tab.active {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            border-color: transparent;
+        }
+        
+        .scoring-tab:hover:not(.active) {
             border-color: var(--primary);
         }
         
@@ -325,7 +463,7 @@
         .scoring-table th, .scoring-table td {
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .scoring-table th {
@@ -340,21 +478,23 @@
         
         .points-positive {
             color: var(--secondary);
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .points-negative {
             color: var(--danger);
-            font-weight: 600;
+            font-weight: 700;
         }
         
         /* FAQ Section */
         .faq-section {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
             margin-bottom: 2rem;
+            border: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .faq-header {
@@ -362,25 +502,35 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .faq-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--dark);
         }
         
         .faq-search {
             display: flex;
             align-items: center;
-            background: var(--light);
+            background: white;
             border-radius: 50px;
             padding: 0.5rem 1rem;
             width: 300px;
+            border: 1px solid rgba(58, 94, 229, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .faq-search:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
         }
         
         .faq-search i {
-            color: var(--gray);
+            color: var(--primary);
             margin-right: 0.5rem;
         }
         
@@ -389,6 +539,7 @@
             background: transparent;
             width: 100%;
             outline: none;
+            font-family: 'Open Sans', sans-serif;
         }
         
         .faq-list {
@@ -396,7 +547,7 @@
         }
         
         .faq-item {
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .faq-item:last-child {
@@ -415,6 +566,8 @@
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s;
+            color: var(--dark);
+            font-size: 1rem;
         }
         
         .faq-question:hover {
@@ -423,6 +576,7 @@
         
         .faq-question i {
             transition: transform 0.3s;
+            color: var(--primary);
         }
         
         .faq-item.active .faq-question i {
@@ -448,54 +602,63 @@
         
         /* Bonus Points Section */
         .bonus-section {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
             margin-bottom: 2rem;
+            border: 1px solid rgba(58, 94, 229, 0.1);
         }
         
         .bonus-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 1.5rem;
         }
         
         .bonus-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .bonus-description-text {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
         }
         
         .bonus-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         .bonus-card {
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
+            border: 2px solid rgba(58, 94, 229, 0.1);
+            border-radius: 16px;
             padding: 1.5rem;
             text-align: center;
             transition: all 0.3s;
+            background: white;
         }
         
         .bonus-card:hover {
             border-color: var(--primary);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(58, 94, 229, 0.1);
         }
         
         .bonus-rank {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 800;
+            font-size: 1.3rem;
             margin: 0 auto 1rem;
             color: white;
         }
@@ -506,23 +669,53 @@
         
         .bonus-points {
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 0.5rem;
             color: var(--dark);
         }
         
         .bonus-description {
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+        }
+        
+        .bps-info {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(58, 94, 229, 0.05);
+            border-radius: 12px;
+        }
+        
+        .bps-info h4 {
+            margin-bottom: 0.75rem;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary);
+        }
+        
+        .bps-info p {
+            color: var(--gray);
+            line-height: 1.6;
         }
         
         /* Pro Tip */
         .pro-tip {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
             padding: 2rem;
             color: white;
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pro-tip::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 60%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
         }
         
         .pro-tip-header {
@@ -530,6 +723,8 @@
             align-items: center;
             gap: 1rem;
             margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
         }
         
         .pro-tip-icon {
@@ -539,46 +734,50 @@
         .pro-tip-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.3rem;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .pro-tip-content {
-            opacity: 0.9;
+            opacity: 0.95;
             line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .overlay.active {
+            display: block;
         }
         
         /* Responsive Design */
+        @media (max-width: 992px) {
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 768px) {
             .sidebar {
-                width: 70px;
-                overflow: visible;
+                transform: translateX(-100%);
             }
             
-            .sidebar-title, .nav-link span {
-                display: none;
-            }
-            
-            .sidebar-header {
-                justify-content: center;
-                padding: 1.5rem 0.5rem;
-            }
-            
-            .nav-link {
-                padding: 1rem;
-                justify-content: center;
-            }
-            
-            .nav-link i {
-                margin-right: 0;
-                font-size: 1.2rem;
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             
             .main-content {
-                margin-left: 70px;
-            }
-            
-            .header {
-                padding: 0 1rem;
+                margin-left: 0;
             }
             
             .user-info {
@@ -593,17 +792,27 @@
                 text-align: center;
             }
             
-            .rules-grid {
-                grid-template-columns: 1fr;
+            .scoring-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .scoring-tabs {
+                width: 100%;
+            }
+            
+            .scoring-tab {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .faq-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
             .faq-search {
                 width: 100%;
-                margin-top: 1rem;
-            }
-            
-            .bonus-grid {
-                grid-template-columns: 1fr;
             }
         }
         
@@ -616,15 +825,34 @@
                 padding: 0 1rem;
             }
             
-            .scoring-tabs {
-                flex-direction: column;
+            .bonus-grid {
+                grid-template-columns: 1fr;
             }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .rule-card, .scoring-system, .faq-section, .bonus-section, .pro-tip {
+            animation: fadeInUp 0.5s ease forwards;
         }
     </style>
 </head>
 <body>
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay" onclick="closeMobileSidebar()"></div>
+
     <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">F</div>
             <div class="sidebar-title">Footsy</div>
@@ -655,12 +883,12 @@
                     <span>Statistics</span>
                 </a>
             </li>
-            <!-- <li class="nav-item">
+            <li class="nav-item">
                 <a href="{{ route('transfers.index') }}" class="nav-link">
                     <i class="fas fa-exchange-alt"></i>
                     <span>Transfers</span>
                 </a>
-            </li> -->
+            </li>
             <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
@@ -680,23 +908,27 @@
                 </a>
             </li>
             <li class="nav-item">
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
+                    <button type="submit" class="nav-link" style="background:none;border:none;width:100%;text-align:left;">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Log Out</span>
-                    </a>
+                    </button>
                 </form>
             </li>
         </ul>
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <!-- Header -->
         <header class="header">
-            <div></div> <!-- Empty div for spacing -->
+            <div class="header-left">
+                <button class="burger-menu" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Help & Rules</h1>
+            </div>
             
             <div class="user-menu">
                 <div class="user-profile">
@@ -718,10 +950,10 @@
 
             <!-- Help Navigation -->
             <div class="help-nav">
-                <div class="help-tab active" onclick="showHelpTab('rules')">Game Rules</div>
-                <div class="help-tab" onclick="showHelpTab('scoring')">Scoring System</div>
-                <div class="help-tab" onclick="showHelpTab('bonus')">Bonus Points</div>
-                <div class="help-tab" onclick="showHelpTab('faq')">FAQ</div>
+                <div class="help-tab active" onclick="showHelpTab('rules', this)">Game Rules</div>
+                <div class="help-tab" onclick="showHelpTab('scoring', this)">Scoring System</div>
+                <div class="help-tab" onclick="showHelpTab('bonus', this)">Bonus Points</div>
+                <div class="help-tab" onclick="showHelpTab('faq', this)">FAQ</div>
             </div>
 
             <!-- Rules Tab -->
@@ -795,9 +1027,9 @@
                     <div class="scoring-header">
                         <h3 class="scoring-title">Scoring System</h3>
                         <div class="scoring-tabs">
-                            <span class="scoring-tab active" onclick="showScoringTab('attacking')">Attacking</span>
-                            <span class="scoring-tab" onclick="showScoringTab('defensive')">Defensive</span>
-                            <span class="scoring-tab" onclick="showScoringTab('disciplinary')">Disciplinary</span>
+                            <span class="scoring-tab active" onclick="showScoringTab('attacking', this)">Attacking</span>
+                            <span class="scoring-tab" onclick="showScoringTab('defensive', this)">Defensive</span>
+                            <span class="scoring-tab" onclick="showScoringTab('disciplinary', this)">Disciplinary</span>
                         </div>
                     </div>
                     
@@ -811,30 +1043,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Goal (Forward)</td>
-                                    <td class="points-positive">+4</td>
-                                </tr>
-                                <tr>
-                                    <td>Goal (Midfielder)</td>
-                                    <td class="points-positive">+5</td>
-                                </tr>
-                                <tr>
-                                    <td>Goal (Defender / GK)</td>
-                                    <td class="points-positive">+6</td>
-                                </tr>
-                                <tr>
-                                    <td>Assist</td>
-                                    <td class="points-positive">+3</td>
-                                </tr>
-                                <tr>
-                                    <td>Shot on Target</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
-                                <tr>
-                                    <td>Key Pass</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
+                                <tr><td>Goal (Forward)</td><td class="points-positive">+4</td></tr>
+                                <tr><td>Goal (Midfielder)</td><td class="points-positive">+5</td></tr>
+                                <tr><td>Goal (Defender / GK)</td><td class="points-positive">+6</td></tr>
+                                <tr><td>Assist</td><td class="points-positive">+3</td></tr>
+                                <tr><td>Shot on Target</td><td class="points-positive">+1</td></tr>
+                                <tr><td>Key Pass</td><td class="points-positive">+1</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -842,37 +1056,14 @@
                     <!-- Defensive Scoring -->
                     <div id="defensive-scoring" class="scoring-tab-content" style="display: none;">
                         <table class="scoring-table">
-                            <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Action</th><th>Points</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td>Clean Sheet (DEF / GK)</td>
-                                    <td class="points-positive">+4</td>
-                                </tr>
-                                <tr>
-                                    <td>Clean Sheet (MID)</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
-                                <tr>
-                                    <td>Save (GK)</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
-                                <tr>
-                                    <td>Penalty Save</td>
-                                    <td class="points-positive">+5</td>
-                                </tr>
-                                <tr>
-                                    <td>Tackle Won</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
-                                <tr>
-                                    <td>Interception</td>
-                                    <td class="points-positive">+1</td>
-                                </tr>
+                                <tr><td>Clean Sheet (DEF / GK)</td><td class="points-positive">+4</td></tr>
+                                <tr><td>Clean Sheet (MID)</td><td class="points-positive">+1</td></tr>
+                                <tr><td>Save (GK)</td><td class="points-positive">+1</td></tr>
+                                <tr><td>Penalty Save</td><td class="points-positive">+5</td></tr>
+                                <tr><td>Tackle Won</td><td class="points-positive">+1</td></tr>
+                                <tr><td>Interception</td><td class="points-positive">+1</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -880,33 +1071,13 @@
                     <!-- Disciplinary Scoring -->
                     <div id="disciplinary-scoring" class="scoring-tab-content" style="display: none;">
                         <table class="scoring-table">
-                            <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Action</th><th>Points</th></tr></thead>
                             <tbody>
-                                <tr>
-                                    <td>Yellow Card</td>
-                                    <td class="points-negative">-1</td>
-                                </tr>
-                                <tr>
-                                    <td>Red Card</td>
-                                    <td class="points-negative">-3</td>
-                                </tr>
-                                <tr>
-                                    <td>Own Goal</td>
-                                    <td class="points-negative">-2</td>
-                                </tr>
-                                <tr>
-                                    <td>Penalty Miss</td>
-                                    <td class="points-negative">-2</td>
-                                </tr>
-                                <tr>
-                                    <td>Error Leading to Goal</td>
-                                    <td class="points-negative">-2</td>
-                                </tr>
+                                <tr><td>Yellow Card</td><td class="points-negative">-1</td></tr>
+                                <tr><td>Red Card</td><td class="points-negative">-3</td></tr>
+                                <tr><td>Own Goal</td><td class="points-negative">-2</td></tr>
+                                <tr><td>Penalty Miss</td><td class="points-negative">-2</td></tr>
+                                <tr><td>Error Leading to Goal</td><td class="points-negative">-2</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -918,8 +1089,8 @@
                 <div class="bonus-section">
                     <div class="bonus-header">
                         <h3 class="bonus-title">Bonus Points System (BPS)</h3>
+                        <p class="bonus-description-text">The Bonus Points System awards additional points to the top three performing players in each match, regardless of their team or position.</p>
                     </div>
-                    <p style="margin-bottom: 1.5rem; color: var(--gray);">The Bonus Points System awards additional points to the top three performing players in each match, regardless of their team or position.</p>
                     
                     <div class="bonus-grid">
                         <div class="bonus-card">
@@ -927,13 +1098,11 @@
                             <div class="bonus-points">+3 pts</div>
                             <div class="bonus-description">Top performer in the match</div>
                         </div>
-                        
                         <div class="bonus-card">
                             <div class="bonus-rank rank-2">2nd</div>
                             <div class="bonus-points">+2 pts</div>
                             <div class="bonus-description">Second best performer</div>
                         </div>
-                        
                         <div class="bonus-card">
                             <div class="bonus-rank rank-3">3rd</div>
                             <div class="bonus-points">+1 pt</div>
@@ -941,13 +1110,9 @@
                         </div>
                     </div>
                     
-                    <div style="margin-top: 2rem; padding: 1.5rem; background: var(--light); border-radius: 8px;">
-                        <h4 style="margin-bottom: 1rem; font-family: 'Montserrat', sans-serif;">How BPS Works</h4>
-                        <p style="color: var(--gray); line-height: 1.6;">
-                            Players earn BPS points for various actions during a match (goals, assists, tackles, passes, etc.). 
-                            The top three players with the highest BPS receive bonus points. BPS is calculated automatically 
-                            based on official match statistics.
-                        </p>
+                    <div class="bps-info">
+                        <h4>How BPS Works</h4>
+                        <p>Players earn BPS points for various actions during a match (goals, assists, tackles, passes, etc.). The top three players with the highest BPS receive bonus points. BPS is calculated automatically based on official match statistics.</p>
                     </div>
                 </div>
             </div>
@@ -959,226 +1124,27 @@
                         <h3 class="faq-title">Frequently Asked Questions</h3>
                         <div class="faq-search">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search FAQs...">
+                            <input type="text" id="faqSearchInput" placeholder="Search FAQs...">
                         </div>
                     </div>
                     
-                    <ul class="faq-list">
-                        <!-- Team Management FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>When do points get updated?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Points are usually updated shortly after each real-life match concludes. Major updates happen within a few hours of the final whistle, with live points updating during matches for goals, assists, and other key actions.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Can I change my captain after deadline?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>No, once the gameweek deadline passes, your team including captain selection is locked until the next gameweek. Make sure to set your captain and vice-captain before the deadline to avoid missing out on double points.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>What happens if I don't use my free transfer?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>You can carry over one free transfer to the next gameweek, allowing you to make two free transfers. However, you cannot carry over more than one free transfer - any additional unused transfers beyond one are lost.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>What if my player doesn't play in a gameweek?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>If your player doesn't feature at all in a gameweek, they'll score 0 points. If they're on your bench, your first substitute will automatically replace them if they don't play. If they're in your starting XI and don't play, no automatic substitution occurs for that position.</p>
-                            </div>
-                        </li>
-                        
-                        <!-- Scoring & Points FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How are bonus points calculated?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Bonus points are awarded to the top-performing players in each match based on the Bonus Points System (BPS). Players earn BPS points for actions like completed passes, tackles, clearances, and key contributions. The top three players receive 3, 2, and 1 bonus points respectively.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Do substitutes earn points?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Substitutes only earn points if they automatically replace a player in your starting XI who didn't play. Your substitutes are used in order (first substitute replaces first non-playing starter, etc.). If a substitute comes on in real life but remains on your fantasy bench, they won't score points for your team.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>What counts as an assist?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>An assist is awarded to the player who makes the final pass, cross, header, or shot that leads to a goal. This includes deflections that don't significantly change the direction of the ball. Own goals, penalties won, and rebounds don't count as assists unless it's the final pass before the goal.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How are clean sheet points awarded?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Clean sheet points (4 points) are awarded to goalkeepers and defenders who play 60 minutes or more and don't concede a goal. Midfielders don't receive clean sheet points. If a player is substituted before 60 minutes and their team keeps a clean sheet, they won't receive the points.</p>
-                            </div>
-                        </li>
-                        
-                        <!-- Transfers FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>When is the transfer deadline?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>The transfer deadline is typically 1 hour before the first match of each gameweek. This gives you time to make changes based on team news and lineups. Always check the exact deadline time as it may vary for different gameweeks, especially during busy festive periods.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Can I reverse a transfer?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Yes, you can reverse transfers made in the same gameweek as long as you haven't confirmed your team after the changes. Once you confirm your team or the deadline passes, transfers cannot be reversed. Use the "Undo" button before confirming to revert changes.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How do price changes work?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Player prices change based on transfer activity. If many managers bring in a player, their price rises; if many sell, it falls. Price changes typically occur overnight. You make a profit of 0.1M for every 0.1M price rise when selling players (e.g., buy at 8.0M, sell at 8.3M = 0.3M profit).</p>
-                            </div>
-                        </li>
-                        
-                        <!-- Leagues FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How do I join a private league?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>To join a private league, you need the league code from the league administrator. Go to the "Leagues" section, click "Join League," and enter the code. You can join up to 20 private leagues. Your points will be automatically tracked from when you join.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Can I create my own league?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Yes! You can create unlimited private leagues. Go to the "Leagues" section and click "Create League." Choose a name, set whether it's public or private, and share the code with friends. You can also set up head-to-head leagues where you compete against a different manager each week.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>What's the difference between classic and head-to-head leagues?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>In classic leagues, managers are ranked by total points. In head-to-head leagues, you face a different opponent each week - the manager with more points that week gets 3 points (like a win), draws get 1 point each. Head-to-head adds a competitive weekly matchup element to the game.</p>
-                            </div>
-                        </li>
-                        
-                        <!-- Bonus Points FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How are bonus points calculated and awarded?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Bonus points are awarded using the Bonus Points System (BPS). Players earn BPS points for various actions during a match (goals, assists, tackles, passes, etc.). The top three players with the highest BPS receive 3, 2, and 1 bonus points respectively. BPS is calculated automatically based on official match statistics.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Which players typically earn bonus points?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Players who consistently earn bonus points include: creative midfielders who make key passes, dominant defenders who make many tackles and clearances, penalty takers, and players from teams that dominate possession. Defensive midfielders often score high BPS through their all-around contributions.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Can multiple players from the same team get bonus points?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Yes, bonus points are awarded to the top three performers in the match regardless of team. It's common to see two players from the winning team and one from the losing team, or sometimes all three from the same team in dominant performances.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Do bonus points affect my captain's double points?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Yes! If your captain earns bonus points, they are doubled along with all their other points. This makes bonus-point magnets excellent captain choices, as the extra points can significantly boost your gameweek score.</p>
-                            </div>
-                        </li>
-                        
-                        <!-- General FAQs -->
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>What happens during cup competitions?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Fantasy Football continues through cup competitions. Premier League matches are the primary source of points, but be aware of potential rotation as managers rest players for cup games. There's also a Fantasy Cup that starts around Gameweek 17 - qualified managers compete in knockout format.</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>Can I play with multiple teams?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>No, you can only manage one team per account. Multiple teams are against the rules and may result in all your teams being deleted. Focus on making your single team as competitive as possible - that's where the real challenge and satisfaction comes from!</p>
-                            </div>
-                        </li>
-                        
-                        <li class="faq-item">
-                            <button class="faq-question" onclick="toggleFAQ(this)">
-                                <span>How do I reset my password?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                            <div class="faq-answer">
-                                <p>Click "Forgot Password" on the login page and enter your registered email address. You'll receive a password reset link. If you don't receive the email, check your spam folder. For further assistance, contact support with your team name and registered email address.</p>
-                            </div>
-                        </li>
+                    <ul class="faq-list" id="faqList">
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>When do points get updated?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Points are usually updated shortly after each real-life match concludes. Major updates happen within a few hours of the final whistle, with live points updating during matches for goals, assists, and other key actions.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Can I change my captain after deadline?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>No, once the gameweek deadline passes, your team including captain selection is locked until the next gameweek.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>What happens if I don't use my free transfer?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>You can carry over one free transfer to the next gameweek, allowing you to make two free transfers.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>What if my player doesn't play in a gameweek?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>If on bench, first substitute replaces them. If in starting XI and doesn't play, no substitution occurs.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>How are bonus points calculated?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Bonus points are awarded using the Bonus Points System (BPS). Top three players receive 3, 2, and 1 bonus points respectively.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Do substitutes earn points?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Only if they automatically replace a non-playing starter. Substitutes are used in bench order.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>What counts as an assist?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Final pass, cross, header, or shot leading to a goal. Deflections that don't significantly change direction count.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>How are clean sheet points awarded?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>GK/DEF must play 60+ minutes without conceding. Midfielders don't get clean sheet points.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>When is the transfer deadline?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>1 hour before the first match of each gameweek. Check exact times as they may vary.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Can I reverse a transfer?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Yes, before confirming your team. Once confirmed or deadline passes, irreversible.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>How do price changes work?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Based on transfer activity. Rise with high demand, fall with high sales. Changes occur overnight.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>How do I join a private league?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Need league code from admin. Go to Leagues → Join League → Enter code.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Can I create my own league?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Yes! Create unlimited private leagues. Share code with friends to invite them.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Classic vs Head-to-Head leagues?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Classic: ranked by total points. H2H: weekly matchups (win=3pts, draw=1pt each).</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>Do bonus points affect my captain's double points?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Yes! Captain's bonus points are doubled along with all other points.</p></div></li>
+                        <li class="faq-item"><button class="faq-question" onclick="toggleFAQ(this)"><span>How do I reset my password?</span><i class="fas fa-chevron-down"></i></button><div class="faq-answer"><p>Click "Forgot Password" on login page. Check spam folder if no email.</p></div></li>
                     </ul>
                 </div>
             </div>
@@ -1186,42 +1152,58 @@
     </div>
 
     <script>
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const overlay = document.getElementById('overlay');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        }
+        
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+        
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !e.target.closest('.burger-menu')) {
+                sidebar.classList.remove('mobile-open');
+                document.getElementById('overlay').classList.remove('active');
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+                document.getElementById('overlay').classList.remove('active');
+            }
+        });
+
         // Tab navigation for help sections
-        function showHelpTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.help-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
+        function showHelpTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.help-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabName + '-tab').style.display = 'block';
-            
-            // Add active class to clicked tab
-            event.target.classList.add('active');
+            element.classList.add('active');
         }
 
         // Tab navigation for scoring system
-        function showScoringTab(tabName) {
-            // Hide all scoring tabs
-            document.querySelectorAll('.scoring-tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remove active class from all scoring tabs
-            document.querySelectorAll('.scoring-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected scoring tab
+        function showScoringTab(tabName, element) {
+            document.querySelectorAll('.scoring-tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.scoring-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabName + '-scoring').style.display = 'block';
-            
-            // Add active class to clicked scoring tab
-            event.target.classList.add('active');
+            element.classList.add('active');
         }
 
         // FAQ toggle functionality
@@ -1230,26 +1212,21 @@
             faqItem.classList.toggle('active');
         }
 
-        // Add interactivity to FAQ search
-        document.querySelector('.faq-search input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const faqItems = document.querySelectorAll('.faq-item');
-            
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question span').textContent.toLowerCase();
-                const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
-                
-                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-
-        // Initialize with first FAQ item open
+        // FAQ search functionality
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.faq-item').classList.add('active');
+            const searchInput = document.getElementById('faqSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const faqItems = document.querySelectorAll('.faq-item');
+                    faqItems.forEach(item => {
+                        const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                        const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+                        item.style.display = (question.includes(searchTerm) || answer.includes(searchTerm)) ? 'block' : 'none';
+                    });
+                });
+            }
+            document.querySelector('.faq-item')?.classList.add('active');
         });
     </script>
 </body>

@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Footsy Fantasy Football</title>
+    <!-- Fontu pievienošana no Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome ikonu bibliotēka -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* CSS mainīgie krāsu un fontu definēšanai */
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
@@ -41,7 +44,7 @@
             padding: 0 20px;
         }
         
-        /* Header Styles */
+        /* Galvenes stili */
         header {
             background: var(--gradient);
             padding: 1.5rem 0;
@@ -76,7 +79,7 @@
             font-weight: bold;
         }
         
-        /* Main Content */
+        /* Galvenā satura daļa */
         .main-content {
             display: flex;
             align-items: center;
@@ -85,6 +88,7 @@
             padding: 2rem 0;
         }
         
+        /* Autentifikācijas konteiners */
         .auth-container {
             display: flex;
             width: 100%;
@@ -95,6 +99,7 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
         
+        /* Kreisā puse ar informāciju */
         .auth-left {
             flex: 1;
             background: var(--gradient);
@@ -107,6 +112,7 @@
             overflow: hidden;
         }
         
+        /* Dekoratīvi apļi fonā */
         .auth-left::before {
             content: '';
             position: absolute;
@@ -167,6 +173,7 @@
             justify-content: center;
         }
         
+        /* Labā puse ar formu */
         .auth-right {
             flex: 1;
             padding: 3rem;
@@ -203,6 +210,7 @@
             color: var(--dark);
         }
         
+        /* Ievades lauki ar ikonām */
         .input-with-icon {
             position: relative;
         }
@@ -234,6 +242,7 @@
             box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
         }
         
+        /* Parāoles parādīšanas/paslēpšanas poga */
         .password-toggle {
             position: absolute;
             right: 15px;
@@ -269,6 +278,7 @@
             text-decoration: underline;
         }
         
+        /* Pogu stili */
         .btn {
             display: inline-block;
             width: 100%;
@@ -293,7 +303,7 @@
             box-shadow: 0 5px 15px rgba(58, 94, 229, 0.3);
         }
         
-        /* Google Button Styles */
+        /* Google pogas stils */
         .btn-google {
             background: white;
             color: #757575;
@@ -321,6 +331,7 @@
             font-size: 1.1rem;
         }
         
+        /* Atdalītājs starp parasto un Google reģistrāciju */
         .divider {
             text-align: center;
             position: relative;
@@ -360,7 +371,7 @@
             text-decoration: underline;
         }
         
-        /* Team Selection Styles */
+        /* Komandas izvēles stili */
         .team-selection {
             margin-bottom: 1.5rem;
         }
@@ -375,6 +386,7 @@
             cursor: pointer;
             transition: all 0.3s;
             appearance: none;
+            /* Pielāgota bultiņa izvēles laukam */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
@@ -387,6 +399,7 @@
             box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
         }
         
+        /* Komandas priekšskatījums */
         .team-preview {
             margin-top: 1rem;
             display: flex;
@@ -418,7 +431,7 @@
             font-size: 1rem;
         }
         
-        /* Error Messages */
+        /* Kļūdu ziņojumu stili */
         .error-message {
             color: #e74c3c;
             font-size: 0.875rem;
@@ -429,7 +442,7 @@
             border-color: #e74c3c;
         }
         
-        /* Footer */
+        /* Kājenes stils */
         footer {
             background: var(--dark);
             color: white;
@@ -460,7 +473,7 @@
             font-size: 0.9rem;
         }
         
-        /* Responsive Design */
+        /* Responsīvais dizains */
         @media (max-width: 900px) {
             .auth-container {
                 flex-direction: column;
@@ -492,7 +505,7 @@
     </style>
 </head>
 <body>
-    <!-- Header with Navigation -->
+    <!-- Galvene ar navigāciju -->
     <header>
         <div class="container">
             <nav>
@@ -504,7 +517,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Galvenais saturs -->
     <main class="main-content">
         <div class="container">
             <div class="auth-container">
@@ -524,8 +537,9 @@
                         <p>Join thousands of football fans managing their fantasy teams</p>
                     </div>
                     
+                    <!-- Reģistrācijas forma -->
                     <form class="auth-form" method="POST" action="{{ route('register') }}">
-                        <!-- CSRF Token -->
+                        <!-- CSRF aizsardzības tokens -->
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         
                         <div class="form-group">
@@ -534,7 +548,7 @@
                                 <i class="fas fa-user"></i>
                                 <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus placeholder="Enter your full name">
                             </div>
-                            <!-- Validation Error -->
+                            <!-- Validācijas kļūda -->
                             <div class="error-message">
                                 @error('name') {{ $message }} @enderror
                             </div>
@@ -546,13 +560,13 @@
                                 <i class="fas fa-envelope"></i>
                                 <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required placeholder="Enter your email">
                             </div>
-                            <!-- Validation Error -->
+                            <!-- Validācijas kļūda -->
                             <div class="error-message">
                                 @error('email') {{ $message }} @enderror
                             </div>
                         </div>
                         
-                        <!-- Team Selection -->
+                        <!-- Komandas izvēle -->
                         <div class="form-group team-selection">
                             <label for="favorite_team">Select Your Favorite Team</label>
                             <select id="favorite_team" name="favorite_team" class="team-select form-control" required>
@@ -566,13 +580,13 @@
                                 @endforeach
                             </select>
 
-                            <!-- Team Preview -->
+                            <!-- Komandas priekšskatījums -->
                             <div id="teamPreview" class="team-preview">
                                 <img id="teamLogo" src="" alt="Team Logo" class="team-logo-preview">
                                 <span id="teamName" class="team-name-preview"></span>
                             </div>
 
-                            <!-- Validation Error -->
+                            <!-- Validācijas kļūda -->
                             <div class="error-message">
                                 @error('favorite_team') {{ $message }} @enderror
                             </div>
@@ -587,7 +601,7 @@
                                     <i class="fas fa-eye"></i>
                                 </span>
                             </div>
-                            <!-- Validation Error -->
+                            <!-- Validācijas kļūda -->
                             <div class="error-message">
                                 @error('password') {{ $message }} @enderror
                             </div>
@@ -614,7 +628,7 @@
                             <span>Or sign up with</span>
                         </div>
                         
-                        <!-- Google Sign In Button -->
+                        <!-- Google pierakstīšanās poga -->
                         <a href="{{ route('google.login') }}" class="btn btn-google">
                             <i class="fab fa-google"></i>
                             <span>Sign up with Google</span>
@@ -629,7 +643,7 @@
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Kājene -->
     <footer>
         <div class="container">
             <div class="footer-links">
@@ -646,7 +660,7 @@
     </footer>
 
     <script>
-        // Password visibility toggle
+        // Paroles redzamības pārslēgšana
         document.addEventListener('DOMContentLoaded', function() {
             const passwordToggle = document.getElementById('passwordToggle');
             const passwordField = document.getElementById('password');
@@ -655,7 +669,7 @@
                 const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordField.setAttribute('type', type);
                 
-                // Toggle eye icon
+                // Pārslēgt acs ikonu
                 const eyeIcon = passwordToggle.querySelector('i');
                 if (type === 'password') {
                     eyeIcon.classList.remove('fa-eye-slash');
@@ -666,7 +680,7 @@
                 }
             });
             
-            // Team selection preview
+            // Komandas izvēles priekšskatījums
             const teamSelect = document.getElementById('favorite_team');
             const teamPreview = document.getElementById('teamPreview');
             const teamLogo = document.getElementById('teamLogo');
@@ -678,18 +692,18 @@
                 const teamNameText = selectedOption.getAttribute('data-name');
                 
                 if (this.value) {
-                    // Show preview
+                    // Rādīt priekšskatījumu
                     teamLogo.src = logoUrl;
                     teamName.textContent = teamNameText;
                     teamPreview.classList.add('active');
                     this.classList.remove('input-error');
                 } else {
-                    // Hide preview
+                    // Paslēpt priekšskatījumu
                     teamPreview.classList.remove('active');
                 }
             });
             
-            // Form validation
+            // Formas validācija
             const form = document.querySelector('.auth-form');
             form.addEventListener('submit', function(e) {
                 let isValid = true;
@@ -704,7 +718,7 @@
                     }
                 });
                 
-                // Check if passwords match
+                // Pārbaudīt vai paroles sakrīt
                 const password = document.getElementById('password');
                 const confirmPassword = document.getElementById('password_confirmation');
                 
@@ -717,7 +731,7 @@
                     }
                 }
                 
-                // Check if team is selected
+                // Pārbaudīt vai komanda ir izvēlēta
                 if (!teamSelect.value) {
                     isValid = false;
                     teamSelect.classList.add('input-error');

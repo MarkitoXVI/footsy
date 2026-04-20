@@ -119,7 +119,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/players/search', [PlayersController::class, 'search'])->name('players.search');
     
     // Fixture Routes
-    Route::get('/fixtures', [FixturesController::class, 'index'])
+    Route::get('/fixtures', [App\Http\Controllers\FixturesController::class, 'index'])
      ->name('fixtures.index');
     
     // Transfer Routes

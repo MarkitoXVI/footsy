@@ -699,59 +699,69 @@
                 </select>
             </div>
 
-            <!-- My Leagues Section -->
-            <div class="league-section">
-                <h2 class="section-title">My Leagues</h2>
+           <!-- My Leagues Section -->
+<div class="league-section">
+    <h2 class="section-title">My Leagues</h2>
 
-                <!-- Leagues where user is admin -->
-                @if($myLeagues->where('is_admin', true)->count() > 0)
-                    @foreach($myLeagues->where('is_admin', true) as $league)
-                        <div class="league-card">
-                            <div class="league-header">
-                                <div>
-                                    <h3 class="league-name">{{ $league->name }}</h3>
-                                    <div class="league-code">Code: {{ $league->code }}</div>
-                                </div>
-                                <span class="league-status status-admin">Admin</span>
-                            </div>
-                            <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
-                            <p class="league-admin">Admin: {{ Auth::user()->name }} • Created: {{ $league->created_at->format('F j, Y') }}</p>
-                            <div class="league-details">
-                                <div class="league-detail">
-                                    <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
-                                    <span class="detail-label">Participants</span>
-                                </div>
-                                <div class="league-detail">
-                                    <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
-                                    <span class="detail-label">Privacy</span>
-                                </div>
-                                <div class="league-detail">
-                                    <span class="detail-value">-</span>
-                                    <span class="detail-label">Your Rank</span>
-                                </div>
-                            </div>
-                            <div class="league-actions">
-                                <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">Manage League</a>
-                                <form method="POST" action="{{ route('leagues.destroy', $league->id) }}" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="league-btn btn-danger" onclick="deleteLeague({{ $league->id }}, '{{ $league->name }}')">Delete League</button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3 class="empty-title">No Leagues Created</h3>
-                        <p class="empty-text">You haven't created any leagues yet. Create your first league to start competing with friends!</p>
-                        <a href="{{ route('leagues.create') }}" class="create-league-btn">
-                            <i class="fas fa-plus"></i> Create Your First League
-                        </a>
+    @if($myLeagues->where('is_admin', true)->isNotEmpty())
+        @foreach($myLeagues->where('is_admin', true) as $league)
+            <div class="league-card">
+                <div class="league-header">
+                    <div>
+                        <h3 class="league-name">{{ $league->name }}</h3>
+                        <div class="league-code">Code: {{ $league->code }}</div>
                     </div>
-                @endif
+                    <span class="league-status status-admin">Admin</span>
+                </div>
+                <p class="league-description">
+                    {{ $league->description ?? 'No description provided' }}
+                </p>
+                <p class="league-admin">
+                    Admin: {{ Auth::user()->name }} • Created: {{ $league->created_at->format('F j, Y') }}
+                </p>
+                <div class="league-details">
+                    <div class="league-detail">
+                        <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
+                        <span class="detail-label">Participants</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">{{ ucfirst($league->privacy) }}</span>
+                        <span class="detail-label">Privacy</span>
+                    </div>
+                    <div class="league-detail">
+                        <span class="detail-value">-</span>
+                        <span class="detail-label">Your Rank</span>
+                    </div>
+                </div>
+                <div class="league-actions">
+                    <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">Manage League</a>
+                    <form method="POST" action="{{ route('leagues.destroy', $league->id) }}" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="league-btn btn-danger"
+                                onclick="deleteLeague({{ $league->id }}, '{{ $league->name }}')">
+                            Delete League
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h3 class="empty-title">No Leagues Created</h3>
+            <p class="empty-text">
+                You haven't created any leagues yet. Create your first league to start competing with friends!
+            </p>
+            <a href="{{ route('leagues.create') }}" class="create-league-btn">
+                <i class="fas fa-plus"></i> Create Your First League
+            </a>
+        </div>
+    @endif
+
+</div>
 
                 <!-- Leagues where user is participant (not admin) -->
                 @if($myLeagues->where('is_admin', false)->count() > 0)

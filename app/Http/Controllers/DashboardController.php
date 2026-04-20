@@ -10,17 +10,55 @@ use App\Models\FantasyTeam;
 class DashboardController extends Controller
 {
     public function index()
-    {
-        // Get user's fantasy team
-        $fantasyTeam = Auth::user()->fantasyTeam;
+{
+    $user = Auth::user();
+    $fantasyTeam = $user->fantasyTeam;
 
-        // Make sure players are in array form (not string)
-        $players = [];
-        if ($fantasyTeam && $fantasyTeam->players) {
-            $players = is_string($fantasyTeam->players)
-                ? json_decode($fantasyTeam->players, true)
-                : $fantasyTeam->players;
+    // User Stats
+    $userStats = [
+        'has_team'       => (bool) $fantasyTeam,
+        'total_points'   => $fantasyTeam?->total_points ?? 0,
+        'global_rank'    => $fantasyTeam?->global_rank ?? 'N/A',
+        'leagues_joined' => 3,
+        'free_transfers' => $fantasyTeam?->free_transfers ?? 2,
+    ];
+
+    // === MY ACTUAL TEAM PLAYERS ===
+    $myTeamPlayers = collect();
+
+    if ($fantasyTeam && $fantasyTeam->players) {
+        $playerIds = is_string($fantasyTeam->players) 
+            ? json_decode($fantasyTeam->players, true) 
+            : $fantasyTeam->players;
+
+        if (!empty($playerIds)) {
+            $bootstrap = \Illuminate\Support\Facades\Http::timeout(15)
+                ->get('https://fantasy.premierleague.com/api/bootstrap-static/')
+                ->json();
+
+            $elements = collect($bootstrap['elements'] ?? []);
+            $teamsData = collect($bootstrap['teams'] ?? [])->keyBy('id');
+
+            $myTeamPlayers = $elements
+                ->whereIn('id', $playerIds)
+                ->map(function ($p) use ($teamsData) {
+                    $team = $teamsData[$p['team']] ?? null;
+
+                    return (object)[
+                        'id'          => $p['id'],
+                        'web_name'    => $p['web_name'],
+                        'team'        => (object)[
+                            'name'       => $team['name'] ?? 'Unknown',
+                            'short_name' => $team['short_name'] ?? 'UNK',
+                        ],
+                        'price'       => $p['now_cost'] / 10,
+                        'points'      => $p['total_points'],
+                        'event_points'=> $p['event_points'] ?? 0,
+                    ];
+                })
+                ->values();
         }
+    }
 
         // Top Games (sample data)
         $topGames = collect([
@@ -146,12 +184,9 @@ $topPlayers = collect($bootstrap['elements'] ?? [])
 
        return view('dashboard', compact(
     'fantasyTeam',
-    'players',
+    'myTeamPlayers',
     'topGames',
-    'leagueStandings',
-    'recentNews',
     'userStats',
-    'topPlayers' // ✅ added here
 ));
 
     }

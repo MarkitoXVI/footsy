@@ -505,6 +505,17 @@
             margin-top: 0.25rem;
         }
 
+        /* Drag & Drop Animation Styles */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
+        .drag-over {
+            outline: 3px dashed var(--primary);
+            border-radius: 12px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -715,7 +726,7 @@
                 </div>
             </div>
 
-            <!-- CHIPS SECTION -->
+            <!-- CHIPS SECTION
         <div class="chips-container">
             <div class="chip-card">
                 <i class="fas fa-users chip-icon"></i>
@@ -757,7 +768,7 @@
                 <div class="chip-status available">Available</div>
                 <button class="btn-chip" onclick="activateChip('free-hit')">Activate</button>
             </div>
-        </div>
+        </div> -->
 
 
             <div class="pitch-container">
@@ -775,39 +786,17 @@
     </div>
 
 <script>
-    const players = @json($mapped);
+    const players = @json($mapped);   // Make sure this is not empty!
 
-    // Calculate total points from starting players only
-    function calculateTotalPoints() {
-        const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
-        const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
-        
-        players.forEach(p => {
-            if (grouped[p.position]) grouped[p.position].push(p);
-        });
+    console.log("Players received:", players); // ← Add this for debugging
 
-        // Get only starting players based on formation
-        const startingPlayers = Object.entries(layout)
-            .flatMap(([pos, max]) => grouped[pos].slice(0, max));
-
-        return startingPlayers.reduce((total, player) => {
-            return total + (player.event_points || 0);
-        }, 0);
-    }
-
-    // Update the total points display
-    function updateTotalPointsDisplay() {
-        const totalPoints = calculateTotalPoints();
-        const statValueElement = document.querySelector('.stat-value');
-        if (statValueElement) {
-            statValueElement.textContent = totalPoints;
-        }
-    }
-
-    // Rest of your existing code for rendering players...
     const grouped = { GK: [], DEF: [], MID: [], FWD: [] };
+
     players.forEach(p => {
-        if (grouped[p.position]) grouped[p.position].push(p);
+        let pos = p.position;
+        // Normalize position names
+        if (pos === 'GKP') pos = 'GK';
+        if (grouped[pos]) grouped[pos].push(p);
     });
 
     const layout = { GK: 1, DEF: 4, MID: 4, FWD: 2 };
@@ -825,60 +814,73 @@
         'FWD': 'Forward'
     };
 
+    // Render Starting XI
     Object.entries(layout).forEach(([pos, max]) => {
         const row = document.getElementById(pos.toLowerCase() + 'Row');
+        if (!row) return;
+
+        row.innerHTML = ''; // Clear first
+
         grouped[pos].slice(0, max).forEach((p, i) => {
             const div = document.createElement('div');
-            div.className = 'field-player';
+            div.className = 'field-player draggable-player droppable-slot';
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('data-player-id', p.id);
+            div.setAttribute('data-position', p.position);
             div.style.gridColumn = `${columns[pos][i]} / span 2`;
+
             div.innerHTML = `
                 <div class="player-points">${p.event_points ?? 0}</div>
                 <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png"
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
+                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';" 
                      alt="${p.web_name}" class="field-player-img">
                 <div class="field-player-name">${p.web_name}</div>
-                <div class="player-position">${positionLabels[pos]}</div>
+                <div class="player-position">${positionLabels[pos] || pos}</div>
             `;
             row.appendChild(div);
         });
     });
 
+    // Render Bench
     const starters = Object.entries(layout)
         .flatMap(([pos, max]) => grouped[pos].slice(0, max));
 
     const benchPlayers = players.filter(p => !starters.some(s => s.id === p.id));
     const benchRow = document.getElementById('benchRow');
+    benchRow.innerHTML = '';
 
     benchPlayers.slice(0, 4).forEach(p => {
+        let pos = p.position;
+        if (pos === 'GKP') pos = 'GK';
+
         const b = document.createElement('div');
-        b.className = 'bench-player';
+        b.className = 'bench-player draggable-player droppable-slot';
+        b.setAttribute('draggable', 'true');
+        b.setAttribute('data-player-id', p.id);
+        b.setAttribute('data-position', p.position);
+
         b.innerHTML = `
             <div class="player-points">${p.event_points ?? 0}</div>
             <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png"
                  onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
                  alt="${p.web_name}">
             <span>${p.web_name}</span>
-            <div class="bench-position">${positionLabels[p.position]}</div>
+            <div class="bench-position">${positionLabels[pos] || pos}</div>
         `;
         benchRow.appendChild(b);
     });
 
-    // Update total points display after rendering players
-    updateTotalPointsDisplay();
-
-    function activateChip(chipType) {
-        const chipNames = {
-            'bench-boost': 'Bench Boost',
-            'triple-captain': 'Triple Captain',
-            'wildcard': 'Wildcard',
-            'free-hit': 'Free Hit'
-        };
-        const chipName = chipNames[chipType] || chipType;
-
-        if (confirm(`Activate ${chipName}?`)) {
-            alert(`${chipName} activated successfully!`);
-        }
+    // Update total points
+    function calculateTotalPoints() {
+        let total = 0;
+        document.querySelectorAll('.field-player .player-points').forEach(el => {
+            total += parseInt(el.textContent) || 0;
+        });
+        const statEl = document.querySelector('.stat-value');
+        if (statEl) statEl.textContent = total;
     }
+
+    calculateTotalPoints();
 </script>
 
 </body>

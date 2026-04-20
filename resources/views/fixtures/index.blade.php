@@ -675,137 +675,110 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fixtures data organized by date
-           const fixturesData = @json($fixturesByDate);
+    document.addEventListener('DOMContentLoaded', function() {
+        const fixturesData = @json($fixturesByDate);
 
-            // Calendar functionality
-            let currentDate = new Date();
+        let currentDate = new Date();
+        
+        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+        function updateCalendar() {
+            const calendarGrid = document.querySelector('.calendar-grid');
+            const currentMonthElement = document.getElementById('current-month');
             
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-
-            function updateCalendar() {
-                const calendarGrid = document.querySelector('.calendar-grid');
-                const currentMonthElement = document.getElementById('current-month');
-                
-                // Clear existing calendar days (keep headers)
-                while (calendarGrid.children.length > 7) {
-                    calendarGrid.removeChild(calendarGrid.lastChild);
-                }
-                
-                // Update month display
-                currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-                
-                // Get first day of month and number of days
-                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-                const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startingDay = firstDay.getDay();
-                
-                // Add empty cells for days before the first day of the month
-                for (let i = 0; i < startingDay; i++) {
-                    const emptyDay = document.createElement('div');
-                    emptyDay.className = 'calendar-day other-month';
-                    calendarGrid.appendChild(emptyDay);
-                }
-                
-                // Add days of the month
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-day';
-                    dayElement.textContent = day;
-                    
-                    const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    
-                    // Check if today
-                    const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-                    if (cellDate.getTime() === today.getTime()) {
-                        dayElement.classList.add('today');
-                    }
-                    
-                    // Check if has fixtures
-                    if (fixturesData[dateString]) {
-                        dayElement.classList.add('has-fixtures');
-                    }
-                    
-                    // Add click event
-                    dayElement.addEventListener('click', function() {
-                        // Remove active class from all days
-                        document.querySelectorAll('.calendar-day').forEach(day => {
-                            day.classList.remove('active');
-                        });
-                        
-                        // Add active class to clicked day
-                        this.classList.add('active');
-                        
-                        // Display fixtures for selected date
-                        displayFixtures(dateString);
-                    });
-                    
-                    calendarGrid.appendChild(dayElement);
-                }
-                
-                // Auto-select today if it's in the current month view
-                if (currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear()) {
-                    const todayElement = calendarGrid.children[7 + today.getDate() + startingDay - 1];
-                    if (todayElement) {
-                        todayElement.click();
-                    }
-                } else {
-                    // Select first day with fixtures, or first day of month
-                    let selected = false;
-                    for (let i = 7; i < calendarGrid.children.length; i++) {
-                        const dayElement = calendarGrid.children[i];
-                        if (dayElement.classList.contains('has-fixtures')) {
-                            dayElement.click();
-                            selected = true;
-                            break;
-                        }
-                    }
-                    if (!selected && calendarGrid.children.length > 7) {
-                        calendarGrid.children[7].click();
-                    }
-                }
+            // Keep only headers
+            while (calendarGrid.children.length > 7) {
+                calendarGrid.removeChild(calendarGrid.lastChild);
             }
             
-            function displayFixtures(dateString) {
-                const fixturesDisplay = document.getElementById('fixtures-display');
-                const fixtures = fixturesData[dateString];
-                
-                if (fixtures && fixtures.length > 0) {
-                    const date = new Date(dateString);
-                    const formattedDate = date.toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    });
-                    
-                    let fixturesHTML = `
-                        <div class="date-card">
-                            <div class="date-header">
-                                <div class="date-title">${formattedDate}</div>
-                            </div>
-                            <ul class="fixtures-list">
-                    `;
-                    
-                   fixtures.forEach(fixture => {
-                const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : null;
+            currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-                fixturesHTML += `
-                    <li class="fixture-item">
+            // Empty days
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'calendar-day other-month';
+                calendarGrid.appendChild(empty);
+            }
+
+            // Actual days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                if (cellDate.getTime() === today.getTime()) dayElement.classList.add('today');
+                if (fixturesData[dateString]) dayElement.classList.add('has-fixtures');
+
+                dayElement.addEventListener('click', () => {
+                    document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+                    dayElement.classList.add('active');
+                    displayFixtures(dateString);
+                });
+
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Auto select today or first day with fixtures
+            const todayInView = currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear();
+            if (todayInView) {
+                const todayEl = calendarGrid.querySelector('.today');
+                if (todayEl) todayEl.click();
+            } else {
+                const firstFixture = Array.from(calendarGrid.children).find(el => el.classList.contains('has-fixtures'));
+                if (firstFixture) firstFixture.click();
+                else calendarGrid.children[7]?.click();
+            }
+        }
+
+        function displayFixtures(dateString) {
+            const fixturesDisplay = document.getElementById('fixtures-display');
+            const fixtures = fixturesData[dateString] || [];
+
+            if (fixtures.length === 0) {
+                fixturesDisplay.innerHTML = `
+                    <div class="date-card">
+                        <div class="date-header">
+                            <div class="date-title">${new Date(dateString).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                        <div class="no-fixtures">
+                            <i class="fas fa-calendar-times"></i>
+                            <h3>No Fixtures</h3>
+                            <p>No Premier League matches on this date.</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            const formattedDate = new Date(dateString).toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            let html = `
+                <div class="date-card">
+                    <div class="date-header">
+                        <div class="date-title">${formattedDate}</div>
+                    </div>
+                    <ul class="fixtures-list">
+            `;
+
+            fixtures.forEach(fixture => {
+                const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
+                
+                html += `
+                    <li class="fixture-item" data-fixture='${JSON.stringify(fixture)}'>
                         <div class="teams">
                             <div class="home-team">
                                 <div class="team-logo">${fixture.home_short}</div>
                                 <div class="team-name">${fixture.home_team}</div>
                             </div>
-                            ${score ? `<div class="vs">${score}</div>` : `<div class="vs">vs</div>`}
+                            <div class="vs">${score}</div>
                             <div class="away-team">
                                 <div class="team-name">${fixture.away_team}</div>
                                 <div class="team-logo">${fixture.away_short}</div>
@@ -819,129 +792,86 @@
                 `;
             });
 
-            fixturesDisplay.innerHTML = fixturesHTML;
+            html += `</ul></div>`;
+            fixturesDisplay.innerHTML = html;
 
-        fixturesDisplay.innerHTML = fixturesHTML;
+            // Attach click listeners
+            document.querySelectorAll('.fixture-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const fixture = JSON.parse(this.getAttribute('data-fixture'));
 
-        // 🎯 Add click-to-open modal with detailed info
-        document.querySelectorAll('.fixture-item').forEach((item, index) => {
-            item.addEventListener('click', () => {
-                const fixture = fixtures[index]; // get full data for this fixture
-                const home = fixture.home_team;
-                const away = fixture.away_team;
-                const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
-                const kickoff = new Date(fixture.kickoff_time).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-                const venue = fixture.venue ?? 'Unknown Stadium';
-                const matchweek = fixture.event ?? '-';
-                const status = fixture.finished ? 'Finished' : 'Scheduled';
-
-                // Format goalscorers if available
-                let goalsHTML = '';
-                if (fixture.goals && fixture.goals.length > 0) {
-                    goalsHTML = '<h4 style="margin-top:1rem;">Goalscorers</h4><ul style="list-style:none;padding:0;">';
-                    fixture.goals.forEach(goal => {
-                        goalsHTML += `<li>${goal.player} (${goal.minute}')</li>`;
+                    const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
+                    const kickoff = new Date(fixture.kickoff_time).toLocaleString([], {
+                        weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                     });
-                    goalsHTML += '</ul>';
-                } else if (fixture.finished) {
-                    goalsHTML = '<p><em>No goals recorded.</em></p>';
-                } else {
-                    goalsHTML = '<p><em>Match not started.</em></p>';
-                }
+                    const status = fixture.finished ? 'Finished' : 'Scheduled';
 
-                // Build modal HTML
-                const modalBody = document.getElementById('modalBody');
-                modalBody.innerHTML = `
-                    <div class="teams">
-                        <div class="team"><div class="team-name">${home}</div></div>
-                        <div class="score">${score}</div>
-                        <div class="team"><div class="team-name">${away}</div></div>
-                    </div>
-                    <div class="info">
-                        <p><strong>Status:</strong> ${status}</p>
-                        <p><strong>Kick-off:</strong> ${kickoff}</p>
-                        <p><strong>Venue:</strong> ${venue}</p>
-                        <p><strong>Matchweek:</strong> ${matchweek}</p>
-                        ${goalsHTML}
-                    </div>
-                `;
+                    let goalsHTML = '';
+                    if (fixture.goals && fixture.goals.length > 0) {
+                        goalsHTML = `<h4>Goalscorers</h4><ul class="scorers-list">`;
+                        fixture.goals.forEach(g => {
+                            goalsHTML += `<li>${g.player} (${g.minute}') ${g.team ? `(${g.team})` : ''}</li>`;
+                        });
+                        goalsHTML += `</ul>`;
+                    } else if (fixture.finished) {
+                        goalsHTML = `<p><em>No goalscorers recorded.</em></p>`;
+                    }
 
-                document.getElementById('matchModal').classList.add('active');
-            });
-        });
-
-        } else {
-            fixturesDisplay.innerHTML = `
-                        <div class="date-card">
-                            <div class="date-header">
-                                <div class="date-title">${new Date(dateString).toLocaleDateString('en-US', { 
-                                    weekday: 'long', 
-                                    year: 'numeric', 
-                                    month: 'long', 
-                                    day: 'numeric' 
-                                })}</div>
-                            </div>
-                            <div class="no-fixtures">
-                                <i class="fas fa-calendar-times"></i>
-                                <h3>No Fixtures Scheduled</h3>
-                                <p>There are no Premier League matches scheduled for this date.</p>
-                            </div>
+                    document.getElementById('modalBody').innerHTML = `
+                        <div class="teams">
+                            <div class="team"><div class="team-name">${fixture.home_team}</div></div>
+                            <div class="score">${score}</div>
+                            <div class="team"><div class="team-name">${fixture.away_team}</div></div>
+                        </div>
+                        <div class="info">
+                            <p><strong>Status:</strong> ${status}</p>
+                            <p><strong>Kick-off:</strong> ${kickoff}</p>
+                            <p><strong>Venue:</strong> ${fixture.venue || 'Unknown Stadium'}</p>
+                            <p><strong>Matchweek:</strong> ${fixture.event ?? '-'}</p>
+                            ${goalsHTML}
                         </div>
                     `;
-                }
-            }
-            
-            // Event listeners for calendar navigation
-            document.getElementById('prev-month').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                updateCalendar();
+
+                    document.getElementById('matchModal').classList.add('active');
+                });
             });
-            
-            document.getElementById('next-month').addEventListener('click', function() {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                updateCalendar();
-            });
-            
-            document.getElementById('today-btn').addEventListener('click', function() {
-                currentDate = new Date();
-                currentDate.setDate(1);
-                updateCalendar();
-            });
-            
-            // Initialize calendar
+        }
+
+        // Navigation buttons
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
             updateCalendar();
-            
-            // Add hover effects to fixture items
-            document.addEventListener('mouseover', function(e) {
-                if (e.target.closest('.fixture-item')) {
-                    const fixtureItem = e.target.closest('.fixture-item');
-                    fixtureItem.style.transform = 'translateY(-2px)';
-                    fixtureItem.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                }
-            });
-            
-            document.addEventListener('mouseout', function(e) {
-                if (e.target.closest('.fixture-item')) {
-                    const fixtureItem = e.target.closest('.fixture-item');
-                    fixtureItem.style.transform = 'translateY(0)';
-                    fixtureItem.style.boxShadow = 'none';
-                }
-            });
         });
 
-        // Close modal logic
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('matchModal');
-            if (e.target.classList.contains('close-modal') || e.target === modal) {
-                modal.classList.remove('active');
-            }
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
         });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('matchModal').classList.remove('active');
-            }
+
+        document.getElementById('today-btn').addEventListener('click', () => {
+            currentDate = new Date();
+            currentDate.setDate(1);
+            updateCalendar();
         });
-    </script>
+
+        // Initialize
+        updateCalendar();
+    });
+
+    // Modal close handlers
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('matchModal');
+        if (e.target.classList.contains('close-modal') || e.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.getElementById('matchModal').classList.remove('active');
+        }
+    });
+</script>
     <!-- Match Info Modal -->
     <div id="matchModal" class="modal-overlay">
         <div class="modal-content">

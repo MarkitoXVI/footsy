@@ -715,7 +715,7 @@
                             </div>
                             
                             <ul class="player-list">
-                                @forelse($topPlayers as $player)
+                                @forelse($myTeamPlayers as $player)
                                     <li class="player-item">
                                         <div class="player-avatar">
                                             {{ strtoupper(substr($player->name, 0, 2)) }}
@@ -868,40 +868,6 @@
                                     </div>
                                 </div>
                                 <div class="player-points">{{ $userStats['total_points'] ?? 0 }}</div>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Recent News Card -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Fantasy News</h3>
-                            <a href="#" class="view-all">View All</a>
-                        </div>
-                        
-                        <ul class="match-list">
-                            <li class="match-item">
-                                <div class="player-name" style="margin-bottom: 0.5rem;">Haaland injury update</div>
-                                <div class="match-details">
-                                    <span>Expected return: Gameweek 10</span>
-                                    <span>2 hours ago</span>
-                                </div>
-                            </li>
-                            
-                            <li class="match-item">
-                                <div class="player-name" style="margin-bottom: 0.5rem;">Price rises predicted</div>
-                                <div class="match-details">
-                                    <span>Saka, Maddison expected to rise</span>
-                                    <span>5 hours ago</span>
-                                </div>
-                            </li>
-                            
-                            <li class="match-item">
-                                <div class="player-name" style="margin-bottom: 0.5rem;">Gameweek 9 tips</div>
-                                <div class="match-details">
-                                    <span>Best captain choices</span>
-                                    <span>1 day ago</span>
-                                </div>
                             </li>
                         </ul>
                     </div>

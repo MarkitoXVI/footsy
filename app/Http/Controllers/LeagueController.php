@@ -18,7 +18,6 @@ class LeagueController extends Controller
             $q->orderBy('league_user.rank');
         }]);
 
-        // participants relation already orders by rank in model, but we ensure here
         $participants = $league->participants;
 
         return view('leagues.show', compact('league', 'participants'));
@@ -27,18 +26,29 @@ class LeagueController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function index()
-{
-    $myLeagues = auth()->user()->leagues()->with('admin')->get();
-    $otherLeagues = League::with('admin')
-        ->whereDoesntHave('users', function($q) {
-            $q->where('user_id', auth()->id());
-        })->get();
+    {
+        $user = auth()->user();
 
-    return view('leagues.index', compact('myLeagues', 'otherLeagues'));
-}
+        // Load all leagues the user is in + pivot data (is_admin + rank)
+        $myLeagues = $user->leagues()
+            ->with('admin')
+            ->withPivot('is_admin', 'rank')
+            ->get();
 
+        // Split into admin vs participant leagues (this fixes the empty state)
+        $adminLeagues      = $myLeagues->where('pivot.is_admin', true);
+        $participantLeagues = $myLeagues->where('pivot.is_admin', false);
+
+        // Other leagues the user has NOT joined yet
+        $otherLeagues = League::with('admin')
+            ->whereDoesntHave('users', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->get();
+
+        return view('leagues.index', compact('adminLeagues', 'participantLeagues', 'otherLeagues'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -51,49 +61,49 @@ class LeagueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-       public function store(Request $request)
-        {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'type' => 'required|in:public,private',
-                'league_description' => 'nullable|string|max:500',
-                'max_participants' => 'nullable|integer|min:2|max:100',
-            ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'                => 'required|string|max:255',
+            'type'                => 'required|in:public,private',
+            'league_description'  => 'nullable|string|max:500',
+            'max_participants'    => 'nullable|integer|min:2|max:100',
+        ]);
 
-            $code = strtoupper(Str::random(8));
+        $code = strtoupper(Str::random(8));
 
-            $league = League::create([
-                'name' => $validated['name'],
-                'privacy' => $validated['type'],
-                'description' => $validated['league_description'] ?? null,
-                'max_participants' => $validated['max_participants'] ?? 20,
-                'code' => $code,
-                'user_id' => auth()->id(),
-            ]);
+        $league = League::create([
+            'name'             => $validated['name'],
+            'privacy'          => $validated['type'],
+            'description'      => $validated['league_description'] ?? null,
+            'max_participants' => $validated['max_participants'] ?? 20,
+            'code'             => $code,
+            'user_id'          => auth()->id(),
+        ]);
 
-            // ✅ Make the creator also a participant in their league
-            $league->users()->attach(auth()->id());
+        // ✅ FIXED: Creator is now properly added as ADMIN
+        $league->users()->attach(auth()->id(), ['is_admin' => true]);
 
-            return redirect()
-                ->route('leagues.index')
-                ->with('success', 'League created successfully and you have been added as a participant!');
-        }
+        return redirect()
+            ->route('leagues.index')
+            ->with('success', 'League created successfully!');
+    }
 
     /**
      * Join a league.
      */
     public function join($id)
-{
-    $league = \App\Models\League::findOrFail($id);
+    {
+        $league = League::findOrFail($id);
 
-    // Attach the user if not already joined
-    if (! $league->users()->where('user_id', auth()->id())->exists()) {
-        $league->users()->attach(auth()->id());
+        if (! $league->users()->where('user_id', auth()->id())->exists()) {
+            $league->users()->attach(auth()->id());
+        }
+
+        return redirect()
+            ->route('leagues.index')
+            ->with('success', 'Successfully joined "' . $league->name . '"!');
     }
-
-    return redirect()->route('leagues.index')->with('success', 'Successfully joined "' . $league->name . '"!');
-}
-
 
     /**
      * Leave a league.
@@ -102,32 +112,33 @@ class LeagueController extends Controller
     {
         $userId = Auth::id();
 
-        // Admin cannot leave their own league via this action
-        if ($league->admin_id === $userId) {
-            return redirect()->route('leagues.index')
-                ->with('success', 'League admins cannot leave their own league.');
+        // Admin cannot leave their own league
+        if ($league->user_id === $userId) {
+            return redirect()
+                ->route('leagues.index')
+                ->with('error', 'League admins cannot leave their own league.');
         }
 
-        $league->participants()->detach($userId);
+        $league->users()->detach($userId);
 
-        return redirect()->route('leagues.index');
+        return redirect()
+            ->route('leagues.index')
+            ->with('success', 'You have left the league.');
     }
 
     /**
- * Remove the specified league from storage.
- */
-public function destroy(League $league)
-{
-    // Make sure only the admin can delete their own league
-    if ($league->user_id !== auth()->id()) {
+     * Remove the specified league from storage.
+     */
+    public function destroy(League $league)
+    {
+        if ($league->user_id !== auth()->id()) {
+            return redirect()->route('leagues.index')
+                ->with('error', 'You do not have permission to delete this league.');
+        }
+
+        $league->delete();
+
         return redirect()->route('leagues.index')
-            ->with('error', 'You do not have permission to delete this league.');
+            ->with('success', 'League deleted successfully!');
     }
-
-    $league->delete();
-
-    return redirect()->route('leagues.index')
-        ->with('success', 'League deleted successfully!');
-}
-
 }

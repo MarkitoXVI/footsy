@@ -110,8 +110,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/', [LeagueController::class, 'store'])->name('leagues.store');
     Route::resource('leagues', LeagueController::class);
     Route::post('/leagues/{league}/join', [LeagueController::class, 'join'])->name('leagues.join');
-    Route::post('/leagues/{league}/leave', [LeagueController::class, 'leave'])->name('leagues.leave');
-
+    Route::post('/leagues/{id}/leave', [LeagueController::class, 'leave'])->name('leagues.leave');
 });
     
     // Player Routes

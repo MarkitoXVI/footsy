@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <title>Player Statistics - Footsy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3a5ee5;
             --primary-dark: #2a48c5;
+            --primary-light: #5b7ae8;
             --secondary: #34c759;
-            --gray: #6c757d;
-            --light-gray: #f1f3f8;
+            --danger: #e53e3e;
+            --warning: #f59e0b;
             --dark: #1a2238;
-            --sidebar-bg: #1a2238;
-            --sidebar-width: 260px;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-light: linear-gradient(135deg, #e8edff, #dce4ff);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
             --header-height: 70px;
         }
 
@@ -27,50 +33,84 @@
 
         body {
             font-family: 'Open Sans', sans-serif;
-            background: #f5f8fb;
             color: var(--dark);
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
+            position: relative;
         }
 
-        /* Sidebar */
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(58, 94, 229, 0.02) 0px, rgba(58, 94, 229, 0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--sidebar-bg);
+            background: linear-gradient(180deg, var(--dark) 0%, #1e2a4a 100%);
             color: white;
-            height: 100vh;
             position: fixed;
-            overflow-y: auto;
-            transition: all 0.3s ease;
+            height: 100vh;
+            left: 0;
+            top: 0;
             z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 4px 0 25px rgba(58, 94, 229, 0.15);
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
         }
 
         .sidebar-header {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .sidebar-logo {
-            width: 36px;
-            height: 36px;
-            background: white;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-weight: bold;
+            color: white;
+            font-weight: 800;
             font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
 
         .sidebar-title {
             font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 1.4rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-title {
+            opacity: 0;
+            width: 0;
+            display: none;
         }
 
         .sidebar-nav {
@@ -85,37 +125,87 @@
         .nav-link {
             display: flex;
             align-items: center;
+            gap: 14px;
             padding: 0.875rem 1.5rem;
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: all 0.3s;
             border-left: 4px solid transparent;
+            white-space: nowrap;
         }
 
         .nav-link:hover, .nav-link.active {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(58, 94, 229, 0.2);
             color: white;
             border-left-color: var(--primary);
         }
 
         .nav-link i {
-            margin-right: 12px;
             width: 20px;
             text-align: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .nav-link span {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.875rem 1rem;
+        }
+
+        /* Burger Menu Button */
+        .burger-menu {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .burger-menu i {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        .burger-menu:hover {
+            background: rgba(58, 94, 229, 0.1);
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             position: relative;
+            z-index: 1;
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
         }
 
         /* Header */
         .header {
             height: var(--header-height);
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(58, 94, 229, 0.08);
             padding: 0 2rem;
             display: flex;
             align-items: center;
@@ -123,78 +213,44 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
 
-        .search-bar {
+        .header-left {
             display: flex;
             align-items: center;
-            background: var(--light-gray);
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
-            width: 300px;
+            gap: 1rem;
         }
 
-        .search-bar i {
-            color: var(--gray);
-            margin-right: 0.5rem;
-        }
-
-        .search-bar input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            outline: none;
+        .page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-        }
-
-        .notification-bell {
-            position: relative;
-            color: var(--gray);
-            cursor: pointer;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--secondary);
-            color: white;
-            font-size: 0.7rem;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
+            gap: 1rem;
         }
 
         .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.2);
+            object-fit: cover;
         }
 
         .user-name {
@@ -202,95 +258,96 @@
             font-size: 0.95rem;
         }
 
-        .user-role {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-
         /* Page Content */
         .page {
             padding: 2rem;
+            flex: 1;
         }
 
-        h1 {
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
             font-family: 'Montserrat', sans-serif;
             font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
         /* Stats Dropdown */
         .stats-dropdown {
             position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
         }
 
         .stats-dropdown-btn {
-            background: white;
-            border: 1px solid var(--light-gray);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            font-family: 'Montserrat', sans-serif;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(58, 94, 229, 0.2);
+            border-radius: 12px;
+            padding: 0.75rem 1.25rem;
             font-weight: 600;
-            font-size: 1rem;
-            color: var(--dark);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
             transition: all 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            color: var(--dark);
         }
 
         .stats-dropdown-btn:hover {
             border-color: var(--primary);
-            box-shadow: 0 4px 8px rgba(58, 94, 229, 0.1);
+            transform: translateY(-2px);
         }
 
         .stats-dropdown-content {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background: #fff;
-        min-width: 220px;
-        border-radius: 8px;
-        box-shadow: 0 8px 16px rgba(0,0,0,.1);overflow: hidden;
-}
-
-        .stats-dropdown-content.active {
-            display: block !important;
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 220px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            z-index: 200;
+            margin-top: 0.5rem;
         }
 
+        .stats-dropdown.open .stats-dropdown-content {
+            display: block;
+        }
 
         .stats-dropdown-content a {
-            color: var(--dark);
-            padding: 0.75rem 1rem;
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .stats-dropdown-content a:hover {
-            background-color: rgba(58, 94, 229, 0.05);
-            border-left-color: var(--primary);
-        }
-
-        .stats-dropdown-content a.active {
-            background-color: rgba(58, 94, 229, 0.1);
-            border-left-color: var(--primary);
-            color: var(--primary);
-            font-weight: 600;
+            gap: 10px;
+            padding: 0.75rem 1.25rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s;
         }
 
         .stats-dropdown-content a i {
             width: 20px;
-            text-align: center;
+            color: var(--primary);
         }
 
-        .stats-dropdown:hover .stats-dropdown-content {
-            display: block;
+        .stats-dropdown-content a:hover {
+            background: rgba(58, 94, 229, 0.1);
+        }
+
+        .stats-dropdown-content a.active {
+            background: rgba(58, 94, 229, 0.15);
+            color: var(--primary);
+            font-weight: 600;
         }
 
         /* Filters */
@@ -298,48 +355,64 @@
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
-            margin-bottom: 1.5rem;
-            background: white;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
+            border: 1px solid rgba(58, 94, 229, 0.1);
         }
 
         .filters input,
         .filters select {
             padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid rgba(58, 94, 229, 0.1);
+            border-radius: 12px;
             background: white;
             font-size: 0.95rem;
             flex: 1;
             min-width: 180px;
+            font-family: 'Open Sans', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
         }
 
         .filters button {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .filters button:hover {
-            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.3);
         }
 
         /* Table Container */
         .table-container {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
+            border: 1px solid rgba(58, 94, 229, 0.1);
+            overflow-x: auto;
         }
 
         table {
@@ -349,150 +422,203 @@
 
         th, td {
             text-align: left;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--light-gray);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(58, 94, 229, 0.1);
         }
 
         th {
-            background: #fafbff;
+            background: rgba(58, 94, 229, 0.03);
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
-        tr:hover {
-            background: rgba(58,94,229,0.05);
+        th:hover {
+            background: rgba(58, 94, 229, 0.08);
+        }
+
+        th[data-dir="asc"]::after {
+            content: " ↑";
+            color: var(--primary);
+        }
+
+        th[data-dir="desc"]::after {
+            content: " ↓";
+            color: var(--primary);
+        }
+
+        tr:hover td {
+            background: rgba(58, 94, 229, 0.03);
         }
 
         .player-img {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
+            background: var(--light);
         }
 
         .player-name {
             display: flex;
             align-items: center;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .position-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .pos-gk { background: rgba(58, 94, 229, 0.1); color: var(--primary); }
+        .pos-def { background: rgba(52, 199, 89, 0.1); color: var(--secondary); }
+        .pos-mid { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .pos-fwd { background: rgba(229, 62, 62, 0.1); color: var(--danger); }
+
+        .points-badge {
+            font-weight: 700;
+            color: var(--primary);
         }
 
         .compare-btn {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 0.35rem 0.8rem;
+            border-radius: 8px;
+            padding: 0.4rem 0.9rem;
             font-size: 0.8rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
         }
 
         .compare-btn:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .pagination a,
-        .pagination span {
-            padding: 0.5rem 0.9rem;
-            border-radius: 6px;
-            background: #fff;
-            border: 1px solid #ddd;
-            font-size: 0.9rem;
-            color: var(--dark);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .pagination a:hover {
-            background: var(--light-gray);
-        }
-
-        .pagination .active span {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        .pagination .disabled span {
-            color: var(--gray);
-            background: #f8f9fa;
-            cursor: not-allowed;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(58, 94, 229, 0.3);
         }
 
         /* Compare Modal */
         .compare-modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            align-items: center; justify-content: center;
-            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .compare-modal.active {
+            display: flex;
         }
 
         .compare-content {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
             padding: 2rem;
             width: 90%;
             max-width: 800px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(58, 94, 229, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .compare-close {
             float: right;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--gray);
             cursor: pointer;
+            transition: all 0.3s;
             line-height: 1;
         }
 
         .compare-close:hover {
-            color: var(--dark);
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .compare-content h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid rgba(58, 94, 229, 0.1);
+        }
+
+        .compare-table th {
+            background: rgba(58, 94, 229, 0.05);
+            font-weight: 600;
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
-                width: 70px;
-                overflow: visible;
+                transform: translateX(-100%);
             }
             
-            .sidebar-title, .nav-link span {
-                display: none;
-            }
-            
-            .sidebar-header {
-                justify-content: center;
-                padding: 1.5rem 0.5rem;
-            }
-            
-            .nav-link {
-                padding: 1rem;
-                justify-content: center;
-            }
-            
-            .nav-link i {
-                margin-right: 0;
-                font-size: 1.2rem;
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             
             .main-content {
-                margin-left: 70px;
+                margin-left: 0;
             }
             
-            .search-bar {
-                width: 200px;
-            }
-            
-            .user-info {
+            .user-name {
                 display: none;
             }
             
@@ -504,27 +630,38 @@
             .filters select {
                 min-width: 100%;
             }
+            
+            .table-container {
+                overflow-x: auto;
+            }
         }
 
         @media (max-width: 576px) {
+            .page {
+                padding: 1rem;
+            }
+            
             .header {
                 padding: 0 1rem;
             }
             
-            .search-bar {
-                display: none;
-            }
-            
-            .page {
-                padding: 1rem;
+            th, td {
+                white-space: nowrap;
             }
         }
     </style>
 </head>
 <body>
 
+@php 
+    $user = Auth::user(); 
+@endphp
+
+<!-- Overlay for mobile -->
+<div class="overlay" id="overlay" onclick="closeMobileSidebar()"></div>
+
 <!-- Sidebar Navigation -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">F</div>
         <div class="sidebar-title">Footsy</div>
@@ -533,121 +670,110 @@
     <ul class="sidebar-nav">
         <li class="nav-item">
             <a href="{{ route('dashboard') }}" class="nav-link">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
+                <i class="fas fa-home"></i><span>Dashboard</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('fantasy-team.index') }}" class="nav-link">
-                <i class="fas fa-users"></i>
-                <span>My Team</span>
+                <i class="fas fa-users"></i><span>My Team</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('leagues.index') }}" class="nav-link">
-                <i class="fas fa-trophy"></i>
-                <span>Leagues</span>
+                <i class="fas fa-trophy"></i><span>Leagues</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('statistics.index') }}" class="nav-link">
-                <i class="fas fa-chart-line"></i>
-                <span>Statistics</span>
+                <i class="fas fa-chart-line"></i><span>Statistics</span>
             </a>
         </li>
-        <!-- <li class="nav-item">
+        <li class="nav-item">
             <a href="{{ route('transfers.index') }}" class="nav-link">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Transfers</span>
+                <i class="fas fa-exchange-alt"></i><span>Transfers</span>
             </a>
-        </li> -->
+        </li>
         <li class="nav-item">
             <a href="{{ route('fixtures.index') }}" class="nav-link">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Fixtures</span>
+                <i class="fas fa-calendar-alt"></i><span>Fixtures</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('help') }}" class="nav-link">
-                <i class="fas fa-question-circle"></i>
-                <span>Help and Support</span>
+                <i class="fas fa-question-circle"></i><span>Help and Support</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('profile.edit') }}" class="nav-link">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
+                <i class="fas fa-user"></i><span>Profile</span>
             </a>
         </li>
         <li class="nav-item">
-            <!-- Authentication -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Log Out</span>
-                </a>
+                <button type="submit" class="nav-link" style="background:none;border:none;width:100%;text-align:left;">
+                    <i class="fas fa-sign-out-alt"></i><span>Log Out</span>
+                </button>
             </form>
         </li>
     </ul>
 </aside>
 
 <!-- Main Content -->
-<div class="main-content">
+<div class="main-content" id="mainContent">
     <!-- Header -->
     <header class="header">
-        <h2>Player Statistics</h2>
+        <div class="header-left">
+            <button class="burger-menu" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
         <div class="user-menu">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search...">
-            </div>
-            <div class="notification-bell">
-                <i class="fas fa-bell"></i>
-                <div class="notification-badge">3</div>
-            </div>
-            <div class="user-profile">
+            @if(Auth::user()->profile_photo_path)
+                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
+                     class="user-avatar" style="object-fit: cover;" alt="Avatar">
+            @else
                 <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-                <div class="user-info">
-                    <div class="user-name">{{ Auth::user()->name }}</div>
-                    <div class="user-role">Team Manager</div>
-                </div>
-            </div>
+            @endif
+            <span class="user-name">{{ Auth::user()->name }}</span>
         </div>
     </header>
 
     <div class="page">
-        <h1>Player Statistics</h1>
+        <div class="page-header">
+            <h1>Player Statistics</h1>
+            <p>Analyze player performance across the Premier League</p>
+        </div>
         
         <!-- Stats Switcher (Dropdown) -->
-<div class="stats-dropdown" style="position:relative; display:inline-block;">
-    <button class="stats-dropdown-btn" id="statsSwitcherBtn" aria-expanded="false">
-        <i class="fas fa-chart-bar"></i>
-        <span id="statsSwitcherLabel">
-            @if(request()->routeIs('statistics.players')) Player Statistics
-            @elseif(request()->routeIs('statistics.teams')) Team Statistics
-            @else Overview
-            @endif
-        </span>
-        <i class="fas fa-chevron-down" style="margin-left:.35rem;"></i>
-    </button>
+        <div class="stats-dropdown" id="statsDropdown">
+            <button class="stats-dropdown-btn" id="statsSwitcherBtn">
+                <i class="fas fa-chart-bar"></i>
+                <span id="statsSwitcherLabel">
+                    @if(request()->routeIs('statistics.players')) Player Statistics
+                    @elseif(request()->routeIs('statistics.teams')) Team Statistics
+                    @else Overview
+                    @endif
+                </span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="stats-dropdown-content">
+                <a href="{{ route('statistics.index') }}" class="{{ request()->routeIs('statistics.index') ? 'active' : '' }}">
+                    <i class="fas fa-chart-pie"></i> Overview
+                </a>
+                <a href="{{ route('statistics.players') }}" class="{{ request()->routeIs('statistics.players') ? 'active' : '' }}">
+                    <i class="fas fa-user"></i> Player Stats
+                </a>
+                <a href="{{ route('statistics.teams') }}" class="{{ request()->routeIs('statistics.teams') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i> Team Stats
+                </a>
+            </div>
+        </div>
 
-    <div class="stats-dropdown-content" id="statsSwitcherMenu" role="menu" aria-hidden="true" style="z-index: 101;">
-        <a href="{{ route('statistics.index') }}" class="{{ request()->routeIs('statistics.index') ? 'active' : '' }}">
-            <i class="fas fa-chart-pie"></i> Overview
-        </a>
-        <a href="{{ route('statistics.players') }}" class="{{ request()->routeIs('statistics.players') ? 'active' : '' }}">
-            <i class="fas fa-user"></i> Player Stats
-        </a>
-        <a href="{{ route('statistics.teams') }}" class="{{ request()->routeIs('statistics.teams') ? 'active' : '' }}">
-            <i class="fas fa-users"></i> Team Stats
-        </a>
-    </div>
-</div>
-
-        <form method="GET" class="filters">
-            <input type="text" name="search" placeholder="Search player..." value="{{ request('search') }}">
-            <select name="team_id">
+        <!-- Filters -->
+        <form method="GET" class="filters" id="filterForm">
+            <input type="text" name="search" placeholder="🔍 Search player..." value="{{ request('search') }}" id="searchInput">
+            <select name="team_id" id="teamSelect">
                 <option value="">All Teams</option>
                 @foreach($teams as $team)
                     <option value="{{ $team->id }}" {{ request('team_id') == $team->id ? 'selected' : '' }}>
@@ -655,27 +781,28 @@
                     </option>
                 @endforeach
             </select>
-            <select name="position">
+            <select name="position" id="positionSelect">
                 <option value="">All Positions</option>
-                <option value="GK">Goalkeepers</option>
-                <option value="DEF">Defenders</option>
-                <option value="MID">Midfielders</option>
-                <option value="FWD">Forwards</option>
+                <option value="GK" {{ request('position') == 'GK' ? 'selected' : '' }}>Goalkeepers</option>
+                <option value="DEF" {{ request('position') == 'DEF' ? 'selected' : '' }}>Defenders</option>
+                <option value="MID" {{ request('position') == 'MID' ? 'selected' : '' }}>Midfielders</option>
+                <option value="FWD" {{ request('position') == 'FWD' ? 'selected' : '' }}>Forwards</option>
             </select>
             <button type="submit"><i class="fas fa-filter"></i> Filter</button>
         </form>
 
+        <!-- Table Container -->
         <div class="table-container">
-            <table>
+            <table id="playersTable">
                 <thead>
                     <tr>
-                        <th>Player</th>
-                        <th>Team</th>
-                        <th>Position</th>
-                        <th>Points</th>
-                        <th>Goals</th>
-                        <th>Assists</th>
-                        <th>Price (£m)</th>
+                        <th data-sort="web_name">Player</th>
+                        <th data-sort="team">Team</th>
+                        <th data-sort="position">Position</th>
+                        <th data-sort="total_points">Points</th>
+                        <th data-sort="goals_scored">Goals</th>
+                        <th data-sort="assists">Assists</th>
+                        <th data-sort="price">Price (£m)</th>
                         <th>Compare</th>
                     </tr>
                 </thead>
@@ -689,12 +816,25 @@
                             {{ $p->web_name }}
                         </td>
                         <td>{{ $p->team->short_name ?? '-' }}</td>
-                        <td>{{ $p->position_label }}</td>
-                        <td>{{ $p->total_points }}</td>
+                        <td>
+                            @php
+                                $posClass = '';
+                                if($p->position_label == 'GK') $posClass = 'pos-gk';
+                                elseif($p->position_label == 'DEF') $posClass = 'pos-def';
+                                elseif($p->position_label == 'MID') $posClass = 'pos-mid';
+                                elseif($p->position_label == 'FWD') $posClass = 'pos-fwd';
+                            @endphp
+                            <span class="position-badge {{ $posClass }}">{{ $p->position_label }}</span>
+                        </td>
+                        <td class="points-badge">{{ $p->total_points }}</td>
                         <td>{{ $p->goals_scored }}</td>
                         <td>{{ $p->assists }}</td>
-                        <td>{{ number_format($p->price,1) }}</td>
-                        <td><button class="compare-btn" onclick="addToCompare('{{ $p->web_name }}', {{ $p->total_points }}, {{ $p->goals_scored }}, {{ $p->assists }}, {{ $p->price }})">Compare</button></td>
+                        <td>£{{ number_format($p->price,1) }}</td>
+                        <td>
+                            <button class="compare-btn" onclick="addToCompare('{{ $p->web_name }}', {{ $p->total_points }}, {{ $p->goals_scored }}, {{ $p->assists }}, {{ $p->price }})">
+                                Compare
+                            </button>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -718,137 +858,124 @@
 </div>
 
 <script>
-  const tableBody = document.querySelector("table tbody");
-  const searchInput = document.querySelector("input[name='search']");
-  const teamSelect = document.querySelector("select[name='team_id']");
-  const positionSelect = document.querySelector("select[name='position']");
-  const sortHeaders = document.querySelectorAll("th[data-sort]");
-
-  let sortColumn = 'total_points';
-  let sortDirection = 'desc';
-  let typingTimer;
-
-  async function fetchPlayers() {
-    const params = new URLSearchParams({
-      search: searchInput?.value || '',
-      team_id: teamSelect?.value || '',
-      position: positionSelect?.value || '',
-      sort: sortColumn,
-      direction: sortDirection
+    // Sidebar toggle functionality
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const overlay = document.getElementById('overlay');
+        
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+    }
+    
+    function closeMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    }
+    
+    document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !e.target.closest('.burger-menu')) {
+            sidebar.classList.remove('mobile-open');
+            document.getElementById('overlay').classList.remove('active');
+        }
+    });
+    
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('mobile-open');
+            document.getElementById('overlay').classList.remove('active');
+        }
     });
 
-    const res = await fetch(`{{ route('statistics.players') }}?${params.toString()}`, {
-      headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    });
-
-    if (!res.ok) {
-      console.error('Failed to fetch players');
-      return;
+    // Dropdown functionality
+    const dropdown = document.getElementById('statsDropdown');
+    const dropdownBtn = document.getElementById('statsSwitcherBtn');
+    
+    if (dropdownBtn) {
+        dropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
     }
 
-    const data = await res.json();
-    renderPlayers(data.players || []);
-  }
+    // Comparison array
+    let comparePlayers = [];
 
-  function renderPlayers(players) {
-    tableBody.innerHTML = "";
-    if (!players.length) {
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No players found</td></tr>`;
-      return;
+    function addToCompare(name, points, goals, assists, price) {
+        if (comparePlayers.length >= 4) {
+            alert('You can compare up to 4 players at a time.');
+            return;
+        }
+        
+        comparePlayers.push({ name, points, goals, assists, price });
+        updateCompareModal();
+        document.getElementById('compareModal').classList.add('active');
     }
 
-    players.forEach(p => {
-      const row = document.createElement('tr');
-      const code = p.code ?? '0';
-      const price = Number(p.price || 0).toFixed(1);
+    function updateCompareModal() {
+        const tbody = document.querySelector('#compareTable tbody');
+        tbody.innerHTML = '';
+        
+        comparePlayers.forEach(p => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = p.name;
+            row.insertCell(1).innerHTML = p.points;
+            row.insertCell(2).innerHTML = p.goals;
+            row.insertCell(3).innerHTML = p.assists;
+            row.insertCell(4).innerHTML = '£' + p.price + 'm';
+        });
+    }
 
-      row.innerHTML = `
-        <td class="player-name">
-          <img src="https://resources.premierleague.com/premierleague/photos/players/110x140/p${code}.png"
-               onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';"
-               alt="${p.web_name}" class="player-img">
-          ${p.web_name}
-        </td>
-        <td>${p.team ? (p.team.short_name || p.team.name) : '-'}</td>
-        <td>${p.position_label || ''}</td>
-        <td>${p.total_points ?? 0}</td>
-        <td>${p.goals_scored ?? 0}</td>
-        <td>${p.assists ?? 0}</td>
-        <td>${price}</td>
-        <td>
-          <button class="compare-btn"
-            onclick="addToCompare('${p.web_name}', ${p.total_points ?? 0}, ${p.goals_scored ?? 0}, ${p.assists ?? 0}, ${price})">
-            Compare
-          </button>
-        </td>
-      `;
-      tableBody.appendChild(row);
+    function closeCompare() {
+        document.getElementById('compareModal').classList.remove('active');
+        comparePlayers = [];
+    }
+
+    // Sort functionality
+    let sortColumn = 'total_points';
+    let sortDirection = 'desc';
+    
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', function() {
+            const col = this.getAttribute('data-sort');
+            if (sortColumn === col) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = col;
+                sortDirection = 'desc';
+            }
+            
+            // Update sort indicators
+            document.querySelectorAll('th[data-sort]').forEach(h => h.removeAttribute('data-dir'));
+            this.setAttribute('data-dir', sortDirection);
+            
+            // Submit form with sort params
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', sortColumn);
+            url.searchParams.set('direction', sortDirection);
+            window.location.href = url.toString();
+        });
+        
+        if (th.getAttribute('data-sort') === '{{ request('sort', 'total_points') }}') {
+            th.setAttribute('data-dir', '{{ request('direction', 'desc') }}');
+        }
     });
-  }
-
-  // Live search
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(fetchPlayers, 350);
-    });
-  }
-
-  // Filter change
-  teamSelect?.addEventListener("change", fetchPlayers);
-  positionSelect?.addEventListener("change", fetchPlayers);
-
-  // Sort headers
-  sortHeaders.forEach(th => {
-    th.style.cursor = 'pointer';
-    th.addEventListener('click', () => {
-      const col = th.getAttribute('data-sort');
-      if (!col) return;
-      sortDirection = (sortColumn === col && sortDirection === 'asc') ? 'desc' : 'asc';
-      sortColumn = col;
-
-      // Simple sort indicator
-      sortHeaders.forEach(h => h.removeAttribute('data-dir'));
-      th.setAttribute('data-dir', sortDirection);
-
-      fetchPlayers();
-    });
-  });
-
-  // Initial load
-  fetchPlayers();
 </script>
-
-
-<script>
-  (function () {
-    const wrapper = document.querySelector('.stats-dropdown');
-    const btn = document.getElementById('statsSwitcherBtn');
-    const menu = document.getElementById('statsSwitcherMenu');
-
-    function closeMenu() {
-      wrapper.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-      menu.setAttribute('aria-hidden', 'true');
-    }
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = wrapper.classList.toggle('open');
-      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!wrapper.contains(e.target)) closeMenu();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
-  })();
-</script>
-
 
 </body>
 </html>

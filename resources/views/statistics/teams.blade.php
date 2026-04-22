@@ -1,7 +1,6 @@
 @extends('layouts.footsy')
 
 @section('title', 'Team Statistics - Footsy')
-
 @section('header-title', 'Statistics')
 
 @section('header-dropdown')
@@ -28,7 +27,6 @@
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
-
     .stat-card {
         background: white;
         border-radius: 12px;
@@ -37,11 +35,9 @@
         text-align: center;
         transition: transform 0.3s;
     }
-
     .stat-card:hover {
         transform: translateY(-3px);
     }
-
     .stat-icon {
         width: 50px;
         height: 50px;
@@ -54,7 +50,6 @@
         font-size: 1.5rem;
         margin: 0 auto 1rem;
     }
-
     .stat-value {
         font-family: 'Montserrat', sans-serif;
         font-size: 1.8rem;
@@ -62,7 +57,6 @@
         color: var(--primary);
         margin-bottom: 0.5rem;
     }
-
     .stat-label {
         color: var(--gray);
         font-size: 0.9rem;
@@ -76,7 +70,6 @@
         overflow: hidden;
         margin-bottom: 2rem;
     }
-
     .table-header {
         padding: 1.5rem;
         border-bottom: 1px solid var(--light-gray);
@@ -84,24 +77,20 @@
         justify-content: space-between;
         align-items: center;
     }
-
     .table-header h3 {
         font-family: 'Montserrat', sans-serif;
         font-size: 1.3rem;
         margin: 0;
         color: var(--dark);
     }
-
     .table-controls {
         display: flex;
         gap: 1rem;
         align-items: center;
     }
-
     .search-control {
         position: relative;
     }
-
     .search-control input {
         padding: 0.5rem 1rem 0.5rem 2.5rem;
         border: 1px solid var(--light-gray);
@@ -109,7 +98,6 @@
         font-size: 0.9rem;
         width: 250px;
     }
-
     .search-control i {
         position: absolute;
         left: 0.75rem;
@@ -117,7 +105,6 @@
         transform: translateY(-50%);
         color: var(--gray);
     }
-
     .sort-control select {
         padding: 0.5rem 1rem;
         border: 1px solid var(--light-gray);
@@ -132,11 +119,9 @@
         width: 100%;
         border-collapse: collapse;
     }
-
     .team-table thead {
         background: #fafbff;
     }
-
     .team-table th {
         padding: 1rem;
         text-align: left;
@@ -148,37 +133,30 @@
         transition: background 0.2s;
         user-select: none;
     }
-
     .team-table th:hover {
         background: rgba(58, 94, 229, 0.05);
     }
-
     .team-table th i {
         margin-left: 0.5rem;
         color: var(--gray);
         font-size: 0.8rem;
     }
-
     .team-table td {
         padding: 1rem;
         border-bottom: 1px solid var(--light-gray);
         transition: background 0.2s;
     }
-
     .team-table tbody tr:hover {
         background: rgba(58, 94, 229, 0.03);
     }
-
     .team-table tbody tr:last-child td {
         border-bottom: none;
     }
-
     .team-cell {
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
-
     .team-logo {
         width: 32px;
         height: 32px;
@@ -191,38 +169,28 @@
         font-weight: 700;
         color: var(--dark);
         overflow: hidden;
+        flex-shrink: 0;
     }
-
     .team-logo img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-
     .team-name {
         font-weight: 500;
     }
-
     .team-short {
         color: var(--gray);
         font-size: 0.85rem;
     }
-
     .goals-cell, .points-cell {
         font-family: 'Montserrat', sans-serif;
         font-weight: 600;
         text-align: center;
     }
+    .goals-cell { color: var(--secondary); }
+    .points-cell { color: var(--primary); }
 
-    .goals-cell {
-        color: var(--secondary);
-    }
-
-    .points-cell {
-        color: var(--primary);
-    }
-
-    /* Badge for top teams */
     .top-badge {
         background: var(--secondary);
         color: white;
@@ -239,9 +207,7 @@
         gap: 0.5rem;
         margin-top: 2rem;
     }
-
-    .pagination a,
-    .pagination span {
+    .pagination a, .pagination span {
         padding: 0.5rem 0.9rem;
         border-radius: 6px;
         background: #fff;
@@ -251,56 +217,40 @@
         text-decoration: none;
         transition: all 0.2s;
     }
-
     .pagination a:hover {
         background: var(--light-gray);
     }
-
     .pagination .active span {
         background: var(--primary);
         color: #fff;
         border-color: var(--primary);
     }
 
-    /* Responsive Design */
+    /* Responsive */
     @media (max-width: 768px) {
         .table-header {
             flex-direction: column;
             gap: 1rem;
             align-items: flex-start;
         }
-        
         .table-controls {
             width: 100%;
             justify-content: space-between;
         }
-        
         .search-control input {
-            width: 200px;
+            width: 100%;
         }
     }
-
     @media (max-width: 576px) {
         .stats-overview {
             grid-template-columns: 1fr;
         }
-        
         .table-controls {
             flex-direction: column;
             gap: 0.75rem;
         }
-        
         .search-control input {
             width: 100%;
-        }
-        
-        .team-table {
-            font-size: 0.9rem;
-        }
-        
-        .team-table th,
-        .team-table td {
-            padding: 0.75rem 0.5rem;
         }
     }
 </style>
@@ -345,8 +295,9 @@
             <div class="sort-control">
                 <select id="sortSelect">
                     <option value="name">Sort by Name</option>
+                    <option value="short_name">Sort by Short Name</option>
                     <option value="goals">Sort by Goals</option>
-                    <option value="points">Sort by Points</option>
+                    <option value="points" selected>Sort by Points</option>
                 </select>
             </div>
         </div>
@@ -368,27 +319,25 @@
                         <td>
                             <div class="team-cell">
                                 <div class="team-logo">
-                                    @if(isset($team->code))
-                                        <img src="https://resources.premierleague.com/premierleague/badges/70/t{{ $team->code }}.png" 
-                                             alt="{{ $team->name }}" 
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                        <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:#f8f9fa; border-radius:50%; font-size:0.7rem; font-weight:700;">
-                                            {{ strtoupper($team->short_name) }}
-                                        </div>
-                                    @else
-                                        {{ strtoupper($team->short_name) }}
+                                    @if(!empty($team->code))
+                                        <img src="https://resources.premierleague.com/premierleague/badges/70/t{{ $team->code }}.png"
+                                             alt="{{ $team->name }}"
+                                             onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex';">
                                     @endif
+                                    <div class="fallback" style="display: {{ empty($team->code) ? 'flex' : 'none' }}; width:100%; height:100%; align-items:center; justify-content:center; background:#f8f9fa; border-radius:50%; font-size:0.7rem; font-weight:700;">
+                                        {{ strtoupper(substr($team->short_name ?? $team->name, 0, 3)) }}
+                                    </div>
                                 </div>
                                 <div>
                                     <div class="team-name">{{ $team->name }}</div>
-                                    <div class="team-short">{{ $team->short_name }}</div>
+                                    <div class="team-short">{{ $team->short_name ?? 'N/A' }}</div>
                                 </div>
                                 @if($loop->index < 3)
                                     <span class="top-badge">Top {{ $loop->index + 1 }}</span>
                                 @endif
                             </div>
                         </td>
-                        <td>{{ $team->short_name }}</td>
+                        <td>{{ $team->short_name ?? 'N/A' }}</td>
                         <td class="goals-cell">{{ $team->total_goals ?? 0 }}</td>
                         <td class="points-cell">{{ $team->total_points ?? 0 }}</td>
                     </tr>
@@ -399,11 +348,11 @@
 </div>
 
 <!-- Pagination -->
-<div class="pagination">
-    @if(method_exists($teams, 'links'))
+@if(method_exists($teams, 'links'))
+    <div class="pagination">
         {{ $teams->links() }}
-    @endif
-</div>
+    </div>
+@endif
 @endsection
 
 @push('scripts')
@@ -413,59 +362,73 @@
         const headers = table.querySelectorAll('th[data-sort]');
         const searchInput = document.getElementById('teamSearch');
         const sortSelect = document.getElementById('sortSelect');
-        
+
         let currentSort = { column: 'points', direction: 'desc' };
-        
+
+        // Header click sorting
         headers.forEach(header => {
             header.addEventListener('click', () => {
                 const column = header.getAttribute('data-sort');
                 sortTable(column);
             });
         });
-        
+
+        // Dropdown sorting
         sortSelect.addEventListener('change', () => {
-            const column = sortSelect.value === 'name' ? 'name' : 
-                          sortSelect.value === 'goals' ? 'goals' : 'points';
+            const column = sortSelect.value;
             sortTable(column);
         });
-        
+
+        // Search functionality
         searchInput.addEventListener('input', () => {
-            filterTable(searchInput.value.toLowerCase());
+            filterTable(searchInput.value.toLowerCase().trim());
         });
-        
+
         function sortTable(column) {
             const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
+            let rows = Array.from(tbody.querySelectorAll('tr'));
+
             if (currentSort.column === column) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
             } else {
                 currentSort.column = column;
-                currentSort.direction = 'asc';
+                currentSort.direction = (column === 'name' || column === 'short_name') ? 'asc' : 'desc';
             }
-            
+
             rows.sort((a, b) => {
-                let aValue, bValue;
-                if (column === 'name') {
-                    aValue = a.cells[0].querySelector('.team-name').textContent.toLowerCase();
-                    bValue = b.cells[0].querySelector('.team-name').textContent.toLowerCase();
-                } else if (column === 'short_name') {
-                    aValue = a.cells[1].textContent.toLowerCase();
-                    bValue = b.cells[1].textContent.toLowerCase();
-                } else if (column === 'goals') {
-                    aValue = parseInt(a.cells[2].textContent);
-                    bValue = parseInt(b.cells[2].textContent);
-                } else if (column === 'points') {
-                    aValue = parseInt(a.cells[3].textContent);
-                    bValue = parseInt(b.cells[3].textContent);
+                let aValue = getCellValue(a, column);
+                let bValue = getCellValue(b, column);
+
+                if (typeof aValue === 'string') {
+                    return currentSort.direction === 'asc' 
+                        ? aValue.localeCompare(bValue) 
+                        : bValue.localeCompare(aValue);
+                } else {
+                    return currentSort.direction === 'asc' 
+                        ? aValue - bValue 
+                        : bValue - aValue;
                 }
-                return currentSort.direction === 'asc' ? aValue > bValue ? 1 : -1 : aValue < bValue ? 1 : -1;
             });
-            
+
             rows.forEach(row => tbody.appendChild(row));
             updateSortIndicators(column);
         }
-        
+
+        function getCellValue(row, column) {
+            switch(column) {
+                case 'name':
+                    return row.cells[0].querySelector('.team-name').textContent.trim().toLowerCase();
+                case 'short_name':
+                    return row.cells[1].textContent.trim().toLowerCase();
+                case 'goals':
+                    return parseInt(row.cells[2].textContent) || 0;
+                case 'points':
+                    return parseInt(row.cells[3].textContent) || 0;
+                default:
+                    return 0;
+            }
+        }
+
         function updateSortIndicators(column) {
             headers.forEach(header => {
                 const icon = header.querySelector('i');
@@ -476,7 +439,7 @@
                 }
             });
         }
-        
+
         function filterTable(searchTerm) {
             const rows = table.querySelectorAll('tbody tr');
             rows.forEach(row => {
@@ -486,7 +449,8 @@
                 row.style.display = shouldShow ? '' : 'none';
             });
         }
-        
+
+        // Initial sort by points (descending)
         sortTable('points');
     });
 </script>

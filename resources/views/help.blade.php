@@ -927,12 +927,16 @@
                 <button class="burger-menu" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="page-title">Help & Rules</h1>
             </div>
             
             <div class="user-menu">
                 <div class="user-profile">
-                    <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
+                                @if(Auth::user()->profile_photo_path)
+                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
+                    class="user-avatar" style="object-fit: cover;" alt="Avatar">
+            @else
+                <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
+            @endif
                     <div class="user-info">
                         <div class="user-name">{{ Auth::user()->name }}</div>
                         <div class="user-role">Team Manager</div>

@@ -924,8 +924,12 @@
                 </div>
                 
                 <div class="user-profile">
-                    <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-                    <div class="user-info">
+@if(Auth::user()->profile_photo_path)
+    <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
+         class="user-avatar" style="object-fit: cover;" alt="Avatar">
+@else
+    <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
+@endif                    <div class="user-info">
                         <div class="user-name">{{ Auth::user()->name }}</div>
                         <div class="user-role">Team Manager</div>
                     </div>
@@ -936,7 +940,6 @@
         <!-- Leagues Content -->
         <div class="leagues-content">
             <div class="leagues-header">
-                <h1 class="leagues-title">Leagues</h1>
                 <a href="{{ route('leagues.create') }}" class="create-league-btn">
                     <i class="fas fa-plus"></i> Create New League
                 </a>
@@ -961,17 +964,13 @@
                     <option value="public">Public Leagues</option>
                     <option value="private">Private Leagues</option>
                     <option value="joined">Leagues I've Joined</option>
-                    <option value="admin">Leagues I Admin</option>
+                    <option value="admin">My Leagues</option>
                 </select>
             </div>
 
-            <!-- My Leagues Section (Admin) -->
+            <!-- ====================== MY LEAGUES (ADMIN) ====================== -->
             <div class="league-section" id="adminLeaguesSection">
-                <h2 class="section-title">Leagues I Admin</h2>
-                
-                @php
-                    $adminLeagues = $myLeagues->where('is_admin', true);
-                @endphp
+                <h2 class="section-title">My Leagues</h2>
                 
                 @if($adminLeagues->isNotEmpty())
                     @foreach($adminLeagues as $league)
@@ -983,19 +982,14 @@
                                 </div>
                                 <span class="league-status status-admin">Admin</span>
                             </div>
-                            
-                            <p class="league-description">
-                                {{ $league->description ?? 'No description provided.' }}
-                            </p>
-                            
+                            <p class="league-description">{{ $league->description ?? 'No description provided.' }}</p>
                             <p class="league-admin">
-                                <i class="fas fa-user-shield"></i> Admin: {{ Auth::user()->name }} • 
+                                <i class="fas fa-user-shield"></i> Admin: {{ Auth::user()->name }} •
                                 <i class="fas fa-calendar-alt"></i> Created: {{ $league->created_at->format('F j, Y') }}
                             </p>
-                            
                             <div class="league-details">
                                 <div class="league-detail">
-                                    <span class="detail-value">{{ $league->participants_count ?? 0 }}</span>
+                                    <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
                                     <span class="detail-label">Participants</span>
                                 </div>
                                 <div class="league-detail">
@@ -1007,13 +1001,9 @@
                                     <span class="detail-label">Your Rank</span>
                                 </div>
                             </div>
-                            
                             <div class="league-actions">
                                 <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">
                                     <i class="fas fa-chart-line"></i> Manage League
-                                </a>
-                                <a class="league-btn btn-secondary" href="{{ route('leagues.edit', $league->id) }}">
-                                    <i class="fas fa-edit"></i> Edit
                                 </a>
                                 <button type="button" class="league-btn btn-danger"
                                         onclick="deleteLeague({{ $league->id }}, '{{ addslashes($league->name) }}')">
@@ -1024,9 +1014,7 @@
                     @endforeach
                 @else
                     <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
+                        <div class="empty-icon"><i class="fas fa-trophy"></i></div>
                         <h3 class="empty-title">No Leagues Created</h3>
                         <p class="empty-text">
                             You haven't created any leagues yet. Create your first league to start competing with friends!
@@ -1038,17 +1026,13 @@
                 @endif
             </div>
 
-            <!-- Leagues where user is participant (not admin) -->
-            @php
-                $participantLeagues = $myLeagues->where('is_admin', false);
-            @endphp
-            
+            <!-- ====================== LEAGUES I'VE JOINED ====================== -->
             @if($participantLeagues->isNotEmpty())
                 <div class="league-section" id="joinedLeaguesSection">
                     <h2 class="section-title">Leagues I've Joined</h2>
                     @foreach($participantLeagues as $league)
                         <div class="league-card" data-league-name="{{ strtolower($league->name) }}" data-league-type="joined" data-league-privacy="{{ $league->privacy ?? 'private' }}">
-                            <div class="league-header">
+                           <div class="league-header">
                                 <div>
                                     <h3 class="league-name">{{ $league->name }}</h3>
                                     @if($league->privacy === 'private')
@@ -1057,14 +1041,11 @@
                                 </div>
                                 <span class="league-status status-joined">Joined</span>
                             </div>
-                            
                             <p class="league-description">{{ $league->description ?? 'No description provided' }}</p>
-                            
                             <p class="league-admin">
-                                <i class="fas fa-user-shield"></i> Admin: {{ $league->admin->name ?? 'Unknown' }} • 
+                                <i class="fas fa-user-shield"></i> Admin: {{ $league->admin->name ?? 'Unknown' }} •
                                 <i class="fas fa-calendar-alt"></i> Created: {{ $league->created_at->format('F j, Y') }}
                             </p>
-                            
                             <div class="league-details">
                                 <div class="league-detail">
                                     <span class="detail-value">{{ $league->participants_count ?? 1 }}</span>
@@ -1075,11 +1056,11 @@
                                     <span class="detail-label">Privacy</span>
                                 </div>
                                 <div class="league-detail">
-                                    <span class="detail-value">{{ $league->user_rank ?? '-' }}</span>
+                                    <!-- FIXED: now reads from pivot -->
+                                    <span class="detail-value">{{ $league->pivot->rank ?? '-' }}</span>
                                     <span class="detail-label">Your Rank</span>
                                 </div>
                             </div>
-                            
                             <div class="league-actions">
                                 <a class="league-btn btn-primary" href="{{ route('leagues.show', $league->id) }}">
                                     <i class="fas fa-chart-line"></i> View Standings
@@ -1096,7 +1077,6 @@
             <!-- Other Leagues Section -->
             <div class="league-section" id="otherLeaguesSection">
                 <h2 class="section-title">Other Leagues to Join</h2>
-                
                 @if($otherLeagues->count() > 0)
                     @foreach($otherLeagues as $league)
                         <div class="league-card" data-league-name="{{ strtolower($league->name) }}" data-league-type="other" data-league-privacy="{{ $league->privacy ?? 'public' }}">
@@ -1148,9 +1128,6 @@
                         </div>
                         <h3 class="empty-title">No Other Leagues Available</h3>
                         <p class="empty-text">There are no other public leagues available to join at the moment. Create your own league and invite friends!</p>
-                        <a href="{{ route('leagues.create') }}" class="create-league-btn">
-                            <i class="fas fa-plus"></i> Create a League
-                        </a>
                     </div>
                 @endif
             </div>
@@ -1260,24 +1237,21 @@
                 'Leave League',
                 `Are you sure you want to leave "${leagueName}"? You will lose all your progress in this league.`,
                 () => {
-                    // Create and submit form
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/leagues/${leagueId}/leave`;
-                    
+                    form.action = `{{ url('leagues') }}/${leagueId}/leave`;
+
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
                     csrfInput.name = '_token';
                     csrfInput.value = '{{ csrf_token() }}';
-                    
+
                     form.appendChild(csrfInput);
                     document.body.appendChild(form);
                     form.submit();
                 }
             );
-            currentLeagueId = leagueId;
         }
-
         function deleteLeague(leagueId, leagueName) {
             showModal(
                 'Delete League',
@@ -1285,25 +1259,25 @@
                 () => {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/leagues/${leagueId}`;
-                    
+                    // Use the exact resource route pattern
+                    form.action = `{{ url('leagues') }}/${leagueId}`;
+
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
                     csrfInput.name = '_token';
                     csrfInput.value = '{{ csrf_token() }}';
-                    
+
                     const methodInput = document.createElement('input');
                     methodInput.type = 'hidden';
                     methodInput.name = '_method';
                     methodInput.value = 'DELETE';
-                    
+
                     form.appendChild(csrfInput);
                     form.appendChild(methodInput);
                     document.body.appendChild(form);
                     form.submit();
                 }
             );
-            currentLeagueId = leagueId;
         }
 
         // Search and filter functionality

@@ -469,6 +469,57 @@
         .overlay.active {
             display: block;
         }
+
+        /* NEW: Profile Picture Upload Styles */
+        .avatar-upload {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 1rem;
+        }
+
+        .avatar-preview {
+            width: 140px;
+            height: 140px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 8px 25px rgba(58, 94, 229, 0.25);
+        }
+
+        .avatar-upload-label {
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            background: var(--primary);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(58, 94, 229, 0.4);
+            transition: all 0.3s;
+        }
+
+        .avatar-upload-label:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-upload input[type="file"] {
+            display: none;
+        }
+
+        .remove-avatar-btn {
+            margin-top: 8px;
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
         
         /* Responsive Design */
         @media (max-width: 992px) {
@@ -603,7 +654,12 @@
         </div>
 
         <div class="user-profile">
-            <div class="user-avatar">{{ substr($user->name, 0, 1) }}</div>
+            @if($user->profile_photo_path)
+                <img src="{{ asset('storage/' . $user->profile_photo_path) }}" 
+                     class="user-avatar" style="object-fit: cover;" alt="Avatar">
+            @else
+                <div class="user-avatar">{{ substr($user->name, 0, 1) }}</div>
+            @endif
             <div class="user-name">{{ $user->name }}</div>
         </div>
     </header>

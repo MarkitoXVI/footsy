@@ -159,57 +159,71 @@
         
         /* Hero Section */
         .hero {
-            position: relative;
-            padding: 6rem 0;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
             background: linear-gradient(135deg, var(--dark) 0%, var(--primary-dark) 100%);
             color: white;
+            position: relative;
             overflow: hidden;
         }
         
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 80%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(58, 94, 229, 0.3) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-        
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 60%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-        }
-        
         .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
         }
-        
+
         .hero h1 {
             font-family: 'Montserrat', sans-serif;
-            font-size: 3.5rem;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
+            font-size: 3.8rem;
+            line-height: 1.1;
             font-weight: 800;
+            margin-bottom: 1.5rem;
         }
-        
+
         .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
             opacity: 0.9;
         }
-        
+
         .hero-buttons {
             display: flex;
-            gap: 1rem;
+            justify-content: center;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline {
+            border: 2px solid rgba(255,255,255,0.6);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary-dark);
         }
         
         /* Features Section */
@@ -585,15 +599,15 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Section - Now Perfectly Centered -->
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>Build Your Ultimate Fantasy Football Team</h1>
+                <h1>Build Your Ultimate<br>Fantasy Football Team</h1>
                 <p>Join thousands of football fans managing their fantasy teams, competing with friends, and proving their managerial skills.</p>
                 <div class="hero-buttons">
                     <a href="{{ route('register') }}" class="btn btn-primary">Get Started</a>
-                    <a href="{{ route('how-it-works') }}" class="btn btn-outline">Learn More</a>
+                    <a href="#" class="btn btn-outline">Learn More</a>
                 </div>
             </div>
         </div>

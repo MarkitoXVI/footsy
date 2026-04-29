@@ -6,7 +6,7 @@ use App\Http\Controllers\FantasyTeamController;
 use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\PlayersController;
 use App\Http\Controllers\FixturesController;
-use App\Http\Controllers\TransfersController;
+use App\Http\Controllers\TransferController;
 use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\GoogleController;
@@ -123,8 +123,8 @@ Route::middleware('auth')->group(function () {
     
     // Transfer Routes
     Route::prefix('transfers')->group(function () {
-        Route::get('/transfers', [TransfersController::class, 'index'])->name('transfers.index');
-        Route::post('/transfers/{teamId}', [TransfersController::class, 'makeTransfer'])->name('transfers.make');
+        Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
+        Route::post('/transfers/confirm', [TransferController::class, 'confirm'])->name('transfers.confirm');
     });
 
     // Statistics routes

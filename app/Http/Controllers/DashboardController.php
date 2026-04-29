@@ -16,50 +16,57 @@ class DashboardController extends Controller
         $myTeamPlayers = collect();
 
         if ($fantasyTeam && $fantasyTeam->players) {
-            $playerIds = is_string($fantasyTeam->players) 
-                ? json_decode($fantasyTeam->players, true) 
-                : $fantasyTeam->players;
+            $playerIds = $fantasyTeam->players;
 
-            if (!empty($playerIds)) {
-                $bootstrap = Http::timeout(15)
-                    ->get('https://fantasy.premierleague.com/api/bootstrap-static/')
-                    ->json();
+            // Handle both string (JSON) and array
+            if (is_string($playerIds)) {
+                $playerIds = json_decode($playerIds, true);
+            }
 
-                $elements = collect($bootstrap['elements'] ?? []);
-                $teamsData = collect($bootstrap['teams'] ?? [])->keyBy('id');
+            if (!empty($playerIds) && is_array($playerIds)) {
+                try {
+                    $bootstrap = Http::timeout(20)
+                        ->get('https://fantasy.premierleague.com/api/bootstrap-static/')
+                        ->json();
 
-                $myTeamPlayers = $elements
-                    ->whereIn('id', $playerIds)
-                    ->map(function ($p) use ($teamsData) {
-                        $team = $teamsData[$p['team']] ?? null;
+                    $elements = collect($bootstrap['elements'] ?? []);
+                    $teamsData = collect($bootstrap['teams'] ?? [])->keyBy('id');
 
-                        return (object)[
-                            'web_name'     => $p['web_name'],
-                            'team'         => (object)[
-                                'short_name' => $team['short_name'] ?? 'UNK',
-                            ],
-                            'price'        => $p['now_cost'] / 10,
-                            'event_points' => $p['event_points'] ?? 0,
-                        ];
-                    })
-                    ->values();
+                    $myTeamPlayers = $elements
+                        ->whereIn('id', $playerIds)
+                        ->map(function ($p) use ($teamsData) {
+                            $team = $teamsData[$p['team']] ?? null;
+
+                            return (object)[
+                                'name'         => $p['web_name'] ?? 'Unknown Player',
+                                'team'         => (object)[
+                                    'short_name' => $team['short_name'] ?? 'UNK',
+                                ],
+                                'price'        => number_format($p['now_cost'] / 10, 1),
+                                'points'       => $p['event_points'] ?? 0,
+                            ];
+                        })
+                        ->values();
+                } catch (\Exception $e) {
+                    $myTeamPlayers = collect();
+                }
             }
         }
 
-        // ====================== GW POINTS (Gameweek Points) ======================
-        $gwPoints = $myTeamPlayers->sum('event_points');
+        // ====================== GW POINTS ======================
+        $gwPoints = $myTeamPlayers->sum('points');
 
         // ====================== USER STATS ======================
         $userStats = [
             'has_team'       => (bool) $fantasyTeam,
             'total_points'   => $fantasyTeam?->total_points ?? 0,
-            'gw_points'      => $gwPoints,                    // ← Used in Dashboard
+            'gw_points'      => $gwPoints,
             'global_rank'    => $fantasyTeam?->global_rank ?? 'N/A',
-            'leagues_joined' => $fantasyTeam?->leagues?->count() ?? 3,
+            'leagues_joined' => $user->leagues()->count(),
             'free_transfers' => $fantasyTeam?->free_transfers ?? 2,
         ];
 
-        // ====================== TOP GAMES (Sample for now) ======================
+        // ====================== TOP GAMES ======================
         $topGames = collect([
             (object) [
                 'home_team' => (object)['name' => 'Brentford', 'short_name' => 'BRE'],
@@ -84,11 +91,45 @@ class DashboardController extends Controller
             ],
         ]);
 
+        // ====================== LEAGUE STANDINGS ======================
+        $leagueStandings = $this->getLeagueStandings($user);
+
         return view('dashboard', compact(
             'fantasyTeam',
             'myTeamPlayers',
             'topGames',
-            'userStats'
+            'userStats',
+            'leagueStandings'
         ));
+    }
+
+    /**
+     * Get League Standings for Dashboard
+     */
+    private function getLeagueStandings($user)
+    {
+        $league = $user->leagues()->first();
+
+        if (!$league) {
+            return collect();
+        }
+
+        return $league->users()
+            ->with('fantasyTeam')
+            ->get()
+            ->sortByDesc(function ($u) {
+                return $u->fantasyTeam?->total_points ?? 0;
+            })
+            ->take(5)
+            ->values()
+            ->map(function ($u, $index) {
+                return (object) [
+                    'user_id'      => $u->id,
+                    'team_name'    => $u->fantasyTeam?->name ?? 'Unnamed Team',
+                    'user_name'    => $u->name,
+                    'total_points' => $u->fantasyTeam?->total_points ?? 0,
+                    'rank'         => $index + 1,
+                ];
+            });
     }
 }

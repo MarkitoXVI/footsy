@@ -1,31 +1,78 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class RegistrationTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    public function test_registration_screen_can_be_rendered(): void
-    {
-        $response = $this->get('/register');
+test('registration page is accessible', function () {
+    $response = $this->get(route('register'));
 
-        $response->assertStatus(200);
-    }
+    $response->assertStatus(200);
+    $response->assertSee('Register');   // Change text if your register page has different wording
+});
 
-    public function test_new_users_can_register(): void
-    {
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+test('user can register with valid data', function () {
+    $response = $this->post(route('register'), [
+        'name'                  => 'John Doe',
+        'email'                 => 'john@example.com',
+        'password'              => 'Password123!',
+        'password_confirmation' => 'Password123!',
+    ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
-    }
-}
+    $response->assertRedirect(route('dashboard')); // Change if your redirect is different
+
+    $this->assertDatabaseHas('users', [
+        'name'  => 'John Doe',
+        'email' => 'john@example.com',
+    ]);
+
+    $this->assertAuthenticated();
+});
+
+test('user cannot register with invalid data', function () {
+    $response = $this->post(route('register'), [
+        'name'                  => '',
+        'email'                 => 'invalid-email',
+        'password'              => '123',
+        'password_confirmation' => '456',
+    ]);
+
+    $response->assertSessionHasErrors(['name', 'email', 'password']);
+    $this->assertGuest();
+});
+
+test('email must be unique', function () {
+    User::factory()->create(['email' => 'existing@example.com']);
+
+    $response = $this->post(route('register'), [
+        'name'                  => 'Jane Doe',
+        'email'                 => 'existing@example.com',
+        'password'              => 'Password123!',
+        'password_confirmation' => 'Password123!',
+    ]);
+
+    $response->assertSessionHasErrors('email');
+});
+
+test('password must be confirmed', function () {
+    $response = $this->post(route('register'), [
+        'name'                  => 'Test User',
+        'email'                 => 'testexample.com',
+        'password'              => 'Password123!',
+        'password_confirmation' => 'WrongPass123!',
+    ]);
+
+    $response->assertSessionHasErrors('password');
+});
+
+test('password must be at least 8 characters', function () {
+    $response = $this->post(route('register'), [
+        'name'                  => 'Test User',
+        'email'                 => 'test@example.com',
+        'password'              => 'short',
+        'password_confirmation' => 'short',
+    ]);
+
+    $response->assertSessionHasErrors('password');
+});

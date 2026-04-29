@@ -20,16 +20,21 @@ class FantasyTeam extends Model
         'players' => 'array',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function getPlayersCollectionAttribute()
     {
         return collect($this->players ?? []);
     }
 
     public function players()
-{
-    return $this->belongsToMany(Player::class, 'fantasy_team_player')
-        ->withPivot(['is_starter', 'position'])
-        ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Player::class, 'fantasy_team_player')
+            ->withPivot(['is_starter', 'position'])
+            ->withTimestamps();
+    }
 
 }

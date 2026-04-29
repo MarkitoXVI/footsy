@@ -975,34 +975,37 @@
                 <div class="left-column">
                     @if($userStats['has_team'])
                         <!-- My Team Card -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">My Team</h3>
-                                <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
-                            </div>
-                            
-                            <ul class="player-list">
-                                @forelse($myTeamPlayers as $player)
-                                    <li class="player-item">
-                                        <div class="player-avatar">
-                                            {{ strtoupper(substr($player->name, 0, 2)) }}
-                                        </div>
-                                        <div class="player-info">
-                                            <div class="player-name">{{ $player->name }}</div>
-                                            <div class="player-details">
-                                                <span>{{ $player->team->short_name ?? ($player->team->name ?? 'N/A') }}</span>
-                                                <span>£{{ $player->price }}m</span>
-                                            </div>
-                                        </div>
-                                        <div class="player-points">{{ $player->points }} pts</div>
-                                    </li>
-                                @empty
-                                    <li class="player-item">
-                                        <div class="player-info">No players found.</div>
-                                    </li>
-                                @endforelse
-                            </ul>
-                        </div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">My Team</h3>
+        <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
+    </div>
+    
+    <ul class="player-list">
+        @forelse($myTeamPlayers as $player)
+            <li class="player-item">
+                <div class="player-avatar">
+                    {{ strtoupper(substr($player->name, 0, 2)) }}
+                </div>
+                <div class="player-info">
+                    <div class="player-name">{{ $player->name }}</div>
+                    <div class="player-details">
+                        <span>{{ $player->team->short_name ?? 'N/A' }}</span>
+                        <span>£{{ $player->price }}m</span>
+                    </div>
+                </div>
+                <div class="player-points">{{ $player->points }} pts</div>
+            </li>
+        @empty
+            <li class="player-item">
+                <div class="player-info">
+                    No players found.<br>
+                    <small>Go to "Manage Team" to add players.</small>
+                </div>
+            </li>
+        @endforelse
+    </ul>
+</div>
                     @else
                         <!-- Prompt to create a team -->
                         <div class="card" style="text-align: center; padding: 2rem;">
@@ -1083,62 +1086,44 @@
                     @endif
                 </div>
                 
-                <!-- Right Column -->
-                <div class="right-column">
-                    <!-- League Standings Card -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">League Standings</h3>
-                            <a href="{{ route('leagues.index') }}" class="view-all">View All</a>
-                        </div>
-                        
-                        <ul class="player-list">
-                            <li class="player-item">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: white;">1</div>
-                                <div class="player-info">
-                                    <div class="player-name">Red Devils FC</div>
-                                    <div class="player-details">
-                                        <span>James Wilson</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">268</div>
-                            </li>
-                            
-                            <li class="player-item">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: white;">2</div>
-                                <div class="player-info">
-                                    <div class="player-name">Blue Warriors</div>
-                                    <div class="player-details">
-                                        <span>Sarah Johnson</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">247</div>
-                            </li>
-                            
-                            <li class="player-item">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #CD7F32, #A66C2A); color: white;">3</div>
-                                <div class="player-info">
-                                    <div class="player-name">Cityzens</div>
-                                    <div class="player-details">
-                                        <span>Michael Brown</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">232</div>
-                            </li>
-                            
-                            <li class="player-item" style="background: rgba(58, 94, 229, 0.08); border-radius: 12px; margin: 0 -0.75rem; padding: 1rem 0.75rem;">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;">124</div>
-                                <div class="player-info">
-                                    <div class="player-name">{{ Auth::user()->name }}</div>
-                                    <div class="player-details">
-                                        <span>Your Team</span>
-                                    </div>
-                                </div>
-                                <div class="player-points">{{ $userStats['total_points'] ?? 0 }}</div>
-                            </li>
-                        </ul>
+                <!-- Right Column - League Standings -->
+<div class="right-column">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">League Standings</h3>
+            <a href="{{ route('leagues.index') }}" class="view-all">View All</a>
+        </div>
+        
+        <ul class="player-list">
+            @forelse($leagueStandings as $standing)
+                <li class="player-item {{ $standing->user_id === Auth::id() ? 'highlight' : '' }}">
+                    <div class="player-avatar" 
+                         style="background: {{ $loop->index < 3 
+                            ? 'linear-gradient(135deg, #FFD700, #FFA500)' 
+                            : 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}; color: white;">
+                        {{ $standing->rank ?? $loop->iteration }}
                     </div>
-                </div>
+                    <div class="player-info">
+                        <div class="player-name">{{ $standing->team_name }}</div>
+                        <div class="player-details">
+                            <span>{{ $standing->user_name }}</span>
+                        </div>
+                    </div>
+                    <div class="player-points">{{ $standing->total_points }}</div>
+                </li>
+            @empty
+                <li class="player-item">
+                    <div class="player-info">
+                        <p>No league data available yet.</p>
+                        <a href="{{ route('leagues.create') }}" class="btn" style="margin-top: 10px; font-size: 0.9rem;">
+                            Create a League
+                        </a>
+                    </div>
+                </li>
+            @endforelse
+        </ul>
+    </div>
+</div>
             </div>
         </div>
     </div>

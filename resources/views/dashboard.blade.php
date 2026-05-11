@@ -536,6 +536,11 @@
             font-size: 1rem;
         }
         
+        .player-avatar.highlight {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
         .player-info {
             flex: 1;
         }
@@ -603,6 +608,7 @@
             align-items: center;
             gap: 0.5rem;
             min-width: 0;
+            flex: 1;
         }
         
         .team-right {
@@ -611,23 +617,22 @@
         }
         
         .team-logo {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: rgba(58, 94, 229, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--primary);
             font-size: 0.8rem;
+            flex-shrink: 0;
         }
         
         .team-name {
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 0.95rem;
         }
         
         .fixture-meta {
@@ -647,14 +652,43 @@
         }
         
         .fixture-meta .venue {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         
         .scoreline {
             font-family: 'Montserrat', sans-serif;
             font-weight: 700;
             color: var(--primary);
-            margin-top: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .status-finished {
+            background: rgba(52, 199, 89, 0.15);
+            color: var(--secondary);
+        }
+        
+        .status-live {
+            background: rgba(229, 62, 62, 0.15);
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .status-upcoming {
+            background: rgba(108, 117, 125, 0.15);
+            color: var(--gray);
         }
         
         .scorers-row {
@@ -670,7 +704,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--gray);
         }
         
@@ -680,6 +714,24 @@
         
         .scorers-away {
             text-align: right;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: var(--primary);
+        }
+        
+        .empty-state p {
+            margin-bottom: 1rem;
         }
         
         /* Button styles */
@@ -700,6 +752,13 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(58, 94, 229, 0.4);
+        }
+        
+        .highlight {
+            background: rgba(58, 94, 229, 0.08);
+            border-radius: 8px;
+            margin: 0 -0.75rem;
+            padding: 1rem 0.75rem !important;
         }
         
         /* Overlay for mobile */
@@ -745,6 +804,24 @@
             .user-info {
                 display: none;
             }
+            
+            .fixture-teams {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .team-side {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .team-right {
+                justify-content: center;
+            }
+            
+            .fixture-meta {
+                min-width: auto;
+            }
         }
         
         @media (max-width: 576px) {
@@ -771,15 +848,6 @@
             
             .dashboard-stats {
                 grid-template-columns: 1fr;
-            }
-            
-            .fixture-teams {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            
-            .fixture-meta {
-                min-width: auto;
             }
         }
         
@@ -837,12 +905,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('transfers.index') }}" class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transfers</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link {{ request()->routeIs('fixtures.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Fixtures</span>
@@ -894,12 +956,13 @@
                 </div>
                 
                 <div class="user-profile">
-@if(Auth::user()->profile_photo_path)
-    <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
-         class="user-avatar" style="object-fit: cover;" alt="Avatar">
-@else
-    <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
-@endif                    <div class="user-info">
+                    @if(Auth::user()->profile_photo_path)
+                        <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" 
+                             class="user-avatar" style="object-fit: cover;" alt="Avatar">
+                    @else
+                        <div class="user-avatar">{{ substr(Auth::user()->name, 0, 1) }}</div>
+                    @endif
+                    <div class="user-info">
                         <div class="user-name">{{ Auth::user()->name }}</div>
                         <div class="user-role">Team Manager</div>
                     </div>
@@ -975,37 +1038,37 @@
                 <div class="left-column">
                     @if($userStats['has_team'])
                         <!-- My Team Card -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">My Team</h3>
-        <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
-    </div>
-    
-    <ul class="player-list">
-        @forelse($myTeamPlayers as $player)
-            <li class="player-item">
-                <div class="player-avatar">
-                    {{ strtoupper(substr($player->name, 0, 2)) }}
-                </div>
-                <div class="player-info">
-                    <div class="player-name">{{ $player->name }}</div>
-                    <div class="player-details">
-                        <span>{{ $player->team->short_name ?? 'N/A' }}</span>
-                        <span>£{{ $player->price }}m</span>
-                    </div>
-                </div>
-                <div class="player-points">{{ $player->points }} pts</div>
-            </li>
-        @empty
-            <li class="player-item">
-                <div class="player-info">
-                    No players found.<br>
-                    <small>Go to "Manage Team" to add players.</small>
-                </div>
-            </li>
-        @endforelse
-    </ul>
-</div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">My Team</h3>
+                                <a href="{{ route('fantasy-team.index') }}" class="view-all">Manage Team</a>
+                            </div>
+                            
+                            <ul class="player-list">
+                                @forelse($myTeamPlayers as $player)
+                                    <li class="player-item">
+                                        <div class="player-avatar">
+                                            {{ strtoupper(substr($player->name, 0, 2)) }}
+                                        </div>
+                                        <div class="player-info">
+                                            <div class="player-name">{{ $player->name }}</div>
+                                            <div class="player-details">
+                                                <span>{{ $player->team->short_name ?? 'N/A' }}</span>
+                                                <span>£{{ $player->price }}m</span>
+                                            </div>
+                                        </div>
+                                        <div class="player-points">{{ $player->points }} pts</div>
+                                    </li>
+                                @empty
+                                    <li class="player-item">
+                                        <div class="player-info">
+                                            <p>No players found.</p>
+                                            <small>Go to "Manage Team" to add players.</small>
+                                        </div>
+                                    </li>
+                                @endforelse
+                            </ul>
+                        </div>
                     @else
                         <!-- Prompt to create a team -->
                         <div class="card" style="text-align: center; padding: 2rem;">
@@ -1018,31 +1081,35 @@
                     @endif
 
                     <!-- Upcoming Fixtures Section -->
-                    @if(isset($topGames) && count($topGames) > 0)
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Top Games</h3>
-                                <a href="{{ route('fixtures.index') }}" class="view-all">View All</a>
-                            </div>
-                            
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Top Games</h3>
+                            <a href="{{ route('fixtures.index') }}" class="view-all">View All</a>
+                        </div>
+                        
+                        @if(isset($topGames) && $topGames->count() > 0)
                             <ul class="fixture-preview-list">
                                 @foreach($topGames as $fixture)
                                     <li class="fixture-preview-item">
-                                        <a href="{{ isset($fixture->id) ? route('fixtures.show', $fixture->id) : route('fixtures.index') }}" class="fixture-link">
+                                        <a href="{{ route('fixtures.index') }}" class="fixture-link">
                                             <div class="fixture-teams">
                                                 <div class="team-side">
                                                     <div class="team-logo">
-                                                        {{ isset($fixture->homeTeam) ? substr($fixture->homeTeam->short_name, 0, 3) : (isset($fixture->home_team) ? substr($fixture->home_team->short_name, 0, 3) : 'HOM') }}
+                                                        {{ $fixture->homeTeam->short_name ?? $fixture->home_team->short_name ?? substr($fixture->homeTeam->name ?? $fixture->home_team->name ?? 'Home', 0, 3) }}
                                                     </div>
                                                     <div class="team-name">
-                                                        {{ isset($fixture->homeTeam) ? $fixture->homeTeam->name : (isset($fixture->home_team) ? $fixture->home_team->name : 'Home Team') }}
+                                                        {{ $fixture->homeTeam->name ?? $fixture->home_team->name ?? 'Home Team' }}
                                                     </div>
                                                 </div>
+                                                
                                                 <div class="fixture-meta">
-                                                    @if(isset($fixture->score_home) && isset($fixture->score_away))
-                                                        <div class="scoreline">{{ $fixture->score_home }} - {{ $fixture->score_away }}</div>
-                                                    @endif
-                                                    @if(!empty($fixture->kickoff_time ?? null))
+                                                    @if($fixture->finished)
+                                                        <div class="scoreline">{{ $fixture->home_score }} - {{ $fixture->away_score }}</div>
+                                                        <span class="status-badge status-finished">Finished</span>
+                                                    @elseif($fixture->started)
+                                                        <div class="scoreline">{{ $fixture->home_score }} - {{ $fixture->away_score }}</div>
+                                                        <span class="status-badge status-live">LIVE</span>
+                                                    @else
                                                         <div class="kickoff">
                                                             @if($fixture->kickoff_time instanceof \Carbon\Carbon)
                                                                 {{ $fixture->kickoff_time->format('D, M j • g:i A') }}
@@ -1050,31 +1117,20 @@
                                                                 {{ \Carbon\Carbon::parse($fixture->kickoff_time)->format('D, M j • g:i A') }}
                                                             @endif
                                                         </div>
+                                                        <span class="status-badge status-upcoming">Upcoming</span>
                                                     @endif
-                                                    @if(!empty($fixture->stadium ?? ''))
+                                                    
+                                                    @if(!empty($fixture->stadium))
                                                         <div class="venue">{{ $fixture->stadium }}</div>
                                                     @endif
-                                                    @if(isset($fixture->scorers_home) || isset($fixture->scorers_away))
-                                                        <div class="scorers-row">
-                                                            <ul class="scorers-list scorers-home">
-                                                                @foreach(($fixture->scorers_home ?? []) as $sh)
-                                                                    <li>{{ $sh }}</li>
-                                                                @endforeach
-                                                            </ul>
-                                                            <ul class="scorers-list scorers-away">
-                                                                @foreach(($fixture->scorers_away ?? []) as $sa)
-                                                                    <li>{{ $sa }}</li>
-                                                                @endforeach
-                                                            </ul>
-                                                        </div>
-                                                    @endif
                                                 </div>
+                                                
                                                 <div class="team-side team-right">
                                                     <div class="team-name">
-                                                        {{ isset($fixture->awayTeam) ? $fixture->awayTeam->name : (isset($fixture->away_team) ? $fixture->away_team->name : 'Away Team') }}
+                                                        {{ $fixture->awayTeam->name ?? $fixture->away_team->name ?? 'Away Team' }}
                                                     </div>
                                                     <div class="team-logo">
-                                                        {{ isset($fixture->awayTeam) ? substr($fixture->awayTeam->short_name, 0, 3) : (isset($fixture->away_team) ? substr($fixture->away_team->short_name, 0, 3) : 'AWY') }}
+                                                        {{ $fixture->awayTeam->short_name ?? $fixture->away_team->short_name ?? substr($fixture->awayTeam->name ?? $fixture->away_team->name ?? 'Away', 0, 3) }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1082,48 +1138,55 @@
                                     </li>
                                 @endforeach
                             </ul>
-                        </div>
-                    @endif
+                        @else
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>No fixtures available at the moment.</p>
+                                <p class="small-text">Check back later for upcoming matches.</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
                 
                 <!-- Right Column - League Standings -->
-<div class="right-column">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">League Standings</h3>
-            <a href="{{ route('leagues.index') }}" class="view-all">View All</a>
-        </div>
-        
-        <ul class="player-list">
-            @forelse($leagueStandings as $standing)
-                <li class="player-item {{ $standing->user_id === Auth::id() ? 'highlight' : '' }}">
-                    <div class="player-avatar" 
-                         style="background: {{ $loop->index < 3 
-                            ? 'linear-gradient(135deg, #FFD700, #FFA500)' 
-                            : 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}; color: white;">
-                        {{ $standing->rank ?? $loop->iteration }}
-                    </div>
-                    <div class="player-info">
-                        <div class="player-name">{{ $standing->team_name }}</div>
-                        <div class="player-details">
-                            <span>{{ $standing->user_name }}</span>
+                <div class="right-column">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">World Leaders</h3>
+                            <a href="{{ route('leagues.index') }}" class="view-all">View All</a>
                         </div>
+                        
+                        @if(isset($leagueStandings) && count($leagueStandings) > 0)
+                            <ul class="player-list">
+                                @foreach($leagueStandings as $standing)
+                                    <li class="player-item {{ isset($standing->user_id) && $standing->user_id === Auth::id() ? 'highlight' : '' }}">
+                                        <div class="player-avatar" 
+                                             style="background: {{ $loop->index < 3 
+                                                ? 'linear-gradient(135deg, #FFD700, #FFA500)' 
+                                                : 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}; color: white;">
+                                            {{ $standing->rank ?? $loop->iteration }}
+                                        </div>
+                                        <div class="player-info">
+                                            <div class="player-name">{{ $standing->team_name ?? 'Team Name' }}</div>
+                                            <div class="player-details">
+                                                <span>{{ $standing->user_name ?? $standing->name ?? 'Manager' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="player-points">{{ $standing->total_points ?? 0 }}</div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <div class="empty-state">
+                                <i class="fas fa-trophy"></i>
+                                <p>No league data available yet.</p>
+                                <a href="{{ route('leagues.create') }}" class="btn" style="margin-top: 1rem; font-size: 0.9rem;">
+                                    Create a League
+                                </a>
+                            </div>
+                        @endif
                     </div>
-                    <div class="player-points">{{ $standing->total_points }}</div>
-                </li>
-            @empty
-                <li class="player-item">
-                    <div class="player-info">
-                        <p>No league data available yet.</p>
-                        <a href="{{ route('leagues.create') }}" class="btn" style="margin-top: 10px; font-size: 0.9rem;">
-                            Create a League
-                        </a>
-                    </div>
-                </li>
-            @endforelse
-        </ul>
-    </div>
-</div>
+                </div>
             </div>
         </div>
     </div>
@@ -1136,11 +1199,9 @@
             const overlay = document.getElementById('overlay');
             
             if (window.innerWidth <= 768) {
-                // Mobile behavior
                 sidebar.classList.toggle('mobile-open');
                 overlay.classList.toggle('active');
             } else {
-                // Desktop behavior - collapse/expand
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
             }
@@ -1149,7 +1210,6 @@
         function closeMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
-            
             sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
         }

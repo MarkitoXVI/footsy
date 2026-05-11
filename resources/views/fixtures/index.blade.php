@@ -836,12 +836,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('transfers.index') }}" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transfers</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link active">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Fixtures</span>
@@ -929,11 +923,6 @@
                     <div class="calendar-day-header">Sat</div>
                 </div>
             </div>
-
-            <!-- Fixtures Display -->
-            <div id="fixtures-display">
-                <!-- Fixtures will be displayed here based on selected date -->
-            </div>
         </div>
     </div>
 
@@ -945,6 +934,19 @@
             <div id="modalBody" class="modal-body"></div>
         </div>
     </div>
+
+    <!-- Day Fixtures Modal -->
+<div id="dayFixturesModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 700px;">
+        <button class="close-modal">&times;</button>
+
+        <h2 class="modal-title" id="dayFixturesTitle">
+            Fixtures
+        </h2>
+
+        <div id="dayFixturesBody"></div>
+    </div>
+</div>
 
     <script>
         // Sidebar toggle functionality
@@ -1057,111 +1059,154 @@
             }
 
             function displayFixtures(dateString) {
-                const fixturesDisplay = document.getElementById('fixtures-display');
-                const fixtures = fixturesData[dateString] || [];
+    const fixtures = fixturesData[dateString] || [];
+    const fixturesDisplay = document.getElementById('fixtures-display');
+    
+    // Make sure the fixtures display div exists - add it to your HTML if missing
+    if (!fixturesDisplay) {
+        // Create it if it doesn't exist
+        const fixturesContent = document.querySelector('.fixtures-content');
+        const container = document.createElement('div');
+        container.id = 'fixtures-display';
+        fixturesContent.appendChild(container);
+    }
 
-                if (fixtures.length === 0) {
-                    fixturesDisplay.innerHTML = `
-                        <div class="date-card">
-                            <div class="date-header">
-                                <div class="date-title">${new Date(dateString).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-                            </div>
-                            <div class="no-fixtures">
-                                <i class="fas fa-calendar-times"></i>
-                                <h3>No Fixtures</h3>
-                                <p>No Premier League matches on this date.</p>
-                            </div>
-                        </div>`;
-                    return;
-                }
+    const formattedDate = new Date(dateString).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 
-                const formattedDate = new Date(dateString).toLocaleDateString('en-US', {
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                });
+    if (fixtures.length === 0) {
+        document.getElementById('fixtures-display').innerHTML = `
+            <div class="date-card">
+                <div class="date-header">
+                    <div class="date-title">${formattedDate}</div>
+                </div>
+                <div class="no-fixtures">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>No Fixtures</h3>
+                    <p>No Premier League matches on this date.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
 
-                let html = `
-                    <div class="date-card">
-                        <div class="date-header">
-                            <div class="date-title">${formattedDate}</div>
-                        </div>
-                        <ul class="fixtures-list">
-                `;
+    let html = `
+        <div class="date-card">
+            <div class="date-header">
+                <div class="date-title">${formattedDate}</div>
+            </div>
+            <ul class="fixtures-list">
+    `;
 
-                fixtures.forEach(fixture => {
-                    const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
-                    
-                    html += `
-                        <li class="fixture-item" data-fixture='${JSON.stringify(fixture)}'>
-                            <div class="teams">
-                                <div class="home-team">
-                                    <div class="team-logo">${fixture.home_short}</div>
-                                    <div class="team-name">${fixture.home_team}</div>
-                                </div>
-                                <div class="vs">${score}</div>
-                                <div class="away-team">
-                                    <div class="team-name">${fixture.away_team}</div>
-                                    <div class="team-logo">${fixture.away_short}</div>
-                                </div>
-                            </div>
-                            <div class="fixture-details">
-                                <div class="fixture-time">${new Date(fixture.kickoff_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                                <div class="fixture-venue">Matchweek ${fixture.event ?? '-'}</div>
-                            </div>
-                        </li>
-                    `;
-                });
+    fixtures.forEach(fixture => {
+        const score = fixture.finished
+            ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}`
+            : 'vs';
 
-                html += `</ul></div>`;
-                fixturesDisplay.innerHTML = html;
+        const kickoffTime = fixture.kickoff_time 
+            ? new Date(fixture.kickoff_time).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'TBD';
 
-                // Attach click listeners
-                document.querySelectorAll('.fixture-item').forEach(item => {
-                    item.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const fixture = JSON.parse(this.getAttribute('data-fixture'));
+        html += `
+            <li class="fixture-item" data-fixture='${JSON.stringify(fixture)}'>
+                <div class="teams">
+                    <div class="home-team">
+                        <div class="team-logo">${fixture.home_short}</div>
+                        <div class="team-name">${fixture.home_team}</div>
+                    </div>
+                    <div class="vs">${score}</div>
+                    <div class="away-team">
+                        <div class="team-name">${fixture.away_team}</div>
+                        <div class="team-logo">${fixture.away_short}</div>
+                    </div>
+                </div>
+                <div class="fixture-details">
+                    <div class="fixture-time">${kickoffTime}</div>
+                    <div class="fixture-venue">Matchweek ${fixture.event ?? '-'}</div>
+                </div>
+            </li>
+        `;
+    });
 
-                        const score = fixture.finished ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}` : 'vs';
-                        const kickoff = new Date(fixture.kickoff_time).toLocaleString([], {
-                            weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                        });
-                        const status = fixture.finished ? 'Finished' : 'Scheduled';
+    html += `
+            </ul>
+        </div>
+    `;
 
-                        let goalsHTML = '';
-                        if (fixture.goals && fixture.goals.length > 0) {
-                            goalsHTML = `<h4 style="margin-top: 1rem; color: var(--primary);">Goalscorers</h4><ul class="scorers-list">`;
-                            fixture.goals.forEach(g => {
-                                goalsHTML += `<li>${g.player} (${g.minute}') ${g.team ? `(${g.team})` : ''}</li>`;
-                            });
-                            goalsHTML += `</ul>`;
-                        } else if (fixture.finished) {
-                            goalsHTML = `<p style="margin-top: 1rem;"><em>No goalscorers recorded.</em></p>`;
-                        }
+    document.getElementById('fixtures-display').innerHTML = html;
 
-                        document.getElementById('modalBody').innerHTML = `
-                            <div class="teams">
-                                <div class="team">
-                                    <div class="team-logo" style="margin: 0 auto;">${fixture.home_short}</div>
-                                    <div class="team-name">${fixture.home_team}</div>
-                                </div>
-                                <div class="score">${score}</div>
-                                <div class="team">
-                                    <div class="team-logo" style="margin: 0 auto;">${fixture.away_short}</div>
-                                    <div class="team-name">${fixture.away_team}</div>
-                                </div>
-                            </div>
-                            <div class="info">
-                                <p><strong>Status:</strong> ${status}</p>
-                                <p><strong>Kick-off:</strong> ${kickoff}</p>
-                                <p><strong>Venue:</strong> ${fixture.venue || 'Unknown Stadium'}</p>
-                                <p><strong>Matchweek:</strong> ${fixture.event ?? '-'}</p>
-                                ${goalsHTML}
-                            </div>
-                        `;
+    // Add click listeners to open match modal
+    document.querySelectorAll('#fixtures-display .fixture-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const fixture = JSON.parse(this.getAttribute('data-fixture'));
+            openMatchModal(fixture);
+        });
+    });
+}
 
-                        document.getElementById('matchModal').classList.add('active');
-                    });
-                });
-            }
+function openMatchModal(fixture) {
+    const score = fixture.finished
+        ? `${fixture.home_score ?? 0} - ${fixture.away_score ?? 0}`
+        : 'vs';
+
+    const kickoff = fixture.kickoff_time 
+        ? new Date(fixture.kickoff_time).toLocaleString([], {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : 'Date TBD';
+
+    const status = fixture.finished ? 'Finished' : 'Scheduled';
+
+    let goalsHTML = '';
+
+    if (fixture.goals && fixture.goals.length > 0) {
+        goalsHTML = `
+            <h4 style="margin-top: 1rem; color: var(--primary);">Goalscorers</h4>
+            <ul class="scorers-list">
+        `;
+        fixture.goals.forEach(g => {
+            goalsHTML += `<li>${g.player} (${g.minute}') ${g.team ? `(${g.team})` : ''}</li>`;
+        });
+        goalsHTML += `</ul>`;
+    } else if (fixture.finished) {
+        goalsHTML = `<p style="margin-top:1rem;"><em>No goalscorers recorded.</em></p>`;
+    }
+
+    document.getElementById('modalBody').innerHTML = `
+        <div class="teams">
+            <div class="team">
+                <div class="team-logo" style="margin:0 auto;">${fixture.home_short}</div>
+                <div class="team-name">${fixture.home_team}</div>
+            </div>
+            <div class="score">${score}</div>
+            <div class="team">
+                <div class="team-logo" style="margin:0 auto;">${fixture.away_short}</div>
+                <div class="team-name">${fixture.away_team}</div>
+            </div>
+        </div>
+        <div class="info">
+            <p><strong>Status:</strong> ${status}</p>
+            <p><strong>Kick-off:</strong> ${kickoff}</p>
+            <p><strong>Venue:</strong> ${fixture.venue || 'Unknown Stadium'}</p>
+            <p><strong>Matchweek:</strong> ${fixture.event ?? '-'}</p>
+            ${goalsHTML}
+        </div>
+    `;
+
+    document.getElementById('matchModal').classList.add('active');
+}
 
             // Navigation buttons
             document.getElementById('prev-month').addEventListener('click', () => {
@@ -1184,19 +1229,39 @@
             updateCalendar();
         });
 
-        // Modal close handlers
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('matchModal');
-            if (e.target.classList.contains('close-modal') || e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
+        // Close modals properly
+document.addEventListener('click', function(e) {
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('matchModal').classList.remove('active');
-            }
-        });
+    const matchModal = document.getElementById('matchModal');
+
+    // Close button
+    if (e.target.classList.contains('close-modal')) {
+
+        e.target.closest('.modal-overlay').classList.remove('active');
+    }
+
+    // Click outside modal content
+    if (e.target === matchModal) {
+        matchModal.classList.remove('active');
+    }
+
+    if (e.target === dayModal) {
+        dayModal.classList.remove('active');
+    }
+});
+
+// ESC closes both
+document.addEventListener('keydown', function(e) {
+
+    if (e.key === 'Escape') {
+
+        document.getElementById('matchModal')
+            .classList.remove('active');
+
+        document.getElementById('dayFixturesModal')
+            .classList.remove('active');
+    }
+});
     </script>
 </body>
 </html>

@@ -18,7 +18,6 @@ class DashboardController extends Controller
         if ($fantasyTeam && $fantasyTeam->players) {
             $playerIds = $fantasyTeam->players;
 
-            // Handle both string (JSON) and array
             if (is_string($playerIds)) {
                 $playerIds = json_decode($playerIds, true);
             }
@@ -26,6 +25,7 @@ class DashboardController extends Controller
             if (!empty($playerIds) && is_array($playerIds)) {
                 try {
                     $bootstrap = Http::timeout(20)
+                        ->withHeaders(['User-Agent' => 'Mozilla/5.0'])
                         ->get('https://fantasy.premierleague.com/api/bootstrap-static/')
                         ->json();
 
@@ -36,14 +36,13 @@ class DashboardController extends Controller
                         ->whereIn('id', $playerIds)
                         ->map(function ($p) use ($teamsData) {
                             $team = $teamsData[$p['team']] ?? null;
-
                             return (object)[
-                                'name'         => $p['web_name'] ?? 'Unknown Player',
-                                'team'         => (object)[
+                                'name' => $p['web_name'] ?? 'Unknown Player',
+                                'team' => (object)[
                                     'short_name' => $team['short_name'] ?? 'UNK',
                                 ],
-                                'price'        => number_format($p['now_cost'] / 10, 1),
-                                'points'       => $p['event_points'] ?? 0,
+                                'price' => number_format($p['now_cost'] / 10, 1),
+                                'points' => $p['event_points'] ?? 0,
                             ];
                         })
                         ->values();
@@ -67,31 +66,9 @@ class DashboardController extends Controller
         ];
 
         // ====================== TOP GAMES ======================
-        $topGames = collect([
-            (object) [
-                'home_team' => (object)['name' => 'Brentford', 'short_name' => 'BRE'],
-                'away_team' => (object)['name' => 'Manchester United', 'short_name' => 'MUN'],
-                'score_home' => 3,
-                'score_away' => 1,
-                'gameweek' => 6,
-            ],
-            (object) [
-                'home_team' => (object)['name' => 'Chelsea', 'short_name' => 'CHE'],
-                'away_team' => (object)['name' => 'Brighton', 'short_name' => 'BHA'],
-                'score_home' => 1,
-                'score_away' => 3,
-                'gameweek' => 6,
-            ],
-            (object) [
-                'home_team' => (object)['name' => 'Crystal Palace', 'short_name' => 'CRY'],
-                'away_team' => (object)['name' => 'Liverpool', 'short_name' => 'LIV'],
-                'score_home' => 2,
-                'score_away' => 1,
-                'gameweek' => 6,
-            ],
-        ]);
+        $topGames = $this->getTopGames();
 
-        // ====================== LEAGUE STANDINGS ======================
+        // ====================== LEAGUE STANDINGS (REAL DATA) ======================
         $leagueStandings = $this->getLeagueStandings($user);
 
         return view('dashboard', compact(
@@ -104,32 +81,139 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get League Standings for Dashboard
+     * Get Top Games for Dashboard
+     */
+    private function getTopGames()
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0'
+            ])->timeout(15)
+              ->get('https://fantasy.premierleague.com/api/bootstrap-static/');
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $fixtureResponse = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0'
+                ])->timeout(15)
+                  ->get('https://fantasy.premierleague.com/api/fixtures/');
+
+                if ($fixtureResponse->successful()) {
+                    $allFixtures = $fixtureResponse->json();
+                    $teamsData = collect($data['teams'] ?? [])->keyBy('id');
+                    $events = collect($data['events'] ?? []);
+                    
+                    // Get current gameweek
+                    $currentEvent = $events->firstWhere('is_current', true);
+                    $gameweekId = $currentEvent['id'] ?? 1;
+                    
+                    $fixtures = collect($allFixtures)
+                        ->where('event', $gameweekId)
+                        ->take(5)
+                        ->map(function ($fixture) use ($teamsData) {
+                            $homeTeam = $teamsData[$fixture['team_h']] ?? null;
+                            $awayTeam = $teamsData[$fixture['team_a']] ?? null;
+                            
+                            $finished = $fixture['finished'] ?? false;
+                            $started = $fixture['started'] ?? false;
+                            
+                            return (object) [
+                                'id' => $fixture['id'],
+                                'homeTeam' => (object) [
+                                    'name' => $homeTeam['name'] ?? 'Home Team',
+                                    'short_name' => $homeTeam['short_name'] ?? 'HOM',
+                                ],
+                                'awayTeam' => (object) [
+                                    'name' => $awayTeam['name'] ?? 'Away Team',
+                                    'short_name' => $awayTeam['short_name'] ?? 'AWY',
+                                ],
+                                'home_score' => $fixture['team_h_score'] ?? null,
+                                'away_score' => $fixture['team_a_score'] ?? null,
+                                'kickoff_time' => isset($fixture['kickoff_time']) 
+                                    ? \Carbon\Carbon::parse($fixture['kickoff_time'])
+                                    : null,
+                                'finished' => $finished,
+                                'started' => $started,
+                                'stadium' => null,
+                            ];
+                        });
+                    
+                    if ($fixtures->isNotEmpty()) {
+                        return $fixtures;
+                    }
+                }
+            }
+            
+            return collect();
+            
+        } catch (\Exception $e) {
+            return collect();
+        }
+    }
+
+    /**
+     * Get League Standings for Dashboard (Real Data from FPL API)
      */
     private function getLeagueStandings($user)
     {
-        $league = $user->leagues()->first();
-
-        if (!$league) {
+        try {
+            // First, try to get the user's league from database
+            $league = $user->leagues()->first();
+            
+            if ($league && $league->league_code) {
+                // If user is in a league, fetch standings from FPL API
+                $response = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0'
+                ])->timeout(15)
+                  ->get("https://fantasy.premierleague.com/api/leagues-classic/{$league->league_code}/standings/");
+                
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $standings = $data['standings']['results'] ?? [];
+                    
+                    return collect($standings)
+                        ->take(5)
+                        ->map(function ($standing, $index) {
+                            return (object) [
+                                'user_id' => $standing['entry'],
+                                'team_name' => $standing['entry_name'],
+                                'user_name' => $standing['player_name'],
+                                'total_points' => $standing['total'],
+                                'rank' => $standing['rank'] ?? $index + 1,
+                            ];
+                        });
+                }
+            }
+            
+            // Fallback: Try to get public league data
+            $publicLeagueResponse = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0'
+            ])->timeout(15)
+              ->get('https://fantasy.premierleague.com/api/leagues-classic/314/standings/'); // Example league ID
+            
+            if ($publicLeagueResponse->successful()) {
+                $data = $publicLeagueResponse->json();
+                $standings = $data['standings']['results'] ?? [];
+                
+                return collect($standings)
+                    ->take(5)
+                    ->map(function ($standing, $index) use ($user) {
+                        return (object) [
+                            'user_id' => $standing['entry'],
+                            'team_name' => $standing['entry_name'],
+                            'user_name' => $standing['player_name'],
+                            'total_points' => $standing['total'],
+                            'rank' => $standing['rank'] ?? $index + 1,
+                        ];
+                    });
+            }
+            
+            // If all else fails, return empty collection
+            return collect();
+            
+        } catch (\Exception $e) {
+            // If API fails or no league, return empty collection
             return collect();
         }
-
-        return $league->users()
-            ->with('fantasyTeam')
-            ->get()
-            ->sortByDesc(function ($u) {
-                return $u->fantasyTeam?->total_points ?? 0;
-            })
-            ->take(5)
-            ->values()
-            ->map(function ($u, $index) {
-                return (object) [
-                    'user_id'      => $u->id,
-                    'team_name'    => $u->fantasyTeam?->name ?? 'Unnamed Team',
-                    'user_name'    => $u->name,
-                    'total_points' => $u->fantasyTeam?->total_points ?? 0,
-                    'rank'         => $index + 1,
-                ];
-            });
     }
 }

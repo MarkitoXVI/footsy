@@ -393,12 +393,6 @@
                 </a>
             </li> */
             <li class="nav-item">
-                <a href="{{ route('transfers.index') }}" class="nav-link {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transfers</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{ route('fixtures.index') }}" class="nav-link {{ request()->routeIs('fixtures.*') ? 'active' : '' }}">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Fixtures</span>

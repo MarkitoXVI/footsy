@@ -17,7 +17,7 @@ class FixturesController extends Controller
             $fixtures = collect($fixturesResponse->json());
             $teams = collect($bootstrapResponse->json()['teams'])->keyBy('id');
 
-            // Formatē spēļu datus strukturētā formātā
+            // Formatē spēļu datus strukt   urētā formātā
             $formattedFixtures = $fixtures->map(function ($fixture) use ($teams) {
                 return [
                     'kickoff_time' => $fixture['kickoff_time'], // Spēles sākuma laiks

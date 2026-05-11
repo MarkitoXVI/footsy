@@ -120,12 +120,12 @@ Route::middleware('auth')->group(function () {
     // Fixture Routes
     Route::get('/fixtures', [App\Http\Controllers\FixturesController::class, 'index'])
      ->name('fixtures.index');
-    
-    // Transfer Routes
-    Route::prefix('transfers')->group(function () {
-        Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
-        Route::post('/transfers/confirm', [TransferController::class, 'confirm'])->name('transfers.confirm');
-    });
+    Route::get('/fixtures', [FixturesController::class, 'index'])->name('fixtures.index');
+ 
+    // Route::middleware(['auth'])->group(function () {
+    // Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
+    // Route::post('/transfers/confirm', [TransferController::class, 'confirm'])->name('transfers.confirm');
+    // });
 
     // Statistics routes
     Route::prefix('statistics')->group(function () {

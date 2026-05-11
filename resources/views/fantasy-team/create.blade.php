@@ -4,55 +4,111 @@
   <meta charset="UTF-8">
   <title>Create Your Fantasy Team - Footsy Fantasy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #3a5ee5;
+      --primary-dark: #2a48c5;
+      --primary-light: #5b7ae8;
+      --secondary: #34c759;
+      --danger: #e53e3e;
+      --dark: #1a2238;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Open Sans', sans-serif;
-      background: #f5f8fb;
-      color: #1a2238;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 50%, #f5f7ff 100%);
+      color: var(--dark);
       margin: 0;
       display: flex;
       height: 100vh;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* Background decoration */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(58, 94, 229, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(58, 94, 229, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* LEFT PANEL (PLAYER SELECTION) */
     .sidebar {
-      width: 340px;
-      background: #1a2238;
+      width: 360px;
+      background: linear-gradient(180deg, var(--dark) 0%, #1e2a4a 100%);
       color: white;
       padding: 1.5rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      position: relative;
+      z-index: 1;
+      box-shadow: 4px 0 25px rgba(58, 94, 229, 0.15);
     }
 
     .sidebar h2 {
       font-family: 'Montserrat', sans-serif;
-      margin-top: 0;
+      font-weight: 700;
       font-size: 1.4rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar h2 i {
+      color: var(--pr imary-light);
     }
 
     .sidebar input,
     .sidebar select {
       width: 100%;
-      padding: 0.65rem 0.9rem;
+      padding: 0.7rem 1rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       margin-bottom: 1rem;
       font-size: 0.9rem;
       box-sizing: border-box;
+      font-family: 'Open Sans', sans-serif;
     }
 
     .sidebar input {
       background: white;
-      color: #333;
+      color: var(--dark);
+      border: 1px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .sidebar input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.2);
     }
 
     .sidebar select {
-      background: #eaeef6;
-      color: #1a2238;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--dark);
+      cursor: pointer;
     }
 
     .player-list {
@@ -61,27 +117,47 @@
       gap: 0.6rem;
       overflow-y: auto;
       max-height: calc(100vh - 250px);
+      padding-right: 0.25rem;
+    }
+
+    /* Custom scrollbar */
+    .player-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .player-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .player-list::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
     }
 
     .player-card {
-      background: white;
-      border-radius: 8px;
-      padding: 0.8rem;
-      color: #1a2238;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      color: var(--dark);
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(58, 94, 229, 0.1);
     }
 
     .player-card:hover {
-      background: #e8ecff;
+      background: white;
+      transform: translateX(3px);
+      border-color: rgba(58, 94, 229, 0.3);
     }
 
     .player-card.selected {
-      border: 2px solid #3a5ee5;
-      background: rgba(58, 94, 229, 0.1);
+      border: 2px solid var(--primary);
+      background: rgba(58, 94, 229, 0.15);
     }
 
     .player-card .info {
@@ -89,8 +165,20 @@
       flex-direction: column;
     }
 
-    .player-card .price {
+    .player-card .info strong {
       font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .player-card .info span {
+      font-size: 0.75rem;
+      color: var(--gray);
+    }
+
+    .player-card .price {
+      font-weight: 700;
+      color: var(--warning, #f59e0b);
+      font-size: 0.9rem;
     }
 
     /* RIGHT PANEL (PITCH + STATUS) */
@@ -100,6 +188,8 @@
       flex-direction: column;
       overflow-y: auto;
       padding: 1.5rem 2rem;
+      position: relative;
+      z-index: 1;
     }
 
     .top-bar {
@@ -107,48 +197,121 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .top-bar h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .status-box {
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 2rem;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-      flex-wrap: wrap;
+      box-shadow: 0 4px 15px rgba(58, 94, 229, 0.08);
+      border: 1px solid rgba(58, 94, 229, 0.1);
     }
 
     .status-item {
       font-weight: 600;
+      color: var(--dark);
+    }
+
+    .status-item span {
+      color: var(--primary);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* TEAM NAME BOX */
+    .team-name-box {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(58, 94, 229, 0.08);
+      max-width: 500px;
+      border: 1px solid rgba(58, 94, 229, 0.1);
+    }
+
+    .team-name-box label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .team-name-box input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border: 1px solid rgba(58, 94, 229, 0.2);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: var(--dark);
+      background: white;
+      transition: all 0.2s;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .team-name-box input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(58, 94, 229, 0.1);
     }
 
     /* PITCH AREA */
     .pitch-container {
       position: relative;
       width: 100%;
-      max-width: 900px;
+      max-width: 950px;
       height: 820px;
-      margin: 2rem auto;
+      margin: 1.5rem auto;
       padding: 2rem;
       border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      background:
-        linear-gradient(180deg, #4db36a 0%, #2f8e5c 100%),
-        url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccer_field_-_empty.svg/1280px-Soccer_field_-_empty.svg.png') no-repeat center center;
-      background-size: cover;
-      background-position: center;
+      box-shadow: 0 15px 35px rgba(58, 94, 229, 0.15);
+      background: linear-gradient(180deg, #2d8c5a 0%, #1a6b45 100%);
       display: grid;
       grid-template-rows: repeat(4, 1fr);
       gap: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pitch-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccer_field_-_empty.svg/1280px-Soccer_field_-_empty.svg.png') no-repeat center center;
+      background-size: cover;
+      opacity: 0.15;
+      pointer-events: none;
     }
 
     .pitch-row {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       align-items: center;
+      gap: 8px;
     }
 
     .field-player {
@@ -157,12 +320,20 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 0.55rem 0.6rem;
-      min-width: 92px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      transition: transform 0.2s ease, background 0.2s ease;
+      padding: 0.6rem 0.5rem;
+      min-width: 95px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(58, 94, 229, 0.2);
+    }
+
+    .field-player:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(58, 94, 229, 0.25);
+      border-color: var(--primary);
     }
 
     .field-player-img {
@@ -171,37 +342,37 @@
       object-fit: cover;
       border-radius: 12px;
       margin-bottom: 0.35rem;
+      background: var(--light);
     }
 
     .field-player-name {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       font-weight: 700;
       text-transform: capitalize;
-      line-height: 1.1;
-    }
-
-    .field-player:hover {
-      transform: translateY(-3px);
-      background: rgba(58,94,229,0.92);
-      color: #fff;
+      line-height: 1.2;
+      text-align: center;
+      color: var(--dark);
     }
 
     /* BENCH */
     .bench-container {
-      max-width: 900px;
-      margin: 2rem;
-      background: #fff;
+      max-width: 950px;
+      margin: 1rem auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 1.5rem 1rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      padding: 1.5rem;
+      box-shadow: 0 8px 25px rgba(58, 94, 229, 0.08);
       text-align: center;
+      border: 1px solid rgba(58, 94, 229, 0.1);
     }
 
     .bench-container h3 {
       font-family: 'Montserrat', sans-serif;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+      font-weight: 700;
       margin-bottom: 1rem;
-      color: #1a2238;
+      color: var(--dark);
     }
 
     .bench-row {
@@ -215,11 +386,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #f8f9fa;
+      background: rgba(58, 94, 229, 0.05);
       border-radius: 12px;
-      padding: 0.8rem 0.6rem;
-      width: 80px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      padding: 0.7rem 0.5rem;
+      width: 85px;
+      transition: all 0.2s;
+      border: 1px solid rgba(58, 94, 229, 0.1);
+    }
+
+    .bench-player:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
     }
 
     .bench-player img {
@@ -228,66 +405,46 @@
       object-fit: cover;
       border-radius: 10px;
       margin-bottom: 0.3rem;
+      background: white;
+    }
+
+    .bench-player span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
     }
 
     .btn-submit {
-      background: linear-gradient(135deg,#3a5ee5,#2a48c5);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       border: none;
       color: white;
       padding: 1rem 2rem;
-      font-weight: 600;
-      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 12px;
       cursor: pointer;
-      transition: .3s;
-      margin: 2rem auto;
-      display: block;
+      transition: all 0.3s;
+      margin: 1.5rem auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      width: 250px;
+      font-family: 'Montserrat', sans-serif;
+      box-shadow: 0 4px 15px rgba(58, 94, 229, 0.3);
     }
 
-    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(58, 94, 229, 0.4);
+    }
 
     .warning {
-      color: #e53e3e;
+      color: var(--danger);
       margin-top: 0.5rem;
       text-align: center;
       font-size: 0.9rem;
-    }
-
-    /* TEAM NAME BOX */
-    .team-name-box {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-      max-width: 600px;
-    }
-
-    .team-name-box label {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      color: #1a2238;
-      font-size: 1rem;
-      white-space: nowrap;
-    }
-
-    .team-name-box input {
-      flex: 1;
-      padding: 0.7rem 1rem;
-      border: 1px solid #d3d9e2;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      color: #1a2238;
-      background: #f5f8fb;
-      transition: 0.2s;
-    }
-
-    .team-name-box input:focus {
-      border-color: #3a5ee5;
-      outline: none;
-      background: #fff;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -295,8 +452,8 @@
 
   <!-- LEFT: Player Selection -->
   <div class="sidebar">
-    <h2>Player Selection</h2>
-    <input type="text" id="searchPlayer" placeholder="Search by name...">
+    <h2><i class="fas fa-users"></i> Player Selection</h2>
+    <input type="text" id="searchPlayer" placeholder="🔍 Search by name...">
     <select id="filterPosition">
       <option value="">All Positions</option>
       <option value="GK">Goalkeepers</option>
@@ -327,17 +484,17 @@
   <!-- RIGHT: Pitch & Status -->
   <div class="main">
     <div class="top-bar">
-      <h1>Create Team</h1>
+      <h1>Create Your Fantasy Team</h1>
       <div class="status-box">
-        <div class="status-item">Players Selected: <span id="playerCount">0</span>/15</div>
-        <div class="status-item">Budget Remaining: £<span id="budgetRemaining">100.0</span>m</div>
+        <div class="status-item"><i class="fas fa-users"></i> Players: <span id="playerCount">0</span>/15</div>
+        <div class="status-item"><i class="fas fa-coins"></i> Budget: £<span id="budgetRemaining">100.0</span>m</div>
       </div>
     </div>
 
     <form id="teamForm" action="{{ route('fantasy-team.store') }}" method="POST">
       @csrf
       <div class="team-name-box">
-        <label for="team_name">Team Name</label>
+        <label for="team_name"><i class="fas fa-tag"></i> Team Name</label>
         <input type="text" id="team_name" name="team_name" placeholder="Enter your team name..." maxlength="30" required>
       </div>
 
@@ -349,13 +506,13 @@
       </div>
 
       <div class="bench-container">
-        <h3>Bench</h3>
+        <h3><i class="fas fa-chair"></i> Bench</h3>
         <div class="bench-row" id="benchRow"></div>
       </div>
 
       <input type="hidden" name="players" id="selectedPlayersInput">
       <div class="warning" id="warningMessage"></div>
-      <button type="submit" class="btn-submit">Save Team</button>
+      <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Save Team</button>
     </form>
   </div>
 

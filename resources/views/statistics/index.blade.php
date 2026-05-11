@@ -639,7 +639,6 @@
         <li class="nav-item"><a href="{{ route('fantasy-team.index') }}" class="nav-link"><i class="fas fa-users"></i><span>My Team</span></a></li>
         <li class="nav-item"><a href="{{ route('leagues.index') }}" class="nav-link"><i class="fas fa-trophy"></i><span>Leagues</span></a></li>
         <li class="nav-item"><a href="{{ route('statistics.index') }}" class="nav-link active"><i class="fas fa-chart-line"></i><span>Statistics</span></a></li>
-        <li class="nav-item"><a href="{{ route('transfers.index') }}" class="nav-link"><i class="fas fa-exchange-alt"></i><span>Transfers</span></a></li>
         <li class="nav-item"><a href="{{ route('fixtures.index') }}" class="nav-link"><i class="fas fa-calendar-alt"></i><span>Fixtures</span></a></li>
         <li class="nav-item"><a href="{{ route('help') }}" class="nav-link"><i class="fas fa-question-circle"></i><span>Help and Support</span></a></li>
         <li class="nav-item"><a href="{{ route('profile.edit') }}" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a></li>

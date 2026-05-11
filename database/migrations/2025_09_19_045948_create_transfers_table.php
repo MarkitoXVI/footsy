@@ -9,19 +9,18 @@ return new class extends Migration
     public function up()
     {
         Schema::create('transfers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('fantasy_team_id')->constrained()->onDelete('cascade');
-            $table->foreignId('player_in_id')->constrained('players')->onDelete('cascade');
-            $table->foreignId('player_out_id')->constrained('players')->onDelete('cascade');
-            $table->integer('gameweek');
-            $table->boolean('is_wildcard')->default(false);
-            $table->boolean('is_free_hit')->default(false);
-            $table->timestamps();
+    $table->id();
+    $table->foreignId('fantasy_team_id')->constrained()->onDelete('cascade');
+
+    $table->integer('element_out'); // player ID leaving
+    $table->integer('element_in');   // player ID joining
+
+    $table->integer('selling_price');
+    $table->integer('buying_price');
+
+    $table->integer('gameweek')->nullable();
+
+    $table->timestamps();
         });
     }
-
-    public function down()
-    {
-        Schema::dropIfExists('transfers');
-    }
-};
+}
